@@ -1,0 +1,207 @@
+TCS248Assign2
+v7
+r0
+t317348448.606252
+cCheck dependencies
+cCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/main.o /Users/Matt/Code/assign2/xcode/../main.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+cCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/mglmesh.o /Users/Matt/Code/assign2/xcode/../mglmesh.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+cCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/minigl.o /Users/Matt/Code/assign2/xcode/../minigl.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+
+N/Developer/SDKs/MacOSX10.6.sdk
+c000000004C5342BA00000000000000EE
+t1280524986
+s238
+
+N/Developer/SDKs/MacOSX10.6.sdk/Library/Frameworks/SDL.framework/SDL
+c000000004ADD32BD0000000000156068
+t1256010429
+s1400936
+
+N/Developer/SDKs/MacOSX10.6.sdk/Library/Frameworks/SDL_image.framework/SDL_image
+c000000004AFFCE77000000000001A548
+t1258278519
+s107848
+
+N/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/GLUT.framework/GLUT
+c000000004C5342AC000000000001A494
+t1280524972
+s107668
+
+N/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/OpenGL.framework/OpenGL
+c000000004C5342AD000000000000DB14
+t1280524973
+s56084
+
+N/Developer/SDKs/MacOSX10.6.sdk/usr/include/stdio.h
+c000000004AC59C820000000000004174
+t1254464642
+s16756
+
+N/Users/Matt/Code/assign2/mglmesh.h
+c000000004D3A21C40000000000000D77
+t1295655364
+s3447
+i<string>
+i<vector>
+i"minigl.h"
+
+N/Users/Matt/Code/assign2/mgltexture.h
+c000000004D3A21C400000000000006AA
+t1295655364
+s1706
+i"SDL.h"
+i"SDL_image.h"
+i"minigl.h"
+i<string>
+
+N/Users/Matt/Code/assign2/minigl.h
+c000000004D3A21BE00000000000030FE
+t1295655358
+s12542
+
+N/Users/Matt/Code/assign2/xcode/../main.cpp
+c000000004D3A21BE0000000000002501
+t1295655358
+s9473
+i<cstdlib>
+i<cstdio>
+i<cstring>
+i<cmath>
+i<SDL.h>
+i"minigl.h"
+i"mglmesh.h"
+i<iostream>
+
+N/Users/Matt/Code/assign2/xcode/../mglmesh.cpp
+c000000004D3A21C40000000000001C48
+t1295655364
+s7240
+i<iostream>
+i<fstream>
+i<sstream>
+i<SDL.h>
+i"mglmesh.h"
+i"mgltexture.h"
+
+N/Users/Matt/Code/assign2/xcode/../minigl.cpp
+c000000004D3A21BE0000000000007C90
+t1295655358
+s31888
+i<cstdio>
+i<cstdlib>
+i<cstring>
+i<cassert>
+i<cmath>
+i<vector>
+i<stack>
+i"minigl.h"
+
+N/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/CS248Assign2.LinkFileList
+c000000004D3A22DF000000000000014F
+t1295655647
+s335
+
+N/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/main.o
+t2
+s0
+
+N/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/mglmesh.o
+t2
+s0
+
+N/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/minigl.o
+t1295655648
+s183700
+
+N/Users/Matt/Code/assign2/xcode/build/Debug/CS248Assign2
+t2
+s0
+
+N/Users/Matt/Code/assign2/xcode/main.c
+c000000004D3A222D0000000000000089
+t1295655469
+s137
+i<stdio.h>
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies317348447#317348447#0(0"0(0#1#0"27866456492998768#0"0#
+
+CCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/main.o /Users/Matt/Code/assign2/xcode/../main.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+s317348447.434962
+e317348448.196036
+r0
+xCompileC
+xbuild/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/main.o
+x/Users/Matt/Code/assign2/xcode/../main.cpp
+xnormal
+xx86_64
+xc++
+xcom.apple.compilers.gcc.4_2
+o/Users/Matt/Code/assign2/xcode/../main.cpp:15:17: error: SDL.h: No such file or directory
+o/Users/Matt/Code/assign2/xcode/../main.cpp: In function 'void setupLights(float)':
+o/Users/Matt/Code/assign2/xcode/../main.cpp:46: error: 'Uint8' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:46: error: 'keystate' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:46: error: 'SDL_GetKeyState' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:47: error: 'SDLK_4' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:51: error: 'SDLK_5' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:55: error: 'SDLK_6' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp: In function 'void setupCamera(float)':
+o/Users/Matt/Code/assign2/xcode/../main.cpp:74: error: 'Uint8' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:74: error: 'keystate' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:74: error: 'SDL_GetKeyState' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:79: error: 'SDLK_4' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:79: error: 'SDLK_5' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp:79: error: 'SDLK_6' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../main.cpp: At global scope:
+o/Users/Matt/Code/assign2/xcode/../main.cpp:140: error: variable or field 'handleKeyboard' declared void
+o/Users/Matt/Code/assign2/xcode/../main.cpp:140: error: 'SDL_KeyboardEvent' was not declared in this scope
+lSLF07#2@50"Compile /Users/Matt/Code/assign2/xcode/../main.cpp317348447#317348448#0(1675"/Users/Matt/Code/assign2/xcode/../main.cpp:15:17: error: SDL.h: No such file or directory/Users/Matt/Code/assign2/xcode/../main.cpp: In function 'void setupLights(float)':/Users/Matt/Code/assign2/xcode/../main.cpp:46: error: 'Uint8' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:46: error: 'keystate' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:46: error: 'SDL_GetKeyState' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:47: error: 'SDLK_4' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:51: error: 'SDLK_5' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:55: error: 'SDLK_6' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp: In function 'void setupCamera(float)':/Users/Matt/Code/assign2/xcode/../main.cpp:74: error: 'Uint8' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:74: error: 'keystate' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:74: error: 'SDL_GetKeyState' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:79: error: 'SDLK_4' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:79: error: 'SDLK_5' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp:79: error: 'SDLK_6' was not declared in this scope/Users/Matt/Code/assign2/xcode/../main.cpp: At global scope:/Users/Matt/Code/assign2/xcode/../main.cpp:140: error: variable or field 'handleKeyboard' declared void/Users/Matt/Code/assign2/xcode/../main.cpp:140: error: 'SDL_KeyboardEvent' was not declared in this scope16(4@32"SDL.h: No such file or directory317348447#0#90#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#15#0#15#0#28"*: No such file or directory0(4@38"'Uint8' was not declared in this scope317348448#173#93#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#46#0#46#0#34"'*' was not declared in this scope0(4@41"'keystate' was not declared in this scope317348448#266#96#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#46#0#46#0#34"'*' was not declared in this scope0(4@48"'SDL_GetKeyState' was not declared in this scope317348448#362#103#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#46#0#46#0#34"'*' was not declared in this scope0(4@39"'SDLK_4' was not declared in this scope317348448#465#94#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#47#0#47#0#34"'*' was not declared in this scope0(4@39"'SDLK_5' was not declared in this scope317348448#559#94#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#51#0#51#0#34"'*' was not declared in this scope0(4@39"'SDLK_6' was not declared in this scope317348448#653#94#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#55#0#55#0#34"'*' was not declared in this scope0(4@38"'Uint8' was not declared in this scope317348448#830#93#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#74#0#74#0#34"'*' was not declared in this scope0(4@41"'keystate' was not declared in this scope317348448#923#96#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#74#0#74#0#34"'*' was not declared in this scope0(4@48"'SDL_GetKeyState' was not declared in this scope317348448#1019#103#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#74#0#74#0#34"'*' was not declared in this scope0(4@39"'SDLK_4' was not declared in this scope317348448#1122#94#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#79#0#79#0#34"'*' was not declared in this scope0(4@39"'SDLK_5' was not declared in this scope317348448#1216#94#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#79#0#79#0#34"'*' was not declared in this scope0(4@39"'SDLK_6' was not declared in this scope317348448#1310#94#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#79#0#79#0#34"'*' was not declared in this scope0(23@16"At global scope:317348448#1404#61#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#0#0#0#0#0"0(4@48"Variable or field 'handleKeyboard' declared void317348448#1465#104#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#140#0#140#0#0"0(4@50"'SDL_KeyboardEvent' was not declared in this scope317348448#1569#106#0(6@42"/Users/Matt/Code/assign2/xcode/../main.cpp317348158#140#0#140#0#34"'*' was not declared in this scope0(0#0#42"/Users/Matt/Code/assign2/xcode/../main.cpp7886488416478786560#1296"    cd /Users/Matt/Code/assign2/xcode    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch x86_64 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -fvisibility-inlines-hidden -mmacosx-version-min=10.6 -gdwarf-2 -iquote /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-generated-files.hmap -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-own-target-headers.hmap -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-all-target-headers.hmap -iquote /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-project-headers.hmap -F/Users/Matt/Code/assign2/xcode/build/Debug -I/Users/Matt/Code/assign2/xcode/build/Debug/include -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/DerivedSources/x86_64 -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/DerivedSources -c /Users/Matt/Code/assign2/xcode/../main.cpp -o /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/main.o1#
+
+CCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/main.o /Users/Matt/Code/assign2/xcode/main.c normal x86_64 c com.apple.compilers.gcc.4_2
+r0
+
+CCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/mglmesh.o /Users/Matt/Code/assign2/xcode/../mglmesh.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+s317348447.508740
+e317348448.257304
+r0
+xCompileC
+xbuild/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/mglmesh.o
+x/Users/Matt/Code/assign2/xcode/../mglmesh.cpp
+xnormal
+xx86_64
+xc++
+xcom.apple.compilers.gcc.4_2
+o/Users/Matt/Code/assign2/xcode/../mglmesh.cpp:4:17: error: SDL.h: No such file or directory
+oIn file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp:6:
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:2:23: error: SDL_image.h: No such file or directory
+oIn file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp:6:
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h: In function 'void mglGetTexture(std::string, MGLpixel*&, MGLsize*, MGLsize*)':
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:25: error: 'SDL_Surface' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:25: error: 'tex' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:26: error: 'IMG_Load' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:28: error: 'SDL_PixelFormat' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:28: error: expected `;' before 'newFormat'
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:29: error: 'newFormat' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:32: error: 'conv' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:32: error: 'SDL_SWSURFACE' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:32: error: 'SDL_ConvertSurface' was not declared in this scope
+o/Users/Matt/Code/assign2/xcode/../mgltexture.h:33: error: 'SDL_FreeSurface' was not declared in this scope
+lSLF07#2@53"Compile /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348447#317348448#0(1474"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp:4:17: error: SDL.h: No such file or directoryIn file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp:6:/Users/Matt/Code/assign2/xcode/../mgltexture.h:2:23: error: SDL_image.h: No such file or directoryIn file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp:6:/Users/Matt/Code/assign2/xcode/../mgltexture.h: In function 'void mglGetTexture(std::string, MGLpixel*&, MGLsize*, MGLsize*)':/Users/Matt/Code/assign2/xcode/../mgltexture.h:25: error: 'SDL_Surface' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:25: error: 'tex' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:26: error: 'IMG_Load' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:28: error: 'SDL_PixelFormat' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:28: error: expected `;' before 'newFormat'/Users/Matt/Code/assign2/xcode/../mgltexture.h:29: error: 'newFormat' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:32: error: 'conv' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:32: error: 'SDL_SWSURFACE' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:32: error: 'SDL_ConvertSurface' was not declared in this scope/Users/Matt/Code/assign2/xcode/../mgltexture.h:33: error: 'SDL_FreeSurface' was not declared in this scope12(4@32"SDL.h: No such file or directory317348447#0#92#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#4#0#4#0#28"*: No such file or directory0(4@38"SDL_image.h: No such file or directory317348447#163#99#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348447#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@88"SDL_image.h: No such file or directory in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348447#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#2#0#2#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#2#0#2#0#28"*: No such file or directory0(4@44"'SDL_Surface' was not declared in this scope317348448#460#103#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@94"'SDL_Surface' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#25#0#25#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#25#0#25#0#34"'*' was not declared in this scope0(4@36"'tex' was not declared in this scope317348448#563#95#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@86"'tex' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#25#0#25#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#25#0#25#0#34"'*' was not declared in this scope0(4@41"'IMG_Load' was not declared in this scope317348448#658#100#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@91"'IMG_Load' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#26#0#26#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#26#0#26#0#34"'*' was not declared in this scope0(4@48"'SDL_PixelFormat' was not declared in this scope317348448#758#107#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@98"'SDL_PixelFormat' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#28#0#28#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#28#0#28#0#34"'*' was not declared in this scope0(4@31"Expected `;' before 'newFormat'317348448#865#90#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@81"Expected `;' before 'newFormat' in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#28#0#28#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#28#0#28#0#19"expected * before *0(4@42"'newFormat' was not declared in this scope317348448#955#101#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@92"'newFormat' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#29#0#29#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#29#0#29#0#34"'*' was not declared in this scope0(4@37"'conv' was not declared in this scope317348448#1056#96#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@87"'conv' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#32#0#32#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#32#0#32#0#34"'*' was not declared in this scope0(4@46"'SDL_SWSURFACE' was not declared in this scope317348448#1152#105#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@96"'SDL_SWSURFACE' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#32#0#32#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#32#0#32#0#34"'*' was not declared in this scope0(4@51"'SDL_ConvertSurface' was not declared in this scope317348448#1257#110#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@101"'SDL_ConvertSurface' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#32#0#32#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#32#0#32#0#34"'*' was not declared in this scope0(4@48"'SDL_FreeSurface' was not declared in this scope317348448#1367#107#2(7@67"In file included from /Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348448#18446744073709551615#0#0(6@45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp317348164#6#0#6#0#0"0(13@98"'SDL_FreeSurface' was not declared in this scope in /Users/Matt/Code/assign2/xcode/../mgltexture.h317348448#18446744073709551615#0#0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#33#0#33#0#0"0(6@46"/Users/Matt/Code/assign2/xcode/../mgltexture.h317348164#33#0#33#0#34"'*' was not declared in this scope0(0#0#45"/Users/Matt/Code/assign2/xcode/../mglmesh.cpp8605521856#1302"    cd /Users/Matt/Code/assign2/xcode    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch x86_64 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -fvisibility-inlines-hidden -mmacosx-version-min=10.6 -gdwarf-2 -iquote /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-generated-files.hmap -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-own-target-headers.hmap -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-all-target-headers.hmap -iquote /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-project-headers.hmap -F/Users/Matt/Code/assign2/xcode/build/Debug -I/Users/Matt/Code/assign2/xcode/build/Debug/include -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/DerivedSources/x86_64 -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/DerivedSources -c /Users/Matt/Code/assign2/xcode/../mglmesh.cpp -o /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/mglmesh.o1#
+
+CCompileC build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/minigl.o /Users/Matt/Code/assign2/xcode/../minigl.cpp normal x86_64 c++ com.apple.compilers.gcc.4_2
+s317348448.196135
+e317348448.606152
+r1
+xCompileC
+xbuild/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/minigl.o
+x/Users/Matt/Code/assign2/xcode/../minigl.cpp
+xnormal
+xx86_64
+xc++
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@52"Compile /Users/Matt/Code/assign2/xcode/../minigl.cpp317348448#317348448#0(0"0(0#0#44"/Users/Matt/Code/assign2/xcode/../minigl.cpp8606113376#1300"    cd /Users/Matt/Code/assign2/xcode    setenv LANG en_US.US-ASCII    /Developer/usr/bin/gcc-4.2 -x c++ -arch x86_64 -fmessage-length=0 -pipe -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/SDKs/MacOSX10.6.sdk -mfix-and-continue -fvisibility-inlines-hidden -mmacosx-version-min=10.6 -gdwarf-2 -iquote /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-generated-files.hmap -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-own-target-headers.hmap -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-all-target-headers.hmap -iquote /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/CS248Assign2-project-headers.hmap -F/Users/Matt/Code/assign2/xcode/build/Debug -I/Users/Matt/Code/assign2/xcode/build/Debug/include -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/DerivedSources/x86_64 -I/Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/DerivedSources -c /Users/Matt/Code/assign2/xcode/../minigl.cpp -o /Users/Matt/Code/assign2/xcode/build/CS248Assign2.build/Debug/CS248Assign2.build/Objects-normal/x86_64/minigl.o0#
+
+CLd /Users/Matt/Code/assign2/xcode/build/Debug/CS248Assign2 normal x86_64
+r0
+

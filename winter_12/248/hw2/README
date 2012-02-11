@@ -1,0 +1,6 @@
+Sample renderings can be found in 'samples'
+To run the driver program, type: ./run model/<model-name>.obj
+ONLY turn in this README and minigl.cpp.
+
+
+Replace this README with your write-up for the assignment.

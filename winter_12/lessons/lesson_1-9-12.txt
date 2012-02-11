@@ -1,0 +1,27 @@
+Features to finish
+----------------
+
+Code Structure
+	-edges vs. nodes
+
+Piece 'Trajectory'
+	-unlocking areas, graph 'growth'
+	-goals, in both musical and game sense
+
+Audio Tracking
+	-audio tracking patch
+	-OSC working
+	-pitch, amplitude, rhythm, timbre
+	-what effects do different inputs have?
+
+Audio Playback
+	-what are the computer parts?
+
+Graphics
+	-visably represent groups, note clusters
+
+Mechanics
+	-how smooth is player movement?
+	-note movement and movement speed
+	-is graph fixed or changeable?
+	-node avoidance

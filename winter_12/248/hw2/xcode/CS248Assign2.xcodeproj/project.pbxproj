@@ -1,0 +1,239 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C91BF3A012EA5A19009F6B7F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C91BF39A12EA5A19009F6B7F /* main.cpp */; };
+		C91BF3A112EA5A19009F6B7F /* mglmesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C91BF39B12EA5A19009F6B7F /* mglmesh.cpp */; };
+		C91BF3A212EA5A19009F6B7F /* minigl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C91BF39E12EA5A19009F6B7F /* minigl.cpp */; };
+		C91BF3A412EA5A2C009F6B7F /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C91BF3A312EA5A2C009F6B7F /* SDL_image.framework */; };
+		C91BF3A612EA5A2C009F6B7F /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C91BF3A512EA5A2C009F6B7F /* SDL.framework */; };
+		C91BF40E12EA5D09009F6B7F /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = C91BF40D12EA5D09009F6B7F /* SDLMain.m */; };
+		C91BF41512EA5D1F009F6B7F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C91BF41412EA5D1F009F6B7F /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76FAF0486AB0100D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8DD76FB20486AB0100D96B5E /* CS248Assign2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CS248Assign2; sourceTree = BUILT_PRODUCTS_DIR; };
+		C91BF39A12EA5A19009F6B7F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = SOURCE_ROOT; };
+		C91BF39B12EA5A19009F6B7F /* mglmesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mglmesh.cpp; path = ../mglmesh.cpp; sourceTree = SOURCE_ROOT; };
+		C91BF39C12EA5A19009F6B7F /* mglmesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mglmesh.h; path = ../mglmesh.h; sourceTree = SOURCE_ROOT; };
+		C91BF39D12EA5A19009F6B7F /* mgltexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mgltexture.h; path = ../mgltexture.h; sourceTree = SOURCE_ROOT; };
+		C91BF39E12EA5A19009F6B7F /* minigl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = minigl.cpp; path = ../minigl.cpp; sourceTree = SOURCE_ROOT; };
+		C91BF39F12EA5A19009F6B7F /* minigl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = minigl.h; path = ../minigl.h; sourceTree = SOURCE_ROOT; };
+		C91BF3A312EA5A2C009F6B7F /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = Library/Frameworks/SDL_image.framework; sourceTree = SDKROOT; };
+		C91BF3A512EA5A2C009F6B7F /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = Library/Frameworks/SDL.framework; sourceTree = SDKROOT; };
+		C91BF40C12EA5D09009F6B7F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLMain.h; sourceTree = "<group>"; };
+		C91BF40D12EA5D09009F6B7F /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDLMain.m; sourceTree = "<group>"; };
+		C91BF41412EA5D1F009F6B7F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76FAD0486AB0100D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C91BF3A412EA5A2C009F6B7F /* SDL_image.framework in Frameworks */,
+				C91BF3A612EA5A2C009F6B7F /* SDL.framework in Frameworks */,
+				C91BF41512EA5D1F009F6B7F /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* CS248Assign2 */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+				C91BF3A312EA5A2C009F6B7F /* SDL_image.framework */,
+				C91BF3A512EA5A2C009F6B7F /* SDL.framework */,
+				C91BF41412EA5D1F009F6B7F /* Cocoa.framework */,
+			);
+			name = CS248Assign2;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				C91BF39A12EA5A19009F6B7F /* main.cpp */,
+				C91BF39B12EA5A19009F6B7F /* mglmesh.cpp */,
+				C91BF39C12EA5A19009F6B7F /* mglmesh.h */,
+				C91BF39D12EA5A19009F6B7F /* mgltexture.h */,
+				C91BF39E12EA5A19009F6B7F /* minigl.cpp */,
+				C91BF39F12EA5A19009F6B7F /* minigl.h */,
+				C91BF40C12EA5D09009F6B7F /* SDLMain.h */,
+				C91BF40D12EA5D09009F6B7F /* SDLMain.m */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76FB20486AB0100D96B5E /* CS248Assign2 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76FA90486AB0100D96B5E /* CS248Assign2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "CS248Assign2" */;
+			buildPhases = (
+				8DD76FAB0486AB0100D96B5E /* Sources */,
+				8DD76FAD0486AB0100D96B5E /* Frameworks */,
+				8DD76FAF0486AB0100D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CS248Assign2;
+			productInstallPath = "$(HOME)/bin";
+			productName = CS248Assign2;
+			productReference = 8DD76FB20486AB0100D96B5E /* CS248Assign2 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CS248Assign2" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* CS248Assign2 */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76FA90486AB0100D96B5E /* CS248Assign2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76FAB0486AB0100D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C91BF3A012EA5A19009F6B7F /* main.cpp in Sources */,
+				C91BF3A112EA5A19009F6B7F /* mglmesh.cpp in Sources */,
+				C91BF3A212EA5A19009F6B7F /* minigl.cpp in Sources */,
+				C91BF40E12EA5D09009F6B7F /* SDLMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB928608733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = CS248Assign2;
+			};
+			name = Debug;
+		};
+		1DEB928708733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = CS248Assign2;
+			};
+			name = Release;
+		};
+		1DEB928A08733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+				USER_HEADER_SEARCH_PATHS = /Library/Frameworks/SDL.framework/Headers;
+			};
+			name = Debug;
+		};
+		1DEB928B08733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "CS248Assign2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928608733DD80010E9CD /* Debug */,
+				1DEB928708733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CS248Assign2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928A08733DD80010E9CD /* Debug */,
+				1DEB928B08733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

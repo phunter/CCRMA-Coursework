@@ -1,0 +1,7 @@
+syntax: glob
+vs2010
+vs2008
+xcode
+*.o
+*.orig
+*.~
