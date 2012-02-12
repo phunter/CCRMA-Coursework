@@ -78,7 +78,7 @@ void Graph::AddNote(int mapped_midi, STPoint3 start_pos) {
                                     start_pos.y,
                                     mapped_midi,
                                     .03,
-                                    800);
+                                    1000);
     cur_size++;
 }
 

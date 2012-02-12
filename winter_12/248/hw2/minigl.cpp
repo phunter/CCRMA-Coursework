@@ -109,6 +109,10 @@ struct MGLtexture {
     MGLpixel * data;
 };
 
+struct MGLtextureCoord {
+    MGLfloat x, y;
+};
+
 // Data structures definition
 
 struct MGLvertex {
@@ -124,8 +128,12 @@ struct MGLvertex {
     ///////////////////////////////////////////////////////
     MGLmaterial mat;
     
+    MGLbool texturesEnabled;
     MGLtexture * diffuse_tex;
     MGLtexture * specular_tex;
+    
+    MGLfloat diffuse_tex_x, diffuse_tex_y;
+    MGLfloat specular_tex_x, specular_tex_y;
     
     ///////////////////////////////////////////////////////
     //
@@ -229,6 +237,8 @@ vector<MGLvertex> transformedVertices;  // store all vertices in clipping space
 vector<MGLtexture> textures;
 
 MGLtexture* curTexture;
+
+MGLtextureCoord curTextureCoord;
 
 MGLint curTextureSlot;
 
@@ -366,9 +376,20 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 				
 				// The following line needs to be changed to handle
 				// perspective correct interpolation of colors.
-				p.color = tri.v[0].color;
-                //p.color = alpha * tri.v[0].color + beta * tri.v[1].color + gamma * tri.v[2].color;
+                
+//				p.color = tri.v[0].color;
+//                //p.color = alpha * tri.v[0].color + beta * tri.v[1].color + gamma * tri.v[2].color;
+                
+                MGLfloat tex_x, tex_y;
+                
+                tex_x = alpha * tri.v[0].diffuse_tex_x + beta * tri.v[1].diffuse_tex_x + gamma * tri.v[2].diffuse_tex_x;
+                tex_y = alpha * tri.v[0].diffuse_tex_y + beta * tri.v[1].diffuse_tex_y + gamma * tri.v[2].diffuse_tex_y;
+                
+                p.color = tri.v[0].diffuse
 				
+                // find barycentrically interpolated texture coordinate, set it to current color
+                
+                
 				MGLsize idx = x + y * fragbuf.width;
 				
 				// Z-buffer comparison
@@ -597,12 +618,21 @@ MGLtex_id mglLoadTexture(MGLsize width,
 			 MGLsize height,
 			 MGLpixel *imageData)
 {
-    MGLtexture loaded_tex = MGLtexture(width, height);
-    memcpy(loaded_tex.data, imageData, width * height * sizeof(MGLpixel));
-    
-    textures.push_back(loaded_tex);
-    
-    return textures.size() - 1;
+    if (hasBegun) {
+        MGL_ERROR("Cannot change texture after mglBegin");
+        return 0;
+    }
+    else {
+        
+        MGLtexture loaded_tex = MGLtexture(width, height);
+        memcpy(loaded_tex.data, imageData, width * height * sizeof(MGLpixel));
+        
+        textures.push_back(loaded_tex);
+        
+        int id = textures.size() - 1;
+        curTexture = &textures[id];
+        return id;
+    }
 }
 
 /**
@@ -631,7 +661,7 @@ void mglUseTexture(MGLtex_id id)
  */
 void mglFreeTexture(MGLtex_id id)
 {
-  NOT_YET_IMPLEMENTED;
+    
 }
 
 /**
@@ -642,7 +672,8 @@ void mglFreeTexture(MGLtex_id id)
 void mglTexCoord(MGLfloat x,
 		 MGLfloat y)
 {
-  NOT_YET_IMPLEMENTED;
+    curTextureCoord.x = x;
+    curTextureCoord.y = y;
 }
 
 /**
@@ -799,6 +830,22 @@ void mglVertex3(MGLfloat x,
 
     v.color = curColor;
     v.mat = curMaterial;
+
+    // assign normal
+    
+    v.texturesEnabled = texturesEnabled;
+    
+    if (curTextureSlot == MGL_TEX_DIFFUSE) {
+        v.diffuse_tex = curTexture;
+        v.diffuse_tex_x = curTextureCoord.x;
+        v.diffuse_tex_y = curTextureCoord.y;
+    }
+    else if (curTextureSlot == MGL_TEX_SPECULAR) {
+        v.specular_tex = curTexture;
+        v.specular_tex_x = curTextureCoord.x;
+        v.specular_tex_y = curTextureCoord.y;
+    }
+    
 
     ///////////////////////////////////////////////////////
     //
