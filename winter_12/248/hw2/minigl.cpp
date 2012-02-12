@@ -35,6 +35,79 @@ inline void MGL_ERROR(const char* description) {
     exit(1);
 }
 
+/**
+ * MGL_LIGHT_POSITION
+ * Set the position of the light.  This position should be transformed
+ * by the modelview matrix upon specification.  values should point to
+ * three floats representing the position of the light in homogeneous
+ * coordinates.  The initial position should be (0, 0, 1).
+ *
+ * MGL_LIGHT_AMBIENT
+ * three floats representing the ambient RGB (in that order)
+ * intensity of the light in homogeneous coordinates.  The initial
+ * ambient intensity should be (0, 0, 0).
+ *
+ * MGL_LIGHT_DIFFUSE
+ * three floats representing the diffuse RGB (in that order) intensity of
+ * the light in homogeneous coordinates.  The initial diffuse intenisty
+ * for MGL_LIGHT0 should be (1, 1, 1); for all others, it should
+ * be (0, 0, 0).
+ * 
+ * MGL_LIGHT_SPECULAR
+ * three floats representing the specular RGB (in that order) intensity
+ * of the light in homogeneous coordinates.  The initial specular
+ * intensity for MGL_LIGHT0 should be (1, 1, 1); for all others,
+ * it should be (0, 0, 0).
+ */
+struct MGLpointLight {
+    MGLpointLight() {
+        enabled = false;
+        x = 0.0f, y = 0.0f, z = 1.0f, w = 1.0f; // initial positoin (0, 0, 1)
+        ambient[0] = 0.0f, ambient[1] = 0.0f, ambient[2] = 0.0f;
+        diffuse[0] = 0.0f, diffuse[1] = 0.0f, diffuse[2] = 0.0f;
+        specular[0] = 0.0f, specular[1] = 0.0f, specular[2] = 0.0f;
+    }
+    
+    // Location
+    MGLbool enabled;
+    
+    MGLfloat x, y, z, w;
+    
+    MGLfloat ambient[3];
+    MGLfloat diffuse[3];
+    MGLfloat specular[3];
+};
+
+struct MGLSceneLights {
+    MGLSceneLights() {
+        // TODO: set up default lights properly
+    }
+    
+    MGLpointLight light0;
+    MGLpointLight light1;
+    MGLpointLight light2;
+};
+
+struct MGLmaterial {
+    MGLmaterial() {
+        ambient[0] = 0.0f, ambient[1] = 0.0f, ambient[2] = 0.0f;
+        diffuse[0] = 0.0f, diffuse[1] = 0.0f, diffuse[2] = 0.0f;
+        specular[0] = 0.0f, specular[1] = 0.0f, specular[2] = 0.0f;
+        shininess = 0.0f;
+    }
+    MGLfloat ambient[3];
+    MGLfloat diffuse[3];
+    MGLfloat specular[3];
+    MGLfloat shininess;
+};
+
+struct MGLtexture {
+    MGLtexture(int width, int height) {
+        data = (MGLpixel*) malloc (width * height * sizeof(MGLpixel));
+    }
+
+    MGLpixel * data;
+};
 
 // Data structures definition
 
@@ -49,8 +122,11 @@ struct MGLvertex {
     // Add new per-vertex attributes here.
     //
     ///////////////////////////////////////////////////////
-
-
+    MGLmaterial mat;
+    
+    MGLtexture * diffuse_tex;
+    MGLtexture * specular_tex;
+    
     ///////////////////////////////////////////////////////
     //
     // END HERE
@@ -61,8 +137,6 @@ struct MGLvertex {
 struct MGLtriangle {
     MGLvertex v[3];
 };
-
-
 
 /**
  * A simple wrapper structure for storing 4x4 matrix.
@@ -124,10 +198,19 @@ MGLmatrix_mode curMatrixMode = MGL_MODELVIEW;  // current matrix mode,
 MGLpoly_mode curPolyMode = MGL_TRIANGLES;      // current polygon mode
                                                // specified by mglBegin
 
+MGLshading_mode curShadingMode = MGL_PHONG;
+
+
 MGLbool hasBegun = false;  // true when we enter mglBegin and
                            // false when we leave mglEnd
 MGLint curIndex = 0;       // used to ensure correct number of
                            // calls to mglVertex
+
+MGLbool lightingEnabled = false;
+
+MGLbool texturesEnabled = false;
+
+MGLmaterial curMaterial;
 
 MGLmatrix modelViewMatrix, projectionMatrix;  // store the current modelview
                                               // and projection matrices
@@ -139,6 +222,15 @@ stack<MGLmatrix> projectionStack;             // projection matrix stack
 
 vector<MGLvertex> transformedVertices;  // store all vertices in clipping space
                                         // coordinates without dividing by w
+//vector<MGLpointLight> lightz;
+//
+//MGLSceneLights lights;
+
+vector<MGLtexture> textures;
+
+MGLtexture* curTexture;
+
+MGLint curTextureSlot;
 
 
 // Helper functions
@@ -209,6 +301,7 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
         //
         ///////////////////////////////////////////////////
 
+        //MGLfloat orig_w = tri.v[i].w;
         tri.v[i].w = 1.0f;
 
         ///////////////////////////////////////////////////
@@ -247,6 +340,9 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 			beta /= detA;
 			float gamma = (tri.v[0].x * tri.v[1].y) - (tri.v[0].x * p.y) - (tri.v[1].x * tri.v[0].y) + (tri.v[1].x * p.y) + (p.x * tri.v[0].y) - (p.x * tri.v[1].y);
 			gamma /= detA;
+            
+            // possibly this is better 
+            // gamma = 1.0f - alpha - beta;
 			
 			// Point/Triangle test
 			if (alpha >= 0. && alpha <= 1. && beta >= 0. && beta <= 1. && gamma >= 0. && gamma <=1.)
@@ -271,6 +367,7 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 				// The following line needs to be changed to handle
 				// perspective correct interpolation of colors.
 				p.color = tri.v[0].color;
+                //p.color = alpha * tri.v[0].color + beta * tri.v[1].color + gamma * tri.v[2].color;
 				
 				MGLsize idx = x + y * fragbuf.width;
 				
@@ -288,11 +385,8 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 				
 				
 			}
-			
 		}
 	}
-	
-	
 }
 
 /**
@@ -317,7 +411,7 @@ void shadeFragment(const MGLfragment& frag, MGLpixel& data)
  */
 void mglLightingEnabled(bool enabled)
 {
-  NOT_YET_IMPLEMENTED;
+  lightingEnabled = enabled;
 }
 
 /**
@@ -326,7 +420,8 @@ void mglLightingEnabled(bool enabled)
  */
 void mglLightEnabled(MGLlight light, bool enabled)
 {
-  NOT_YET_IMPLEMENTED;
+    
+    //lights[light].enabled = enabled;
 }
 
 /**
@@ -339,7 +434,7 @@ void mglLightEnabled(MGLlight light, bool enabled)
  */
 void mglShadingMode(MGLshading_mode mode)
 {
-  NOT_YET_IMPLEMENTED;
+    curShadingMode = mode;
 }
 
 /**
@@ -379,13 +474,34 @@ void mglLight(MGLlight light,
 	      MGLlight_param pname,
 	      MGLfloat *values)
 {
-  NOT_YET_IMPLEMENTED;
+//    if (pname == MGL_LIGHT_AMBIENT) {
+//        lights[light].ambient[0] = values[0];
+//        lights[light].ambient[1] = values[1];
+//        lights[light].ambient[2] = values[2];
+//    }
+//    else if (pname == MGL_LIGHT_DIFFUSE) {
+//        lights[light].diffuse[0] = values[0];
+//        lights[light].diffuse[1] = values[1];
+//        lights[light].diffuse[2] = values[2];
+//    }
+//    else if (pname == MGL_LIGHT_SPECULAR) {
+//        lights[light].specular[0] = values[0];
+//        lights[light].specular[1] = values[1];
+//        lights[light].specular[2] = values[2];
+//    }
+//    else if (pname == MGL_LIGHT_POSITION){
+//        lights[light].x = values[0];
+//        lights[light].y = values[1];
+//        lights[light].z = values[2];
+//    }
+//    else {
+//        MGL_ERROR("Unknown light parameter");
+//    }
 }
 
 /**
  * Set the material properties for vertices that are being specified.
- * face specifies which face(s) the property changes are being applied
- * to, pname specifies the property being updated, and values is a
+ * pname specifies the property being updated, and values is a
  * pointer to the float or floats which specify the value for that
  * parameter.  Parameters are handled as follows:
  *
@@ -412,7 +528,28 @@ void mglLight(MGLlight light,
 void mglMaterial(MGLmat_param pname,
 		 MGLfloat *values)
 {
-  NOT_YET_IMPLEMENTED;
+    if (pname == MGL_MAT_AMBIENT) {
+        curMaterial.ambient[0] = values[0];
+        curMaterial.ambient[1] = values[1];
+        curMaterial.ambient[2] = values[2];
+    }
+    else if (pname == MGL_MAT_DIFFUSE) {
+        curMaterial.diffuse[0] = values[0];
+        curMaterial.diffuse[1] = values[1];
+        curMaterial.diffuse[2] = values[2];
+    }
+    else if (pname == MGL_MAT_SPECULAR) {
+        curMaterial.specular[0] = values[0];
+        curMaterial.specular[1] = values[1];
+        curMaterial.specular[2] = values[2];
+    }
+    else if (pname == MGL_MAT_SHININESS) {
+        curMaterial.shininess = values[0];
+    }
+    else {
+        MGL_ERROR("Unknown material parameter");
+    }
+
 }
 
 /**
@@ -427,11 +564,11 @@ void mglMaterial(MGLmat_param pname,
  * and the diffuse texture is modulated with the color specified by 
  * mglColor.
  *
- * The initial value this attribute should be false.
+ * The initial value of this attribute should be false.
  */
 void mglTexturesEnabled(bool enabled)
 {
-  NOT_YET_IMPLEMENTED;
+  texturesEnabled = enabled;
 }
 
 /**
@@ -460,8 +597,12 @@ MGLtex_id mglLoadTexture(MGLsize width,
 			 MGLsize height,
 			 MGLpixel *imageData)
 {
-  NOT_YET_IMPLEMENTED;
-  return 0;
+    MGLtexture loaded_tex = MGLtexture(width, height);
+    memcpy(loaded_tex.data, imageData, width * height * sizeof(MGLpixel));
+    
+    textures.push_back(loaded_tex);
+    
+    return textures.size() - 1;
 }
 
 /**
@@ -474,7 +615,12 @@ MGLtex_id mglLoadTexture(MGLsize width,
  */
 void mglUseTexture(MGLtex_id id)
 {
-  NOT_YET_IMPLEMENTED;
+    if (hasBegun) {
+        MGL_ERROR("Cannot change texture after mglBegin");
+    }
+    else {
+        curTexture = &textures[id];
+    }
 }
 
 /**
@@ -514,7 +660,7 @@ void mglTexCoord(MGLfloat x,
  */
 void mglTextureSlot(MGLtex_slot slot)
 {
-  NOT_YET_IMPLEMENTED;
+    curTextureSlot = slot;
 }
 
 /**
@@ -652,6 +798,7 @@ void mglVertex3(MGLfloat x,
     // ////////////////////////////////////////////////////
 
     v.color = curColor;
+    v.mat = curMaterial;
 
     ///////////////////////////////////////////////////////
     //

@@ -5,6 +5,8 @@
  * Author: Ming Jiang (ming.jiang@stanford.edu)
  * Date: Sun Jan 24 21:10:00 PST 2010
  *
+ * Edited and Submitted by: Hunter McCurry(hmccurry@stanford.edu)
+ *
  * Description: Main function entry and SDL framework.
  ****************************************************************************/
 
@@ -27,17 +29,15 @@ string sceneFile;
 int testNum = -1;
 
 
-#define FB_WIDTH    640
+#define FB_WIDTH 640
 #define FB_HEIGHT 480
 
 MGLpixel buffer[FB_WIDTH * FB_HEIGHT];
 MGLpixel flipped[FB_WIDTH * FB_HEIGHT];
 
-float xvel = 0.0, yvel = 0.0,
-    avel = 0.0, svel = 1.0;
+float xvel = 0.0, yvel = 0.0, avel = 0.0, svel = 1.0;
 
-bool lightOn0 = false, lightOn1 = false,
-    lightOn2 = false, lightOnGlobal = false;
+bool lightOn0 = false, lightOn1 = false, lightOn2 = false, lightOnGlobal = false;
 
 float lightPos0[3] = { 0.0f, 0.0f, 2.0f };
 float lightPos1[3] = { 5.0f, 5.0f, 0.0f };
@@ -69,7 +69,6 @@ void setupLights(float elapsedTime) {
 
     // Light 2
     mglLight(MGL_LIGHT2, MGL_LIGHT_POSITION, lightPos2);
-
 }
 
 
@@ -114,13 +113,8 @@ void initScene() {
 void renderScene(float elapsedTime) {
     setupCamera(elapsedTime);
 
-
-    // TODO: Start of calling minigl APIs
-
     mglColor(255, 255, 255);
     mesh->display();
-
-    // End of calling minigl APIs
 
     // DO NOT modify the following statements
 
@@ -315,7 +309,7 @@ int main(int argc, char** argv) {
     sceneFile = string(argv[1]);
 
     cout << endl;
-    cout << "CS 248 Assignment 2 Demo Program" << endl;
+    cout << "CS 248 Assignment 2" << endl;
 
     printControls();
 

@@ -129,8 +129,7 @@ void mglLight(MGLlight light,
 
 /**
  * Set the material properties for vertices that are being specified.
- * face specifies which face(s) the property changes are being applied
- * to, pname specifies the property being updated, and values is a
+ * pname specifies the property being updated, and values is a
  * pointer to the float or floats which specify the value for that
  * parameter.  Parameters are handled as follows:
  *
@@ -173,27 +172,7 @@ void mglMaterial(MGLmat_param pname,
  */
 void mglTexturesEnabled(bool enabled);
 
-/**
- * Load a texture into memory.  As long as textures have been enabled
- * with mglSetTexturesEnabled(), draw this texture over specified
- * surfaces until mglLoadTexture() is called again.  width and height
- * specify the dimensions of the image, and imageData points to an
- * array of RGB pixels.  The array begins with the bottom-left pixel
- * of the image, then the bottom-second-to-left, etc. - that is, elements
- * of the array are ordered first horizontally across the image, then
- * vertically up it.
- *
- * When this function is called, the in-use texture should be set
- * to the one that has been loaded - that is, the user doesn't need
- * to call both mglLoadTexture() and mglUseTexture() if she wishes
- * to use a newly loaded texture.
- *
- * Returns an ID (just an unsigned integer) by which the loaded
- * texture can be referenced in the future, e.g. with mglUseTexture().
- *
- * An ID of zero is reserved for the NULL texture.
- */
-MGLtex_id mglLoadTexture(MGLsize width,
+ MGLtex_id mglLoadTexture(MGLsize width,
 			 MGLsize height,
 			 MGLpixel *imageData);
 
