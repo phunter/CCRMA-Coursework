@@ -64,10 +64,12 @@ typedef enum {
 #define MGL_GET_RED(P)   (((P) & 0x000000ff))
 #define MGL_GET_GREEN(P) (((P) & 0x0000ff00) >> 8)
 #define MGL_GET_BLUE(P)  (((P) & 0x00ff0000) >> 16)
+#define MGL_GET_ALPHA(P)  (((P) & 0xff000000) >> 24)
 
 #define MGL_SET_RED(P, C)   (P = (((P) & 0xffffff00) | (C)))
 #define MGL_SET_GREEN(P, C) (P = (((P) & 0xffff00ff) | ((C) << 8)))
 #define MGL_SET_BLUE(P, C)  (P = (((P) & 0xff00ffff) | ((C) << 16)))
+#define MGL_SET_ALPHA(P, C)  (P = (((P) & 0x00ffffff) | ((C) << 24)))
 /**
  * Enable or disable lighting for the rendered scene.  Lighting should
  * be disabled by default.
