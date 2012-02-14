@@ -9,13 +9,11 @@
          continueAfterRunningActions = "No"
          isPathRelative = "0"
          filePath = "/Users/phunter/CCRMA-Coursework/winter_12/248/hw2/minigl.cpp"
-         timestampString = "350886025.468796"
+         timestampString = "350915721.495254"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "328"
-         endingLineNumber = "328"
-         landmarkName = "MGLColorFromFloats(MGLfloat const * float_list)"
-         landmarkType = "7">
+         startingLineNumber = "903"
+         endingLineNumber = "903">
       </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>
