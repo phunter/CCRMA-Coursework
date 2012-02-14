@@ -35,42 +35,17 @@ inline void MGL_ERROR(const char* description) {
     exit(1);
 }
 
-/**
- * MGL_LIGHT_POSITION
- * Set the position of the light.  This position should be transformed
- * by the modelview matrix upon specification.  values should point to
- * three floats representing the position of the light in homogeneous
- * coordinates.  The initial position should be (0, 0, 1).
- *
- * MGL_LIGHT_AMBIENT
- * three floats representing the ambient RGB (in that order)
- * intensity of the light in homogeneous coordinates.  The initial
- * ambient intensity should be (0, 0, 0).
- *
- * MGL_LIGHT_DIFFUSE
- * three floats representing the diffuse RGB (in that order) intensity of
- * the light in homogeneous coordinates.  The initial diffuse intenisty
- * for MGL_LIGHT0 should be (1, 1, 1); for all others, it should
- * be (0, 0, 0).
- * 
- * MGL_LIGHT_SPECULAR
- * three floats representing the specular RGB (in that order) intensity
- * of the light in homogeneous coordinates.  The initial specular
- * intensity for MGL_LIGHT0 should be (1, 1, 1); for all others,
- * it should be (0, 0, 0).
- */
+// Data structures definition
+
 struct MGLpointLight {
     MGLpointLight() {
-        enabled = false;
-        x = 0.0f, y = 0.0f, z = 1.0f, w = 1.0f; // initial positoin (0, 0, 1)
+        x = 0.0f, y = 0.0f, z = 1.0f; // initial positoin (0, 0, 1)
         ambient[0] = 0.0f, ambient[1] = 0.0f, ambient[2] = 0.0f;
         diffuse[0] = 0.0f, diffuse[1] = 0.0f, diffuse[2] = 0.0f;
         specular[0] = 0.0f, specular[1] = 0.0f, specular[2] = 0.0f;
     }
     
-    // Location
-    MGLbool enabled;
-    
+    // Location    
     MGLfloat x, y, z, w;
     
     MGLfloat ambient[3];
@@ -80,12 +55,18 @@ struct MGLpointLight {
 
 struct MGLSceneLights {
     MGLSceneLights() {
-        // TODO: set up default lights properly
+        // All lights disabled by default
+        enabled[0] = false, enabled[1] = false, enabled[2] = false;
+        
+        // This initializes light 0 to specified defaults
+        light_list[0].diffuse[0] = 1.0f, light_list[0].diffuse[1] = 1.0f, light_list[0].diffuse[2] = 1.0f;
+        light_list[0].specular[0] = 1.0f, light_list[0].specular[1] = 1.0f, light_list[0].specular[2] = 1.0f;
+        
+        // TODO: give some values to other lights for testing
     }
     
-    MGLpointLight light0;
-    MGLpointLight light1;
-    MGLpointLight light2;
+    MGLbool enabled[3];
+    MGLpointLight light_list[3];
 };
 
 struct MGLmaterial {
@@ -102,6 +83,12 @@ struct MGLmaterial {
 };
 
 struct MGLtexture {
+    MGLtexture() {
+        tex_width = 0;
+        tex_height = 0;
+        
+        data = NULL;
+    }
     MGLtexture(int width, int height) {
         tex_width = width;
         tex_height = height;
@@ -118,7 +105,9 @@ struct MGLtextureCoord {
     MGLfloat x, y;
 };
 
-// Data structures definition
+struct MGLnormalStruct {
+    MGLfloat data[3];
+};
 
 struct MGLvertex {
     
@@ -132,20 +121,23 @@ struct MGLvertex {
     // Add new per-vertex attributes here.
     //
     ///////////////////////////////////////////////////////
+    
+    MGLfloat eyeX, eyeY, eyeZ, eyeW;
+    
     MGLmaterial mat;
+    
+    MGLfloat normal[3];
     
     MGLbool texturesEnabled;
     
     MGLtex_id diffuse_tex_id;
     MGLint diffuse_tex_width, diffuse_tex_height;    
-    MGLfloat diffuse_tex_x, diffuse_tex_y;
+    MGLfloat diffuse_u, diffuse_v;
     
     MGLtex_id specular_tex_id;
     MGLint specular_tex_width, specular_tex_height; 
-    MGLfloat specular_tex_x, specular_tex_y;
+    MGLfloat specular_u, specular_v;
     
-    
-    MGLfloat eyeX, eyeY, eyeZ;
     
     ///////////////////////////////////////////////////////
     //
@@ -184,9 +176,27 @@ struct MGLfragment {
     MGLfragment() {
         color = 0xff000000;
         depth = 1.0f;
+        
+        diffuse_id = 0;
+        specular_id = 0;
     }
     MGLpixel color;
     MGLfloat depth;
+    
+    MGLbool texturesEnabled;
+    
+    MGLint diffuse_id;
+    MGLfloat diffuse_u, diffuse_v;
+    
+    MGLint specular_id;
+    MGLfloat specular_u, specular_v;
+    
+    MGLfloat eyeX, eyeY, eyeZ;
+    
+    MGLnormalStruct normal;
+    
+    MGLmaterial material;
+    
 };
 
 /**
@@ -211,20 +221,20 @@ struct MGLfragbuffer {
 // Global variables definition
 
 MGLpixel curColor = 0xff000000;                // changed when mglColor
-// is called
+                                               // is called
 MGLmatrix_mode curMatrixMode = MGL_MODELVIEW;  // current matrix mode,
-// changed when mglMatrixMode
-// is called
+                                               // changed when mglMatrixMode
+                                               // is called
 MGLpoly_mode curPolyMode = MGL_TRIANGLES;      // current polygon mode
-// specified by mglBegin
+                                               // specified by mglBegin
 
 MGLshading_mode curShadingMode = MGL_PHONG;
 
 
 MGLbool hasBegun = false;  // true when we enter mglBegin and
-// false when we leave mglEnd
+                           // false when we leave mglEnd
 MGLint curIndex = 0;       // used to ensure correct number of
-// calls to mglVertex
+                           // calls to mglVertex
 
 MGLbool lightingEnabled = false;
 
@@ -233,26 +243,29 @@ MGLbool texturesEnabled = false;
 MGLmaterial curMaterial;
 
 MGLmatrix modelViewMatrix, projectionMatrix;  // store the current modelview
-// and projection matrices
+                                              // and projection matrices
 MGLmatrix* curMatrix;                         // always point to one of the
-// above matrix according to the
-// current matrix mode
+                                              // above matrix according to the
+                                              // current matrix mode
 stack<MGLmatrix> modelViewStack;              // modelview matrix stack
 stack<MGLmatrix> projectionStack;             // projection matrix stack
 
 vector<MGLvertex> transformedVertices;  // store all vertices in clipping space
-// coordinates without dividing by w
-//vector<MGLpointLight> lightz;
-//
-//MGLSceneLights lights;
+                                        // coordinates without dividing by w
 
-vector<MGLtexture> textures;
+MGLSceneLights lights;
 
-MGLtexture* curTexture;
+MGLnormalStruct curNormal;
 
-MGLtex_id curTextureID;
+vector<MGLtexture> textures(1);
 
-MGLtextureCoord curTextureCoord;
+// MGLtexture* curTexture;
+
+MGLtex_id curDiffuseTextureID = 0;
+MGLtex_id curSpecularTextureID = 0;
+
+MGLtextureCoord curDiffuseTextureCoord;
+MGLtextureCoord curSpecularTextureCoord;
 
 MGLint curTextureSlot;
 
@@ -297,6 +310,89 @@ void mulMatrixVector(const MGLmatrix& mat, const MGLfloat* vi, MGLfloat* vo)
     vo[3] = mat.m[3] * vi[0] + mat.m[7] * vi[1] + mat.m[11] * vi[2] + mat.m[15] * vi[3];
 }
 
+MGLpixel MGLColorFromFloats(MGLfloat const * float_list)
+{
+    MGLint pix_R, pix_G, pix_B, pix_A;
+    // pix individual channels
+    pix_R = min(255, (MGLint) (255.0 * float_list[0]));
+    pix_G = min(255, (MGLint) (255.0 * float_list[1]));
+    pix_B = min(255, (MGLint) (255.0 * float_list[2]));
+    pix_A = 255;
+    
+    MGLpixel pix;
+    
+    MGL_SET_RED(pix, (MGLbyte) pix_R);
+    MGL_SET_GREEN(pix, (MGLbyte) pix_G);
+    MGL_SET_BLUE(pix, (MGLbyte) pix_B);
+    MGL_SET_ALPHA(pix, (MGLbyte) pix_A);
+    
+    return pix;
+}
+
+
+MGLpixel MGLColorAdd(MGLpixel left, MGLpixel right)
+{
+    // extract individual color channels
+    MGLbyte left_R, left_G, left_B, left_A, right_R, right_G, right_B, right_A;
+    left_R = MGL_GET_RED(left);
+    left_G = MGL_GET_GREEN(left);
+    left_B = MGL_GET_BLUE(left);
+    left_A = MGL_GET_ALPHA(left);
+    
+    right_R = MGL_GET_RED(right);
+    right_G = MGL_GET_GREEN(right);
+    right_B = MGL_GET_BLUE(right);
+    right_A = MGL_GET_ALPHA(right);
+    
+    MGLint add_R, add_G, add_B, add_A;
+    // add individual channels
+    add_R = min(255, (MGLint) (255.0*((left_R/255.0) + (right_R/255.0))));
+    add_G = min(255, (MGLint) (255.0*((left_G/255.0) + (right_G/255.0))));
+    add_B = min(255, (MGLint) (255.0*((left_B/255.0) + (right_B/255.0))));
+    add_A = min(255, (MGLint) (255.0*((left_A/255.0) + (right_A/255.0))));
+    
+    MGLpixel add;
+    
+    MGL_SET_RED(add, (MGLbyte) add_R);
+    MGL_SET_GREEN(add, (MGLbyte) add_G);
+    MGL_SET_BLUE(add, (MGLbyte) add_B);
+    MGL_SET_ALPHA(add, (MGLbyte) add_A);
+    
+    return add;
+}
+
+
+MGLpixel MGLColorMult(MGLpixel left, MGLpixel right)
+{
+    // extract individual color channels
+    MGLbyte left_R, left_G, left_B, left_A, right_R, right_G, right_B, right_A;
+    left_R = MGL_GET_RED(left);
+    left_G = MGL_GET_GREEN(left);
+    left_B = MGL_GET_BLUE(left);
+    left_A = MGL_GET_ALPHA(left);
+    
+    right_R = MGL_GET_RED(right);
+    right_G = MGL_GET_GREEN(right);
+    right_B = MGL_GET_BLUE(right);
+    right_A = MGL_GET_ALPHA(right);
+    
+    MGLint mul_R, mul_G, mul_B, mul_A;
+    // multiply individual channels
+    mul_R = min(255, (MGLint) (255.0*((left_R/255.0) * (right_R/255.0))));
+    mul_G = min(255, (MGLint) (255.0*((left_G/255.0) * (right_G/255.0))));
+    mul_B = min(255, (MGLint) (255.0*((left_B/255.0) * (right_B/255.0))));
+    mul_A = min(255, (MGLint) (255.0*((left_A/255.0) * (right_A/255.0))));
+    
+    MGLpixel mul;
+    
+    MGL_SET_RED(mul, (MGLbyte) mul_R);
+    MGL_SET_GREEN(mul, (MGLbyte) mul_G);
+    MGL_SET_BLUE(mul, (MGLbyte) mul_B);
+    MGL_SET_ALPHA(mul, (MGLbyte) mul_A);
+    
+    return mul;
+}
+
 
 /**
  * Linearly interpolates between two colors;
@@ -329,9 +425,6 @@ MGLpixel MGLColorLerp(MGLpixel left, MGLpixel right, MGLfloat s)
     MGL_SET_GREEN(lerped, (MGLbyte) lerp_G);
     MGL_SET_BLUE(lerped, (MGLbyte) lerp_B);
     MGL_SET_ALPHA(lerped, (MGLbyte) lerp_A);
-   
-    
-
     
     return lerped;
 }
@@ -340,8 +433,9 @@ MGLpixel MGLColorLerp(MGLpixel left, MGLpixel right, MGLfloat s)
  * ColorBilerp takes a pointer to a texture, and normalized x_coord and y_coord
  * Note: This wraps around at the edges based on texture height and width 
  */
-MGLpixel MGLColorBilerp(MGLtexture *texture, MGLfloat tex_x, MGLfloat tex_y)
+MGLpixel MGLColorBilerp(MGLint tex_id, MGLfloat tex_x, MGLfloat tex_y)
 {
+    MGLtexture * texture = &textures[tex_id];
     int h = texture->tex_height;
     int w = texture->tex_height;
     
@@ -379,6 +473,7 @@ MGLpixel MGLColorBilerp(MGLtexture *texture, MGLfloat tex_x, MGLfloat tex_y)
 void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 {
     MGLfloat orig_w[3];
+    
     // Viewport transformation
     for (int i = 0; i < 3; ++i) {
         tri.v[i].x = 0.5f * fragbuf.width * (tri.v[i].x / tri.v[i].w + 1.0f);
@@ -396,8 +491,11 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
         //
         ///////////////////////////////////////////////////
         
+        // recompute normals
+        
+        // WTF why do neither of these work?
         orig_w[i] = tri.v[i].w;
-        tri.v[i].w = 1.0f;
+        //orig_w[i] = tri.v[i].eyeW;
         
         ///////////////////////////////////////////////////
         //
@@ -406,6 +504,7 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
         ///////////////////////////////////////////////////
     }
     
+    // printf("orig_w[0] = %f, orig_w[1] = %f, orig_w[2] = %f\n", orig_w[0], orig_w[1], orig_w[2]);
 	
 	// Compute the bounding rectangle
 	float xll = fmax(0.0f, fmin(tri.v[0].x, fmin(tri.v[1].x, tri.v[2].x)));
@@ -437,7 +536,7 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
             // float gamma = (tri.v[0].x * tri.v[1].y) - (tri.v[0].x * p.y) - (tri.v[1].x * tri.v[0].y) + (tri.v[1].x * p.y) + (p.x * tri.v[0].y) - (p.x * tri.v[1].y);
 			// gamma /= detA;
             
-            // possibly this is better 
+            // possibly this is a better way to get gamma
             float gamma = 1.0f - alpha - beta;
 			
 			// Point/Triangle test
@@ -462,46 +561,43 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 				
 				// The following line needs to be changed to handle
 				// perspective correct interpolation of colors.
-                
-                //				p.color = tri.v[0].color;
-                //                //p.color = alpha * tri.v[0].color + beta * tri.v[1].color + gamma * tri.v[2].color;
-                
-                
-                if (tri.v[0].texturesEnabled) {
-                    MGLfloat tex_x, tex_y;
-                    
-//                    tex_x = alpha * tri.v[0].diffuse_tex_x + beta * tri.v[1].diffuse_tex_x + gamma * tri.v[2].diffuse_tex_x;
-//                    tex_y = alpha * tri.v[0].diffuse_tex_y + beta * tri.v[1].diffuse_tex_y + gamma * tri.v[2].diffuse_tex_y;
+               
+                // TODO: PERSPECTIVE CORRECT COLORS
+                p.color = tri.v[0].color;
 
-//                    MGLfloat eye_z = tri.v[0].eyeZ;
-//                    MGLfloat one_over_w = alpha * (1 / eye_z) + beta * (1 / eye_z) + gamma * (1 / eye_z);
-                    
-                    MGLfloat one_over_w = alpha * (1 / orig_w[0]) + beta * (1 / orig_w[1]) + gamma * (1 / orig_w[2]);
-                    
-                    MGLfloat c_over_w_x =   alpha * (tri.v[0].diffuse_tex_x / orig_w[0]) + beta * (tri.v[1].diffuse_tex_x / orig_w[1]) + gamma * (tri.v[2].diffuse_tex_x / orig_w[2]);
-                    MGLfloat c_over_w_y =   alpha * (tri.v[0].diffuse_tex_y / orig_w[0]) + beta * (tri.v[1].diffuse_tex_y / orig_w[1]) + gamma * (tri.v[2].diffuse_tex_y / orig_w[2]);
-                    
-                    tex_x = c_over_w_x / one_over_w;
-                    tex_y = c_over_w_y / one_over_w;
-                    
-                    MGLtexture * tex = &textures[tri.v[0].diffuse_tex_id];
-                    
-                    
-//                    MGLint w = tri.v[0].diffuse_tex_width;
-//                    MGLint h = tri.v[0].diffuse_tex_height;
-//                    
-//                    p.color = tex->data[ (int) (floor(tex_y * h) * w + floor(tex_x * w)) ];
-                    
-                    // MGLColorBilerp takes pointer to texture, x_coord, y_coord
-                    MGLpixel biLerped = MGLColorBilerp(tex, tex_x, tex_y);
-                    p.color = biLerped;
-                                        
-                }
-                else {
-                    p.color = tri.v[0].color;
-                }
+                // This will be used in all perspective-correct calculations
                 
+                MGLfloat one_over_w = alpha * (1 / orig_w[0]) + beta * (1 / orig_w[1]) + gamma * (1 / orig_w[2]);
+
+                // Diffuse Texture Interpoloation
+                MGLfloat diffuse_bary_u, diffuse_bary_v;
+                MGLfloat diff_u_over_w =   alpha * (tri.v[0].diffuse_u / orig_w[0]) + beta * (tri.v[1].diffuse_u / orig_w[1]) + gamma * (tri.v[2].diffuse_u / orig_w[2]);
+                MGLfloat diff_v_over_w =   alpha * (tri.v[0].diffuse_v / orig_w[0]) + beta * (tri.v[1].diffuse_v / orig_w[1]) + gamma * (tri.v[2].diffuse_v / orig_w[2]);
+                diffuse_bary_u = diff_u_over_w / one_over_w;
+                diffuse_bary_v = diff_v_over_w / one_over_w;
                 
+                // Specular Texture Interpolation
+                MGLfloat specular_bary_u, specular_bary_v;
+                MGLfloat spec_u_over_w =   alpha * (tri.v[0].specular_u / orig_w[0]) + beta * (tri.v[1].specular_u / orig_w[1]) + gamma * (tri.v[2].specular_u / orig_w[2]);
+                MGLfloat spec_v_over_w =   alpha * (tri.v[0].specular_v / orig_w[0]) + beta * (tri.v[1].specular_v / orig_w[1]) + gamma * (tri.v[2].specular_v / orig_w[2]);
+                specular_bary_u = spec_u_over_w / one_over_w;
+                specular_bary_v = spec_v_over_w / one_over_w;
+                
+                // eyeX Interpolation
+                MGLfloat bary_eyeX;
+                MGLfloat eyeX_over_w =  alpha * (tri.v[0].eyeX / orig_w[0]) + beta * (tri.v[1].eyeY / orig_w[1]) + gamma * (tri.v[2].eyeZ / orig_w[2]);
+                bary_eyeX = eyeX_over_w / one_over_w;
+
+                // eyeY Interpolation
+                MGLfloat bary_eyeY;
+                MGLfloat eyeY_over_w =  alpha * (tri.v[0].eyeY / orig_w[0]) + beta * (tri.v[1].eyeY / orig_w[1]) + gamma * (tri.v[2].eyeZ / orig_w[2]);
+                bary_eyeY = eyeY_over_w / one_over_w;
+
+                // eyeZ Interpolation
+                MGLfloat bary_eyeZ;
+                MGLfloat eyeZ_over_w =  alpha * (tri.v[0].eyeZ / orig_w[0]) + beta * (tri.v[1].eyeY / orig_w[1]) + gamma * (tri.v[2].eyeZ / orig_w[2]);
+                bary_eyeZ = eyeZ_over_w / one_over_w;
+
                 
 				MGLsize idx = x + y * fragbuf.width;
 				
@@ -509,6 +605,21 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
 				if (p.z < fragbuf.data[idx].depth ) {
 					fragbuf.data[idx].color = p.color;
 					fragbuf.data[idx].depth = p.z;
+                    
+                    fragbuf.data[idx].texturesEnabled = tri.v[0].texturesEnabled;
+                    
+                    fragbuf.data[idx].diffuse_id = tri.v[0].diffuse_tex_id;
+                    fragbuf.data[idx].diffuse_u = diffuse_bary_u;
+                    fragbuf.data[idx].diffuse_v = diffuse_bary_v;
+                    
+                    fragbuf.data[idx].specular_id = tri.v[0].specular_tex_id;
+//                    fragbuf.data[idx].specular_u = specular_bary_u;
+//                    fragbuf.data[idx].specular_v = specular_bary_v;
+//                    
+//                    fragbuf.data[idx].eyeX = bary_eyeX;
+//                    fragbuf.data[idx].eyeY = bary_eyeY;
+//                    fragbuf.data[idx].eyeZ = bary_eyeZ;
+                    
 				}
 				
 				///////////////////////////////////////////////////
@@ -531,7 +642,46 @@ void rasterize(MGLtriangle& tri, MGLfragbuffer& fragbuf)
  */
 void shadeFragment(const MGLfragment& frag, MGLpixel& data)
 {
-    data = frag.color;
+    
+    MGLpixel cur_color;
+    
+    if (frag.depth < 1.0) { // it isn't simply a background fragment
+        
+        
+        
+        if (frag.diffuse_id != 0 && frag.texturesEnabled) {
+            MGLpixel biLerped = MGLColorBilerp(frag.diffuse_id, frag.diffuse_u, frag.diffuse_v);
+            cur_color = biLerped;
+            
+            printf("test");
+        }
+        
+        if (lightingEnabled) {
+            for (int l = 0; l < 3; l++) { // for all 3 lights
+                if ( lights.enabled[l] ) {
+                    
+                    MGLpixel amb_light = MGLColorFromFloats(lights.light_list[l].ambient);
+                    MGLpixel amb_mat = MGLColorFromFloats(frag.material.ambient);
+                    
+                    MGLpixel amb_component = MGLColorMult(amb_light, amb_mat);
+                    
+                    cur_color = MGLColorAdd(cur_color, amb_component);
+                    
+                    
+                    // add in diffuse
+                    
+                    // add in specular
+                }
+            }
+        }
+        
+        else {
+            //cur_color = MGLColorMult(cur_color, frag.color);
+        }
+
+    }
+    
+    data = cur_color;
 }
 
 /*************************************************************
@@ -554,8 +704,7 @@ void mglLightingEnabled(bool enabled)
  */
 void mglLightEnabled(MGLlight light, bool enabled)
 {
-    
-    //lights[light].enabled = enabled;
+    lights.enabled[light] = enabled;
 }
 
 /**
@@ -608,29 +757,34 @@ void mglLight(MGLlight light,
               MGLlight_param pname,
               MGLfloat *values)
 {
-    //    if (pname == MGL_LIGHT_AMBIENT) {
-    //        lights[light].ambient[0] = values[0];
-    //        lights[light].ambient[1] = values[1];
-    //        lights[light].ambient[2] = values[2];
-    //    }
-    //    else if (pname == MGL_LIGHT_DIFFUSE) {
-    //        lights[light].diffuse[0] = values[0];
-    //        lights[light].diffuse[1] = values[1];
-    //        lights[light].diffuse[2] = values[2];
-    //    }
-    //    else if (pname == MGL_LIGHT_SPECULAR) {
-    //        lights[light].specular[0] = values[0];
-    //        lights[light].specular[1] = values[1];
-    //        lights[light].specular[2] = values[2];
-    //    }
-    //    else if (pname == MGL_LIGHT_POSITION){
-    //        lights[light].x = values[0];
-    //        lights[light].y = values[1];
-    //        lights[light].z = values[2];
-    //    }
-    //    else {
-    //        MGL_ERROR("Unknown light parameter");
-    //    }
+    if (light > 2) {
+        MGL_ERROR("Trying to access light that doens't exist");
+    }
+    else {
+        if (pname == MGL_LIGHT_AMBIENT) {
+            lights.light_list[light].ambient[0] = values[0];
+            lights.light_list[light].ambient[1] = values[1];
+            lights.light_list[light].ambient[2] = values[2];
+        }
+        else if (pname == MGL_LIGHT_DIFFUSE) {
+            lights.light_list[light].diffuse[0] = values[0];
+            lights.light_list[light].diffuse[1] = values[1];
+            lights.light_list[light].diffuse[2] = values[2];
+        }
+        else if (pname == MGL_LIGHT_SPECULAR) {
+            lights.light_list[light].specular[0] = values[0];
+            lights.light_list[light].specular[1] = values[1];
+            lights.light_list[light].specular[2] = values[2];
+        }
+        else if (pname == MGL_LIGHT_POSITION){
+            lights.light_list[light].x = values[0];
+            lights.light_list[light].y = values[1];
+            lights.light_list[light].z = values[2];
+        }
+        else {
+            MGL_ERROR("Unknown light parameter");
+        }
+    }
 }
 
 /**
@@ -683,7 +837,6 @@ void mglMaterial(MGLmat_param pname,
     else {
         MGL_ERROR("Unknown material parameter");
     }
-    
 }
 
 /**
@@ -736,6 +889,7 @@ MGLtex_id mglLoadTexture(MGLsize width,
                          MGLsize height,
                          MGLpixel *imageData)
 {
+    
     if (hasBegun) {
         MGL_ERROR("Cannot change texture after mglBegin");
         return 0;
@@ -749,8 +903,13 @@ MGLtex_id mglLoadTexture(MGLsize width,
         
         MGLtex_id id = textures.size() - 1;
         
+        if (curTextureSlot == MGL_TEX_DIFFUSE) {
+            curDiffuseTextureID = id;
+        }
+        else {
+            curSpecularTextureID = id;
+        }
         
-        curTexture = &textures[id];
         return id;
     }
 }
@@ -769,7 +928,13 @@ void mglUseTexture(MGLtex_id id)
         MGL_ERROR("Cannot change texture after mglBegin");
     }
     else {
-        curTexture = &textures[id];
+        
+        if (curTextureSlot == MGL_TEX_DIFFUSE) {
+            curDiffuseTextureID = id;
+        }
+        else {
+            curSpecularTextureID = id;
+        }
     }
 }
 
@@ -798,8 +963,15 @@ void mglFreeTexture(MGLtex_id id)
 void mglTexCoord(MGLfloat x,
                  MGLfloat y)
 {
-    curTextureCoord.x = x;
-    curTextureCoord.y = y;
+    
+    if (curTextureSlot == MGL_TEX_DIFFUSE) {
+        curDiffuseTextureCoord.x = x;
+        curDiffuseTextureCoord.y = y;
+    }
+    else {
+        curSpecularTextureCoord.x = x;
+        curSpecularTextureCoord.y = y;
+    }
 }
 
 /**
@@ -830,7 +1002,9 @@ void mglNormal(MGLfloat x,
                MGLfloat y,
                MGLfloat z)
 {
-    NOT_YET_IMPLEMENTED;
+    curNormal.data[0] = x;
+    curNormal.data[1] = y;
+    curNormal.data[2] = z;
 }
 
 /**
@@ -950,6 +1124,7 @@ void mglVertex3(MGLfloat x,
     v.eyeX = v2[0];
     v.eyeY = v2[1];
     v.eyeZ = v2[2];
+    v.eyeW = v2[3];
     
     ///////////////////////////////////////////////////////
     //
@@ -964,31 +1139,15 @@ void mglVertex3(MGLfloat x,
     
     // assign normal
     
-    v.texturesEnabled = texturesEnabled;
-    
-    if (texturesEnabled) {
-        MGLint curTexWidth = textures[curTextureID].tex_width;
-        MGLint curTexHeight = textures[curTextureID].tex_height;
-        
-        if (curTextureSlot == MGL_TEX_DIFFUSE) {
-            
-            v.diffuse_tex_id = curTextureID;
-            v.diffuse_tex_width = curTexWidth;
-            v.diffuse_tex_height = curTexHeight;
-            v.diffuse_tex_x = curTextureCoord.x;
-            v.diffuse_tex_y = curTextureCoord.y; 
-            
-            //printf(" ( v.diffuse_tex_x, v.diffuse_tex_y) = (%f, %f)\n", v.diffuse_tex_x, v.diffuse_tex_y);
-        }
-        else if (curTextureSlot == MGL_TEX_SPECULAR) {
-            
-            v.specular_tex_id = curTextureID;
-            v.specular_tex_width = curTexWidth;
-            v.specular_tex_height = curTexHeight;
-            v.specular_tex_x = curTextureCoord.x;
-            v.specular_tex_y = curTextureCoord.y;
-        }
-    }    
+     
+    MGLint curSpecTexWidth = textures[curSpecularTextureID].tex_width;
+    MGLint curSpecTexHeight = textures[curSpecularTextureID].tex_height;
+
+    v.specular_tex_id = curSpecularTextureID;
+    v.specular_tex_width = curSpecTexWidth;
+    v.specular_tex_height = curSpecTexHeight;
+    v.specular_u = curSpecularTextureCoord.x;
+    v.specular_v = curSpecularTextureCoord.y;
     
     ///////////////////////////////////////////////////////
     //

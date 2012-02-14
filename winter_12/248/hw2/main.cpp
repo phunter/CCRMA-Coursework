@@ -113,7 +113,7 @@ void initScene() {
 void renderScene(float elapsedTime) {
     setupCamera(elapsedTime);
 
-    mglColor(255, 255, 255);
+    mglColor(90, 90, 90);
     mesh->display();
 
     // DO NOT modify the following statements
