@@ -59,11 +59,11 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "models/apple.obj"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "models/bunny.obj"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "models/car.obj"
