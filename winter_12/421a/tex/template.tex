@@ -1,0 +1,247 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{fancyhdr}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath,amssymb,amsthm}
+
+
+
+% FILL IN THE SPECIFICS OF EACH HOMEWORK HERE
+\newcommand{\course}{CSCI 383}
+\newcommand{\semester}{Fall 2009}
+\newcommand{\name}{Theory of Computation}
+%%%
+%%%
+%%% PLEASE FILL OUT YOUR NAME AND THE HWK NUMBER
+%%%
+%%%
+\newcommand{\hwk}{Homework \#? Solutions}
+\newcommand{\student}{Put Your Name Here}
+
+
+%%
+% The following are definitions so that you can use numbered lemmas, claims, etc.
+%%
+\newtheorem{lemma}{Lemma}
+\newtheorem*{lem}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{notation}{Notation}
+\newtheorem*{claim}{Claim}
+\newtheorem*{fclaim}{False Claim}
+\newtheorem{observation}{Observation}
+\newtheorem{conjecture}[lemma]{Conjecture}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem*{rt}{Running Time}
+
+%%
+% The following are definitions so that you can use some shorthand with deltas and such
+%%
+\newcommand{\deltahat}{\hat{\delta}}
+\newcommand{\Deltahat}{\hat{\Delta}}
+\newcommand{\righti}{\stackrel{i}{\rightarrow}}
+\newcommand{\rights}{\stackrel{*}{\rightarrow}}
+\newcommand{\righto}{\stackrel{1}{\rightarrow}}
+\newcommand{\rightn}{\stackrel{n}{\rightarrow}}
+\newcommand{\rightnp}{\stackrel{n+1}{\rightarrow}}
+\newcommand{\rightip}{\stackrel{i+1}{\rightarrow}}
+\newcommand{\rightk}{\stackrel{k}{\rightarrow}}
+\newcommand{\rightln}{\stackrel{\leq n}{\rightarrow}}
+
+
+
+%%% You can ignore the following stuff, it's just for formatting purposes
+\textheight=8.6in
+\setlength{\textwidth}{6.44in}
+\addtolength{\headheight}{\baselineskip} 
+% enumerate uses a), b), c), ...
+\renewcommand{\labelenumi}{\alph{enumi})}
+% Sets the style for fancy pages (namely, all but first page)
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+% Changes style of plain pages (namely, the first page)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \renewcommand\headrulewidth{0pt}
+  \renewcommand\footrulewidth{0.4pt}
+  \renewcommand{\headrule}{}
+  }
+% Changes the title box on the first page
+\renewcommand\maketitle{
+\begin{center}
+\begin{tabular*}{6.44in}{l @{\extracolsep{\fill}}c r}
+\bfseries  &  & \bfseries \course ~\semester \\
+\bfseries&  & \bfseries  \hwk  \\
+\bfseries   &   &  \bfseries \student \\ 
+\end{tabular*}
+\end{center} }
+
+
+
+
+%%
+%%
+%% THE REAL STUFF STARTS HERE
+%%
+%%
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+
+
+%%% PLEASE PLACE THE HONOR CODE AND YOUR NAME/SIGNATURE HERE
+\noindent 
+
+
+\subsection*{Question 1}
+% Your solution to Q1 goes here.
+% Your solution to Q1 goes here.
+Let $P(h)$ be the statement that
+\begin{claim}
+$P(h)$ is true for all $h \geq 0$.
+\end{claim}
+
+\begin{proof}
+We prove the claim by induction on $h$.
+\begin{description}
+\item[BC:] As a basis, consider $h=?$.
+\item[IS:] Suppose $P(h)$ is true for all ...
+\item[IH:] Consider $P(?)$.
+\end{description}
+Therefore $P(h)$ is true for all $h \geq 0$.
+\end{proof}
+
+
+
+\subsection*{Question 2}
+% Your solution to Q2 goes here.
+
+\begin{enumerate}
+\item $A \cup B = \{ \}$.
+\item $A \cap B = \{ \}$.
+\item $A \times B = \{ \}$.
+\item $2^B = \{ \}$.
+\end{enumerate}
+
+
+\subsection*{Question 3}
+% Your solution to Q3 goes here.
+
+\begin{enumerate}
+\item Define the relation $\approx$ on the $\mathbb{Z}$ as follows: for $x, y \in \mathbb{Z}$, 
+\[ x \approx y ~\stackrel{def}{\iff}~ \deltahat(x,a)=\deltahat(y,b)\]
+\item Define the relation $\approx$
+\end{enumerate}
+
+
+
+
+\subsection*{Question 4}
+% Your solution to Q4 goes here.
+
+\begin{claim}
+$R \cup (S \cap T) = (R \cup S) \cap (R \cup T)$ for all sets $R,S$ and $T$.
+\end{claim}
+
+\begin{proof}
+There are two cases:
+\begin{itemize}
+\item[i)]
+\item[ii)]
+\end{itemize}
+\end{proof}
+
+
+
+%% I can force a new page as follows
+\newpage
+%and I may want to add a little vertical space
+\vspace*{2pt}
+
+
+
+
+%% Whatever is between the two &'s gets lines up. In this case, the equal signs.
+\noindent We can define the transition function as
+\begin{eqnarray*}
+\delta(0, a) & = & 1,\\
+\delta( 1, a) & = & 2,\\
+\delta(2, \varepsilon) & = & \delta(3,a) ~=~3~.
+\end{eqnarray*}
+
+
+\noindent A \emph{deterministic finite automaton} (DFA) is a structure 
+\[ M = (Q, \Sigma, \delta, s, F), \]
+where
+\begin{itemize}
+\item $Q$ is a finite set of \emph{states};
+\item $\Sigma$ is a finite alphabet;
+\item $\delta: Q \times \Sigma \rightarrow Q$ is the transition function;
+\item $s \in Q$ is the start state;
+\item $F \subseteq Q$  of \emph{final states}.
+\end{itemize}
+
+
+
+
+
+
+%%% PLEASE ERASE THE STUFF YOU DON'T USE FROM YOUR SUBMISSION
+
+
+%% To put in blank space (vertical space), use the following command.
+%% You can adjust the number of points to suit your tastes.
+%% negative points will shift stuff up, if you want
+\vspace*{50pt}
+
+%%% Possibly useful stuff
+\noindent Possibly useful stuff.
+
+
+% Regular text is roman font.
+\noindent Blahblahblah in roman font, indented by default.\\ 
+
+% and \\ ends a line. 
+ %Note that a new line is automatically indented 
+ %(unless it is the first line in your subsection / question)
+ 
+\noindent \textbf{Blahalala} in bold font, unindented.\\
+ 
+\noindent \emph{blahblahblah} in italics. \\
+
+\noindent \verb+blah blahblah blah+ \texttt{blahblahba} in true-type font.\\ 
+
+\begin{lemma}
+something happens $\iff$ something else happens.
+\end{lemma}
+
+\begin{proof}And I'm proving it here. I'll start with the forward direction, and then the backwards.\medskip
+
+\noindent $(\Rightarrow)$ Forward direction proven here.\medskip
+
+\noindent $(\Leftarrow)$ Backwards direction proven here.\end{proof}
+
+
+Now I will put up a system of equations all lined up n' purdy.
+\begin{eqnarray*}
+LHS & = & n(n-1) \\
+& = & 2n(n-1)/2 \\
+& \stackrel{(*)}{=} & RHS
+\end{eqnarray*}
+%% Whatever is between the two &'s gets lines up. In this case, the equal signs.
+
+Oh, and this is nifty, although maybe a bit confusing...
+\begin{eqnarray*}
+e_{ij} & = & \left\{ \begin{tabular}{ll} $\{v_i, v_j\}$ & if edges are undirected, \\
+						       $(v_i, v_j)$ & otherwise. \end{tabular} \right.
+\end{eqnarray*}
+
+
+
+
+\end{document}
