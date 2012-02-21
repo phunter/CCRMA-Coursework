@@ -1,4 +1,4 @@
-function [output_sig] = zeropadzerophasewin(input_sig, window, padded_length)
+function [output_sig] = zpzpwin(input_sig, window, padded_length)
 % function windows and zero-pads a signal
 % check that input_sig is the same size vector as the window:
 % multiply window by input_sig:
@@ -20,6 +20,6 @@ else
     fillspace = padded_length - length(windowed);
     oddness = mod(fillspace,2);
     
-    output_sig =   [zeros(1, floor(fillspace/2) + oddness) windowed zeros(1, floor(fillspace/2))];
+    output_sig =   [zeros(1, floor(fillspace/2) + oddness)'; windowed; zeros(1, floor(fillspace/2))'];
     output_sig = fftshift(output_sig);
 end
