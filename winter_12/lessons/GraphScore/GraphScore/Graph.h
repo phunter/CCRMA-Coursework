@@ -37,6 +37,7 @@ public:
     void RepelAll();
     void MoveAllFromConnections();
     void MoveFromDissonance();
+    void AttractToZPlane();
     void IncrementTimeCounts();
     void TrimOldConnections();
     

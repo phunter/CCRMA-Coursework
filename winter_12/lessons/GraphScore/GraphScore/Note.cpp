@@ -278,8 +278,8 @@ void Note::MoveFromDissonance(Note *other, float diss_val) {
     STVector3 nudgeVec;
     int note_distance = abs(mapped_midi - other->getMappedMidi());
     
-    float from_midi_diff = .17 * (float)note_distance; //.05 * pow((float)note_distance,2);
-    float from_diss_val = 30.0 * easeRamp(diss_val) ;//(3.0 * log(diss_val+2.0)); //12.0 * pow(1-easeBump(diss_val),7.0);
+    float from_midi_diff = .1 * (float)note_distance; // .05 * pow((float)note_distance,2);
+    float from_diss_val = 20.0 * easeRamp(diss_val) ;//(3.0 * log(diss_val+2.0)); //12.0 * pow(1-easeBump(diss_val),7.0);
     
     float speed_due_to_dist = 1.0; //1.0/(pow(mag,20)+ 1.0); // speed is inversely porportional to mag
     float how_fast = .0005 * speed_due_to_dist; //* (1.0/(mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag + 1.0));
@@ -318,6 +318,18 @@ void Note::RepelFrom(Note *other) {
     centerPosition = me - nudgeVec/2;
     other->Nudge(nudgeVec/2);
 }
+
+void Note::AttractToZ() {
+    
+    STPoint3 me = centerPosition;
+    STPoint3 ground = STPoint3(me.x, me.y, 0.0);
+    STVector3 path = ground - me;
+    float mag = path.Length();
+    STVector3 dir = path / mag;
+        
+    centerPosition = me + (ground - me) * .04;
+}
+
 
 void Note::DisplayNotes(float h)
 {

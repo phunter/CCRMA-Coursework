@@ -65,6 +65,7 @@ public:
     void MoveFromConnections();
     void MoveFromDissonance(Note *other, float diss_val);
     void RepelFrom(Note *other);
+    void AttractToZ();
     
     void DisplayNotes(float h);
     void DisplayConnections(float h);

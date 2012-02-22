@@ -32,8 +32,8 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
         
         // Calculate starting position for new note
         /** CRUDE SWITCH BETWEEN 2D AND 3D **/
-        //STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5);
-        STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, 0.0);
+        STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, .1 * (float)rand()/RAND_MAX - .05);
+        //STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, 0.0);
         new_dir.Normalize();
         
         STPoint3 new_pos;
@@ -81,7 +81,7 @@ void Graph::AddNote(int mapped_midi, STPoint3 start_pos) {
                                     start_pos.z,
                                     mapped_midi,
                                     .03,
-                                    1000);
+                                    1300);
     cur_size++;
 }
 
@@ -89,6 +89,8 @@ void Graph::UpdateGraph() {
     MoveAllFromConnections();
     MoveFromDissonance();
     RepelAll();
+    
+    AttractToZPlane();
     
     IncrementTimeCounts();
     TrimOldConnections();
@@ -120,6 +122,15 @@ void Graph::RepelAll() {
             }
         }
     }
+}
+
+void Graph::AttractToZPlane() {
+    for (int i = 0; i < max_size; i++) {
+        if (note_graph[i] != NULL) {
+            note_graph[i]->AttractToZ();
+        }
+    }
+
 }
 
 void Graph::IncrementTimeCounts() {
