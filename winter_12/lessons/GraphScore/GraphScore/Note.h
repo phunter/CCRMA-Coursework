@@ -38,7 +38,7 @@ struct Spelling {
 
 class Note {
 public:
-    Note(float x, float y, int mapped_midi_num, float s, int t);
+    Note(float x, float y, float z, int mapped_midi_num, float s, int t);
     
     float getExcite();
     void setExcite(float e);

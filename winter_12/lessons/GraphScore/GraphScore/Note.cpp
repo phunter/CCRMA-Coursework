@@ -10,10 +10,10 @@
 #include "stgl.h"
 
 // position: (x,y), relative midi note: mapped_midi_num, speed s, max_connection_time: t
-Note::Note(float x, float y, int mapped_midi_num, float s, int t)
+Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
 {
     color = STColor4f((float)rand()/RAND_MAX,(float)rand()/RAND_MAX,(float)rand()/RAND_MAX,1.0);
-    centerPosition = STPoint3(x,y,0);
+    centerPosition = STPoint3(x,y,z);
     printf("centerPosition.x = %f, centerPosition.y = %f\n", centerPosition.x, centerPosition.y);
     radius = .2;
     width_max = (10 * radius) / .2;
@@ -321,7 +321,7 @@ void Note::RepelFrom(Note *other) {
 
 void Note::DisplayNotes(float h)
 {
-    cam_height = h;
+    cam_height = h - centerPosition.z;
     width_max = ((10 * radius) / .2) / h;
             
     glEnable( GL_LINE_SMOOTH );
@@ -519,10 +519,10 @@ void Note::DrawCircle(STPoint3 cent, float rad, int numVerts, bool filled) {
     float angle, angle2;
     if (filled) {
         glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(cent.x, cent.y, 0.0);
+        glVertex3f(cent.x, cent.y, cent.z);
         for(int i = 0; i <= numVerts; i+=2) { 
             angle = i*2*M_PI/numVerts; 
-            glVertex3f(cent.x + (cos(angle) * rad), cent.y + (sin(angle) * rad), 0.0);
+            glVertex3f(cent.x + (cos(angle) * rad), cent.y + (sin(angle) * rad), cent.z);
         } 
         glEnd();
     }
@@ -530,9 +530,9 @@ void Note::DrawCircle(STPoint3 cent, float rad, int numVerts, bool filled) {
         for(int i = 0; i <= numVerts; i++) { 
             glBegin(GL_LINES);
             angle = (i-1)*2*M_PI/numVerts; 
-            glVertex3f(cent.x + (cos(angle) * rad), cent.y + (sin(angle) * rad), 0.0);
+            glVertex3f(cent.x + (cos(angle) * rad), cent.y + (sin(angle) * rad), cent.z);
             angle2 = (i+1)*2*M_PI/numVerts;
-            glVertex3f(cent.x + (cos(angle2) * rad), cent.y + (sin(angle2) * rad), 0.0);
+            glVertex3f(cent.x + (cos(angle2) * rad), cent.y + (sin(angle2) * rad), cent.z);
             glEnd();
         }
     }

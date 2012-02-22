@@ -29,8 +29,9 @@ public:
     void UpdateDefaultHeight(float def_height);
     
     void setTargetNote(Note * t);
+    STPoint3 * getTargetNotePosition();
     //void setTarget(STPoint3 * t);
-    STPoint3 getPosition();
+    STPoint3 * getPosition();
     
 //    void calculateAccelteration();
 //    void calculateSpeed();

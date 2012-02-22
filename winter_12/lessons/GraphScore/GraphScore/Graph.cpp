@@ -31,7 +31,9 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
     if (note_graph[mapped_midi] == NULL) { // if the note doesn't exist yet, add it
         
         // Calculate starting position for new note
-        STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5,(float)rand()/RAND_MAX - .5,0.0);
+        /** CRUDE SWITCH BETWEEN 2D AND 3D **/
+        //STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5);
+        STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, 0.0);
         new_dir.Normalize();
         
         STPoint3 new_pos;
@@ -76,6 +78,7 @@ void Graph::AddNote(int mapped_midi, STPoint3 start_pos) {
     
     note_graph[cur_note] = new Note(start_pos.x,
                                     start_pos.y,
+                                    start_pos.z,
                                     mapped_midi,
                                     .03,
                                     1000);

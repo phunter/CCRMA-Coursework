@@ -198,12 +198,16 @@ void display(void)
     //glClearColor(1.f, 1.f, 1.f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    STPoint3 cam_pos = cam->getPosition();
+    STPoint3 * cam_pos = cam->getPosition();
+    STPoint3 * look_pos = cam->getTargetNotePosition();
+    
     glLoadIdentity();
-    gluLookAt (cam_pos.x, cam_pos.y, cam_pos.z, cam_pos.x, cam_pos.y, 0.0, 0.0, 1.0, 0.0);
+    
+    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, cam_pos->x, cam_pos->y, 0.0, 0.0, 1.0, 0.0);
+    //gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     
     
-    graph->Display(cam_pos.z);
+    graph->Display(cam_pos->z);
     
     graph->FadeColors();
     
