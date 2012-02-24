@@ -81,16 +81,19 @@ void Graph::AddNote(int mapped_midi, STPoint3 start_pos) {
                                     start_pos.z,
                                     mapped_midi,
                                     .03,
-                                    1300);
+                                    80);
     cur_size++;
 }
 
 void Graph::UpdateGraph() {
+    AttractToZPlane();
     MoveAllFromConnections();
-    MoveFromDissonance();
+    
+    //MoveFromDissonance();
+    AttractFromDissonance();
+    
     RepelAll();
     
-    AttractToZPlane();
     
     IncrementTimeCounts();
     TrimOldConnections();
@@ -109,6 +112,16 @@ void Graph::MoveFromDissonance() {
         for (int j = i+1; j < max_size; j++) {
             if (note_graph[i] != NULL && note_graph[j] != NULL) {
                 note_graph[i]->MoveFromDissonance(note_graph[j], diss_mat->Get(i, j));
+            }
+        }
+    }
+}
+
+void Graph::AttractFromDissonance() {
+    for (int i = 0; i < max_size - 1; i++) {
+        for (int j = i+1; j < max_size; j++) {
+            if (note_graph[i] != NULL && note_graph[j] != NULL) {
+                note_graph[i]->AttractFromDissonance(note_graph[j], diss_mat->Get(i, j));
             }
         }
     }

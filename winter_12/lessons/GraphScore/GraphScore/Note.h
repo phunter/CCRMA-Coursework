@@ -64,6 +64,7 @@ public:
     void Nudge(STVector3 displacement);
     void MoveFromConnections();
     void MoveFromDissonance(Note *other, float diss_val);
+    void AttractFromDissonance(Note *other, float diss_val);
     void RepelFrom(Note *other);
     void AttractToZ();
     

@@ -278,19 +278,51 @@ void Note::MoveFromDissonance(Note *other, float diss_val) {
     STVector3 nudgeVec;
     int note_distance = abs(mapped_midi - other->getMappedMidi());
     
+    float from_max_midi_num = 0; //.12 * min(mapped_midi, other->getMappedMidi());
     float from_midi_diff = .1 * (float)note_distance; // .05 * pow((float)note_distance,2);
     float from_diss_val = 20.0 * easeRamp(diss_val) ;//(3.0 * log(diss_val+2.0)); //12.0 * pow(1-easeBump(diss_val),7.0);
     
     float speed_due_to_dist = 1.0; //1.0/(pow(mag,20)+ 1.0); // speed is inversely porportional to mag
     float how_fast = .0005 * speed_due_to_dist; //* (1.0/(mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag + 1.0));
     
-    STPoint3 newPos = me + ((him - me) * (mag - (from_midi_diff + from_diss_val))) * how_fast;
+    STPoint3 newPos = me + ((him - me) * (mag - (from_max_midi_num + from_midi_diff + from_diss_val))) * how_fast;
     
     nudgeVec = me - newPos;
     
     centerPosition = me - nudgeVec/2;
     other->Nudge(nudgeVec/2);
 }
+
+void Note::AttractFromDissonance(Note *other, float diss_val) {
+    
+    STPoint3 me = centerPosition;
+    STPoint3 him = *other->getLocation();
+    STVector3 path = him - me;
+    float mag = path.Length();
+    STVector3 dir = path / mag;
+        
+    // determines at which point dissonance transfers from attract to repel
+    float crossing_val = .1;
+    
+    float how_fast = .005; //* (1.0/(mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag + 1.0));
+    
+    int note_distance = abs(mapped_midi - other->getMappedMidi());
+    float from_midi_diff = .1 * pow((float)note_distance,.5);
+    float from_max_midi_num = .008 * min(mapped_midi, other->getMappedMidi());
+    
+    float summed_diss = easeRamp(diss_val) - from_midi_diff + from_max_midi_num;
+    
+    STVector3 nudgeVec;
+    
+    float eps = .01;
+    STPoint3 newPos = me + dir * (how_fast/*/(pow(mag,1)+eps)*/) * (crossing_val - summed_diss);
+    
+    nudgeVec = me - newPos;
+    
+    centerPosition = me - nudgeVec/2;
+    other->Nudge(nudgeVec/2);
+}
+
 
 void Note::RepelFrom(Note *other) {
     
@@ -306,14 +338,12 @@ void Note::RepelFrom(Note *other) {
     
     float overlap = mag - 2*radius;
     
+    // strong repulsion for radius collisions
     if (overlap < 0.0) {
-        
         nudgeVec = -(overlap/2)*dir;
-        //nudgeVec = normal_dir * (radius + mag) - normal_dir * radius;
-        
-        //nudgeVec = (1.0 / (mag * mag * mag * mag + .3)) * dir * .05;
     }
-    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * .008; // repulsion diminishes with square of distance
+    // general repulsion
+    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * .005; // repulsion diminishes with square of distance
         
     centerPosition = me - nudgeVec/2;
     other->Nudge(nudgeVec/2);
@@ -326,8 +356,11 @@ void Note::AttractToZ() {
     STVector3 path = ground - me;
     float mag = path.Length();
     STVector3 dir = path / mag;
-        
-    centerPosition = me + (ground - me) * .04;
+    
+    // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
+    float dimensionality = 0.2; //.06;
+    
+    centerPosition = me + (ground - me) * dimensionality;
 }
 
 

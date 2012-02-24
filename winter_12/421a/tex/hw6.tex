@@ -1,0 +1,146 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{fancyhdr}
+\usepackage{epsfig}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+
+
+
+% FILL IN THE SPECIFICS OF EACH HOMEWORK HERE
+\newcommand{\course}{Music 421a}
+\newcommand{\semester}{Winter 2012}
+\newcommand{\name}{Audio Applications of the FFT}
+\newcommand{\hwk}{Homework \#6 Solutions}
+\newcommand{\student}{Hunter McCurry}
+
+
+%%
+% The following are definitions so that you can use numbered lemmas, claims, etc.
+%%
+\newtheorem{lemma}{Lemma}
+\newtheorem*{lem}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{notation}{Notation}
+\newtheorem*{claim}{Claim}
+\newtheorem*{fclaim}{False Claim}
+\newtheorem{observation}{Observation}
+\newtheorem{conjecture}[lemma]{Conjecture}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{proposition}[lemma]{Proposition}
+
+%%
+% The following are definitions so that you can use some shorthand with deltas and such
+%%
+\newcommand{\deltahat}{\hat{\delta}}
+\newcommand{\Deltahat}{\hat{\Delta}}
+\newcommand{\righti}{\stackrel{i}{\rightarrow}}
+\newcommand{\rights}{\stackrel{*}{\rightarrow}}
+\newcommand{\righto}{\stackrel{1}{\rightarrow}}
+\newcommand{\rightn}{\stackrel{n}{\rightarrow}}
+\newcommand{\rightnp}{\stackrel{n+1}{\rightarrow}}
+\newcommand{\rightip}{\stackrel{i+1}{\rightarrow}}
+\newcommand{\rightk}{\stackrel{k}{\rightarrow}}
+\newcommand{\rightln}{\stackrel{\leq n}{\rightarrow}}
+
+
+
+%%% You can ignore the following stuff, it's just for formatting purposes
+\textheight=8.6in
+\setlength{\textwidth}{6.44in}
+\addtolength{\headheight}{\baselineskip} 
+% enumerate uses a), b), c), ...
+\renewcommand{\labelenumi}{\alph{enumi})}
+% Sets the style for fancy pages (namely, all but first page)
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+% Changes style of plain pages (namely, the first page)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \renewcommand\headrulewidth{0pt}
+  \renewcommand\footrulewidth{0.4pt}
+  \renewcommand{\headrule}{}
+  }
+% Changes the title box on the first page
+\renewcommand\maketitle{
+\begin{center}
+\begin{tabular*}{6.44in}{l @{\extracolsep{\fill}}c r}
+\bfseries  &  & \bfseries \course ~\semester \\
+\bfseries&  & \bfseries  \hwk  \\
+\bfseries   &   &  \bfseries \student \\ 
+\end{tabular*}
+\end{center} }
+
+
+%%
+%%
+%% THE REAL STUFF STARTS HERE
+%%
+%%
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+
+\subsection*{Question 1}
+Because we know $S(f) \propto 1/f$ (that is, $S(f) = K/f$), and because the average power within a frequency band is obtained by integrating the sample power spectral density across that band,
+
+\begin{align*}
+P &= \! \int_{\omega}^{2\omega} S(f)\,df \\
+&= K \! \int_{\omega}^{2\omega} 1/f\,df \\
+&= K [ \log{2\omega} - \log{\omega}] \\
+&= K \log{2}
+\end{align*}
+
+\subsection*{Question 2}
+\begin{enumerate}
+\item Here $s(t) = 2\delta(t)$, so:
+\begin{align*}
+r(t) &= (s * h)(t) + n(t) \\
+&= (2\delta * h)(t) + n(t) \\
+&= 2(\delta * h)(t) + n(t). \\
+\end{align*}
+Normalizing (multiplying by $1/2$), we get:
+\begin{align*}
+&= (\delta * h)(t) + \frac{n(t)}{2}. \\
+\end{align*}
+We know the mean of $n(t)$ is zero and the variance of $n(t)$ is $\sigma^2$ so the variance of $\frac{n(t)}{2}$ will be given by:
+\begin{equation}
+E\left\{ \left| \frac{n(t)}{2} - 0 \right|^2\right\} = E\left\{ \left| \frac{n(t)}{2}\right|^2\right\} = \frac{\sigma^2}{4}\\
+\end{equation}
+
+\item Now we have $s(t) = 2\delta(t)$ and two responses, $r_1(t)$ and $r_2(t)$:
+\begin{align*}
+r_1(t) &= (s * h)(t) + n_1(t), \\
+r_2(t) &= (s * h)(t) + n_2(t), \\
+r_1(t) + r_2(t) &= 2(s * h)(t) + \frac{n_1(t)}{2} + \frac{n_2(t)}{2}
+\end{align*}
+
+Because we know that the variance of $\frac{n(t)}{2}$ is $\frac{\sigma^2}{4}$ (from above), and because $n_1(t)$ and $n_2(t)$ will not add coherently,  our new variance is $2\frac{\sigma^2}{4} = \frac{\sigma^2}{2}$.
+
+\item We have $a(t)$ and $b(t)$ such that $(a \star b)(t) + (b \star b)(t) = 2L\delta(t)$. We have
+\begin{align*}
+r_a(t) &= (a * h)(t) + n_a(t), \\
+r_b(t) &= (b * h)(t) + n_b(t), \\
+(a \star r_a)(t) &= a \star ((a * h)(t) + n_a(t)), \\
+(b \star r_b)(t) &= b \star ((b * h)(t) + n_b(t)), \\
+(a \star r_a)(t) + (b \star r_b)(t) &= a \star (a * h)(t) + a \star n_a(t) + b \star (b * h)(t) + b \star n_b(t)\\
+&= ((a \star b)(t) + (b \star b)(t)) * h(t) + (n_a \star a)(t) + (n_b \star b)(t) \\
+&= 2L\delta * h(t) + (n_a \star a)(t) + (n_b \star b)(t)
+\end{align*}
+
+\end{enumerate}
+
+\subsection*{Question 3}
+\begin{enumerate}
+\item 
+\item
+\item
+\end{enumerate}
+
+
+\end{document}

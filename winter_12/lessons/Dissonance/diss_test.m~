@@ -1,11 +1,9 @@
-
-
 % Number of Partials
-n_parts = 5;
-partial_offset = 4;
+n_parts = 8;
+partial_offset = 1;
 
 ints = [1 + partial_offset: n_parts + partial_offset];
-amp_vec = 1 ./ ints
+amp_vec = 1 ./ (ints - partial_offset)
 
 
 % f1 = 440;
