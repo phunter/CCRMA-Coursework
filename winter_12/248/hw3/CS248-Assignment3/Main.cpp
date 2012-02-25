@@ -1,8 +1,16 @@
 #include "Framework.h"
 #include "Shader.h"
 
-#define MODEL_PATH "models/teapot.3ds"
-//#define MODEL_PATH "models/dragon.dae"
+#include "assimp.h"
+#include "aiPostProcess.h"
+#include "aiScene.h"
+
+
+//#define MODEL_PATH "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/CS248-Assignment3/models/teapot.3ds"
+//#define MODEL_PATH "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/CS248-Assignment3/models/cathedral.3ds"
+#define MODEL_PATH "models/cathedral.3ds"
+//#define MODEL_PATH "models/teapot.3ds"
+
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
 // and using rendering settings
@@ -22,6 +30,13 @@ const aiScene* scene;
 const aiMesh* mesh;
 std::vector<unsigned> indexBuffer;
 
+GLuint scene_list = 0;
+
+// current rotation angle
+static float angle = 0.f;
+
+
+
 // vertex shader
 std::auto_ptr<Shader> shader;
 
@@ -32,6 +47,7 @@ std::auto_ptr<sf::Image> specularMap;
 void initOpenGL();
 void loadAssets();
 void handleInput();
+void setMeshData();
 void renderFrame();
 
 int main(int argc, char** argv) {
@@ -96,39 +112,39 @@ void loadAssets() {
     // TODO: LOAD YOUR SHADERS/TEXTURES
     //////////////////////////////////////////////////////////////////////////
   
-    printf("scene->HasMaterials() = %d\nscene->HasMeshes() = %d\nscene->HasTextures() = %d\n",
-           scene->HasMaterials(),scene->HasMeshes(),scene->HasTextures());
+    printf("scene->HasLights() = %d\nscene->HasMaterials() = %d\nscene->HasMeshes() = %d\nscene->HasTextures() = %d\n",
+           scene->HasLights(), scene->HasMaterials(),scene->HasMeshes(),scene->HasTextures());
     
     printf("scene->mNumMaterials = %d\nscene->mNumMeshes = %d\nscene->mNumTextures = %d\n",
            scene->mNumMaterials,scene->mNumMeshes,scene->mNumTextures);
 
     
-//    // Just render the first mesh in the imported scene file
-//    mesh = scene->mMeshes[0];
-//    
-//    // Set up the index buffer.  Each face should have 3 vertices since we
-//    // specified aiProcess_Triangulate
-//    indexBuffer.reserve(mesh->mNumFaces * 3);
-//    for (unsigned i = 0; i < mesh->mNumFaces; i++) {
-//        for (unsigned j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
-//            //printf("indexBuffer.push_back(mesh->mFaces[%d].mIndices[%d] to position %lu\n", i,j, indexBuffer.size());
-//            indexBuffer.push_back(mesh->mFaces[i].mIndices[j]);
-//        }
-//    }
-//	
-//    // Load the vertex shader
-//    shader.reset(new Shader("Shaders/phongDemo"));
-//	if (!shader->loaded()) {
-//		std::cerr << "Shader failed to load" << std::endl;
-//		std::cerr << shader->errors() << std::endl;
-//		exit(-1);
-//	}
-//    
+    // Just render the first mesh in the imported scene file
+    mesh = scene->mMeshes[0];
+    
+    // Set up the index buffer.  Each face should have 3 vertices since we
+    // specified aiProcess_Triangulate
+    indexBuffer.reserve(mesh->mNumFaces * 3);
+    for (unsigned i = 0; i < mesh->mNumFaces; i++) {
+        for (unsigned j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
+            //printf("indexBuffer.push_back(mesh->mFaces[%d].mIndices[%d] to position %lu\n", i,j, indexBuffer.size());
+            indexBuffer.push_back(mesh->mFaces[i].mIndices[j]);
+        }
+    }
+	
+    // Load the vertex shader
+    shader.reset(new Shader("shaders/phongDemo"));
+	if (!shader->loaded()) {
+		std::cerr << "Shader failed to load" << std::endl;
+		std::cerr << shader->errors() << std::endl;
+		exit(-1);
+	}
+    
 //    // Load the textures
 //    diffuseMap.reset(new sf::Image());
-//    diffuseMap->LoadFromFile("Models/dragon-diffuse.jpg");
+//    diffuseMap->LoadFromFile("models/dragon-diffuse.jpg");
 //    specularMap.reset(new sf::Image());
-//    specularMap->LoadFromFile("Models/dragon-specular.jpg");
+//    specularMap->LoadFromFile("models/dragon-specular.jpg");
 }
 
 
@@ -143,22 +159,191 @@ void handleInput() {
     // http://www.sfml-dev.org/tutorials/1.6/window-events.php
     sf::Event evt;
     while (window.GetEvent(evt)) {
+        
         switch (evt.Type) {
-        case sf::Event::Closed: 
-            // Close the window.  This will cause the game loop to exit,
-            // because the IsOpened() function will no longer return true.
-            window.Close(); 
-            break;
-        case sf::Event::Resized: 
-            // If the window is resized, then we need to change the perspective
-            // transformation and viewport
-            glViewport(0, 0, evt.Size.Width, evt.Size.Height);
-            break;
-        default: 
-            break;
+            case sf::Event::Closed: 
+                // Close the window.  This will cause the game loop to exit,
+                // because the IsOpened() function will no longer return true.
+                window.Close(); 
+                break;
+            case sf::Event::Resized: 
+                // If the window is resized, then we need to change the perspective
+                // transformation and viewport
+                glViewport(0, 0, evt.Size.Width, evt.Size.Height);
+                break;
+                
+                // Key presses
+            case sf::Event::KeyPressed:
+                printf("%d\n",evt.Key.Code);
+                if (evt.Key.Code == sf::Key::Escape) {
+                    window.Close();
+                }
+                if (evt.Key.Code == sf::Key::A) {
+                    printf("LOLZ it's an A\n");
+                }
+                if (evt.Key.Code == sf::Key::Left) {
+                    angle += .1;
+                    printf("left\n");
+                }
+                if (evt.Key.Code == sf::Key::Right) {
+                    printf("right\n");
+                    angle -= .1;
+                }
+                if (evt.Key.Code == sf::Key::Up) {
+                    printf("up\n");
+                }
+                if (evt.Key.Code == sf::Key::Down) {
+                    printf("down\n");
+                }
+            default: 
+                break;
         }
     }
 }
+
+
+void apply_material(const struct aiMaterial *mtl)
+{
+//	float c[4];
+//    
+//	GLenum fill_mode;
+//	int ret1, ret2;
+//	struct aiColor4D diffuse;
+//	struct aiColor4D specular;
+//	struct aiColor4D ambient;
+//	struct aiColor4D emission;
+//	float shininess, strength;
+//	int two_sided;
+//	int wireframe;
+//	int max;
+//    
+//	set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
+//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+//		color4_to_float4(&diffuse, c);
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
+//    
+//	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
+//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
+//		color4_to_float4(&specular, c);
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
+//    
+//	set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
+//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient))
+//		color4_to_float4(&ambient, c);
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, c);
+//    
+//	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
+//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
+//		color4_to_float4(&emission, c);
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, c);
+//    
+//	max = 1;
+//	ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
+//	if(ret1 == AI_SUCCESS) {
+//    	max = 1;
+//    	ret2 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
+//		if(ret2 == AI_SUCCESS)
+//			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess * strength);
+//        else
+//        	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+//    }
+//	else {
+//		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
+//		set_float4(c, 0.0f, 0.0f, 0.0f, 0.0f);
+//		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
+//	}
+//    
+//	max = 1;
+//	if(AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_ENABLE_WIREFRAME, &wireframe, &max))
+//		fill_mode = wireframe ? GL_LINE : GL_FILL;
+//	else
+//		fill_mode = GL_FILL;
+//	glPolygonMode(GL_FRONT_AND_BACK, fill_mode);
+//    
+//	max = 1;
+//	if((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
+//		glDisable(GL_CULL_FACE);
+//	else 
+//		glEnable(GL_CULL_FACE);
+}
+
+// ----------------------------------------------------------------------------
+void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
+{
+	int i;
+	unsigned int n = 0, t;
+	struct aiMatrix4x4 m = nd->mTransformation;
+    
+	// update transform
+    
+	aiTransposeMatrix4(&m);
+	glPushMatrix();
+	glMultMatrixf((float*)&m);
+    
+	// draw all meshes assigned to this node
+	for (; n < nd->mNumMeshes; ++n) {
+		const struct aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
+        
+		apply_material(sc->mMaterials[mesh->mMaterialIndex]);
+        
+		if(mesh->mNormals == NULL) {
+			glDisable(GL_LIGHTING);
+		} else {
+			glEnable(GL_LIGHTING);
+		}
+        
+		for (t = 0; t < mesh->mNumFaces; ++t) {
+			const struct aiFace* face = &mesh->mFaces[t];
+			GLenum face_mode;
+            
+			switch(face->mNumIndices) {
+				case 1: face_mode = GL_POINTS; break;
+				case 2: face_mode = GL_LINES; break;
+				case 3: face_mode = GL_TRIANGLES; break;
+				default: face_mode = GL_POLYGON; break;
+			}
+            
+			glBegin(face_mode);
+            
+			for(i = 0; i < face->mNumIndices; i++) {
+				int index = face->mIndices[i];
+				if(mesh->mColors[0] != NULL)
+					glColor4fv((GLfloat*)&mesh->mColors[0][index]);
+				if(mesh->mNormals != NULL) 
+					glNormal3fv(&mesh->mNormals[index].x);
+				glVertex3fv(&mesh->mVertices[index].x);
+			}
+            
+			glEnd();
+		}
+	}
+    
+	// draw all children
+	for (n = 0; n < nd->mNumChildren; ++n) {
+		recursive_render(sc, nd->mChildren[n]);
+	}
+    
+	glPopMatrix();
+}
+
+//////////////////// from DEMO //////////////////////////
+void setMeshData() {
+    // Get a handle to the variables for the vertex data inside the shader.
+    GLint position = glGetAttribLocation(shader->programID(), "positionIn");
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices);
+    
+    // Texture coords.  Note the [0] at the end, very important
+    GLint texcoord = glGetAttribLocation(shader->programID(), "texcoordIn");
+    glEnableVertexAttribArray(texcoord);
+    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]);
+    
+    // Normals
+    GLint normal = glGetAttribLocation(shader->programID(), "normalIn");
+    glEnableVertexAttribArray(normal);
+    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals);
+}
+
 
 //////////////////// from DEMO //////////////////////////
 void setMatrices() {
@@ -179,7 +364,7 @@ void setMatrices() {
     static float elapsed = 0.0f;
     elapsed += clck.GetElapsedTime();
     clck.Reset();
-    glRotatef(20*elapsed, 0, 1, 0);
+    glRotatef(20*angle, 0, 1, 0);
 }
 
 
@@ -235,27 +420,6 @@ void setTextures() {
 
 
 
-//////////////////// from DEMO //////////////////////////
-void setMeshData() {
-    // Get a handle to the variables for the vertex data inside the shader.
-    GLint position = glGetAttribLocation(shader->programID(), "positionIn");
-    glEnableVertexAttribArray(position);
-    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices);
-    
-    // Texture coords.  Note the [0] at the end, very important
-    GLint texcoord = glGetAttribLocation(shader->programID(), "texcoordIn");
-    glEnableVertexAttribArray(texcoord);
-    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]);
-    
-    // Normals
-    GLint normal = glGetAttribLocation(shader->programID(), "normalIn");
-    glEnableVertexAttribArray(normal);
-    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals);
-}
-
-
-
-
 void renderFrame() {
     // Always clear the frame buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -265,19 +429,36 @@ void renderFrame() {
     // in this assignment as you wish.
     //////////////////////////////////////////////////////////////////////////
     
-    //////////////////// from DEMO //////////////////////////
+
+
     
-//    glUseProgram(shader->programID());
-//    
-//    setMatrices();
-//    setMaterial();
+    //////////////////// from DEMO //////////////////////////
+    glUseProgram(shader->programID());
+    
+    setMatrices();
+    setMaterial();
+    
+    // if the display list has not been made yet, create a new one and
+    // fill it with scene contents
+	if(scene_list == 0) {
+	    scene_list = glGenLists(1);
+	    glNewList(scene_list, GL_COMPILE);
+        // now begin at the root node of the imported data and traverse
+        // the scenegraph by multiplying subsequent local transforms
+        // together on GL's matrix stack.
+	    recursive_render(scene, scene->mRootNode);
+	    glEndList();
+	}
+    
+    glCallList(scene_list);
+    
 //    setTextures();
 //    setMeshData();
-//    
-//    // Draw the mesh
-//    
-//    //printf("index buffer is length %lu", indexBuffer.size());
-//    glDrawElements(GL_TRIANGLES, 3*mesh->mNumFaces, GL_UNSIGNED_INT, &indexBuffer[0]);
+    
+    // Draw the mesh
+    
+    //printf("index buffer is length %lu", indexBuffer.size());
+    glDrawElements(GL_TRIANGLES, 3*mesh->mNumFaces, GL_UNSIGNED_INT, &indexBuffer[0]);
 }
 
 
