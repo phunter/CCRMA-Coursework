@@ -343,7 +343,7 @@ void Note::RepelFrom(Note *other) {
         nudgeVec = -(overlap/2)*dir;
     }
     // general repulsion
-    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * .005; // repulsion diminishes with square of distance
+    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * .05; // repulsion diminishes with square of distance
         
     centerPosition = me - nudgeVec/2;
     other->Nudge(nudgeVec/2);
@@ -373,12 +373,14 @@ void Note::DisplayNotes(float h)
     
     // color inside of in bubble
     glColor4f(color.r, color.g, color.b, excitement);
-    DrawCircle(centerPosition, radius, 24, true);    
+//    DrawCircle(centerPosition, radius, 24, true);    
+    DrawCircle(centerPosition, radius, 50, true);
     
     // draw outer bubble
     glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
     glLineWidth(.8*width_max);
-    DrawCircle(centerPosition, radius, 50, false);
+//    DrawCircle(centerPosition, radius, 50, false);
+    DrawCircle(centerPosition, radius, 100, false);
     
     // draw staff lines
     glPushMatrix();

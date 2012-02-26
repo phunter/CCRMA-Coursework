@@ -8,6 +8,7 @@
 
 //#define MODEL_PATH "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/CS248-Assignment3/models/teapot.3ds"
 //#define MODEL_PATH "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/CS248-Assignment3/models/cathedral.3ds"
+//#define MODEL_PATH "models/dragon.dae"
 #define MODEL_PATH "models/cathedral.3ds"
 //#define MODEL_PATH "models/teapot.3ds"
 
@@ -49,6 +50,11 @@ void loadAssets();
 void handleInput();
 void setMeshData();
 void renderFrame();
+void setMatrices();
+void setMaterial();
+void setTextures();
+void setMeshData();
+
 
 int main(int argc, char** argv) {
 
@@ -140,11 +146,11 @@ void loadAssets() {
 		exit(-1);
 	}
     
-//    // Load the textures
-//    diffuseMap.reset(new sf::Image());
-//    diffuseMap->LoadFromFile("models/dragon-diffuse.jpg");
-//    specularMap.reset(new sf::Image());
-//    specularMap->LoadFromFile("models/dragon-specular.jpg");
+    // Load the textures
+    diffuseMap.reset(new sf::Image());
+    diffuseMap->LoadFromFile("models/dragon-diffuse.jpg");
+    specularMap.reset(new sf::Image());
+    specularMap->LoadFromFile("models/dragon-specular.jpg");
 }
 
 
@@ -267,6 +273,7 @@ void apply_material(const struct aiMaterial *mtl)
 //		glEnable(GL_CULL_FACE);
 }
 
+
 // ----------------------------------------------------------------------------
 void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 {
@@ -274,17 +281,19 @@ void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 	unsigned int n = 0, t;
 	struct aiMatrix4x4 m = nd->mTransformation;
     
-	// update transform
-    
+	// update transform    
 	aiTransposeMatrix4(&m);
 	glPushMatrix();
 	glMultMatrixf((float*)&m);
     
 	// draw all meshes assigned to this node
 	for (; n < nd->mNumMeshes; ++n) {
-		const struct aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
+		mesh = scene->mMeshes[nd->mMeshes[n]];
         
-		apply_material(sc->mMaterials[mesh->mMaterialIndex]);
+		//apply_material(sc->mMaterials[mesh->mMaterialIndex]);
+//        setMaterial();
+//        setTextures();
+//        setMeshData();
         
 		if(mesh->mNormals == NULL) {
 			glDisable(GL_LIGHTING);
@@ -430,13 +439,12 @@ void renderFrame() {
     //////////////////////////////////////////////////////////////////////////
     
 
-
-    
     //////////////////// from DEMO //////////////////////////
-    glUseProgram(shader->programID());
+    //glUseProgram(shader->programID());
     
     setMatrices();
-    setMaterial();
+//    setTextures();
+    //setMaterial();
     
     // if the display list has not been made yet, create a new one and
     // fill it with scene contents
@@ -452,8 +460,7 @@ void renderFrame() {
     
     glCallList(scene_list);
     
-//    setTextures();
-//    setMeshData();
+    //setMeshData();
     
     // Draw the mesh
     
