@@ -38,8 +38,9 @@ const aiScene* scene;
 GLuint scene_list = 0;
 
 // current rotation angle
-static float h_angle = 3.14159/2;
-static float v_angle = 0.0f;
+static float h_angle = 3.14159265/2;
+//static float v_angle = 0.0f;
+
 STPoint3 current_location = STPoint3(0.0,2.0,0.0);
 STVector3 current_forward = STVector3(sin(h_angle),0.0,cos(h_angle));
 
@@ -47,6 +48,11 @@ STVector3 current_forward = STVector3(sin(h_angle),0.0,cos(h_angle));
 struct meshObject {
     const aiMesh* mesh;
     std::vector<unsigned> indexBuffer;
+    
+    int diff_index;
+    int spec_index;
+//    std::auto_ptr<sf::Image> diffuseMap;
+//    std::auto_ptr<sf::Image> specularMap;
 };
 
 std::vector<meshObject> meshes;
@@ -55,19 +61,20 @@ std::vector<meshObject> meshes;
 std::auto_ptr<Shader> shader;
 
 // Texture
-std::auto_ptr<sf::Image> diffuseMap;
-std::auto_ptr<sf::Image> specularMap;
+std::auto_ptr<sf::Image> diffuseMaps;
+std::auto_ptr<sf::Image> specularMaps;
+
 sf::Image white = sf::Image(1,1,sf::Color::White);
 
 void initOpenGL();
 void loadAssets();
 void handleInput();
-void setMeshData(const aiMesh * mesh);
+
 void renderFrame();
 void setMatrices();
-void setMaterial(const aiMesh * mesh);
-void setTextures();
-void setMeshData();
+void setMaterial(int meshNum);
+void setTextures(int meshNum);
+void setMeshData(int meshNum);
 void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd);
 //void recursive_render(const struct aiScene *sc, const struct aiNode* nd);
 
@@ -165,12 +172,12 @@ void loadAssets() {
     
     // Load the textures
 //    diffuseMap.reset(new sf::Image());
-//    diffuseMap->LoadFromFile("models/dragon-diffuse.jpg");
+//    diffuseMap->LoadFromFile("models/floor_d.jpg");
 //    specularMap.reset(new sf::Image());
-//    specularMap->LoadFromFile("models/dragon-specular.jpg");
+//    specularMap->LoadFromFile("models/floor_s.jpg");
 
-    diffuseMap.reset(new sf::Image(white));
-    specularMap.reset(new sf::Image(white));
+//    diffuseMap.reset(new sf::Image(white));
+//    specularMap.reset(new sf::Image(white));
     
 }
 
@@ -205,11 +212,11 @@ void handleInput() {
                     case sf::Key::Escape:
                         window.Close();
                         break;
-                    case sf::Key::A:
-                        current_location.x += .1;
-                        break;
                     case sf::Key::D:
-                        current_location.x -= .1;
+                        current_location += .3*STVector3(-cos(h_angle),0,sin(h_angle));
+                        break;
+                    case sf::Key::A:
+                        current_location -= .3*STVector3(-cos(h_angle),0,sin(h_angle));
                         break;
                     case sf::Key::W:
                         current_location += .3*current_forward;
@@ -230,28 +237,6 @@ void handleInput() {
                     default:
                         break;
                 }
-                
-//                printf("%d\n",evt.Key.Code);
-//                if (evt.Key.Code == sf::Key::Escape) {
-//                    window.Close();
-//                }
-//                if (evt.Key.Code == sf::Key::A) {
-//                    current_location.x += .1;
-//                }
-//                if (evt.Key.Code == sf::Key::Left) {
-//                    angle += .1;
-//                    printf("left\n");
-//                }
-//                if (evt.Key.Code == sf::Key::Right) {
-//                    printf("right\n");
-//                    angle -= .1;
-//                }
-//                if (evt.Key.Code == sf::Key::Up) {
-//                    printf("up\n");
-//                }
-//                if (evt.Key.Code == sf::Key::Down) {
-//                    printf("down\n");
-//                }
             default: 
                 break;
         }
@@ -286,6 +271,26 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
             }
         }
         
+        aiMaterial * mat = scene->mMaterials[newMesh.mesh->mMaterialIndex];
+        aiString* prefix = new aiString("models/");
+        aiString* root;
+        mat->GetTexture(aiTextureType_DIFFUSE, 0, root);
+        
+        prefix->Append(root->data);
+        aiString* diff = new aiString(*prefix);
+        diff->Append("_d.jpg");
+        
+        aiString* spec = new aiString(*prefix);
+        spec->Append("_s.jpg");
+
+        
+        std::auto_ptr<sf::Image> diffuseMap, specularMap;
+        
+        newMesh.diffuseMap.reset(new sf::Image());
+        newMesh.diffuseMap->LoadFromFile(diff->data);
+        newMesh.specularMap.reset(new sf::Image());
+        newMesh.specularMap->LoadFromFile(spec->data);
+                
         meshes.push_back(newMesh);
 	}
     
@@ -358,21 +363,23 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
 //}
 
 //////////////////// from DEMO /////////////////////
-void setMeshData(const aiMesh * mesh) {
+void setMeshData(int meshNum) {
+    aiMesh mesh = *meshes[meshNum].mesh;
+    
     // Get a handle to the variables for the vertex data inside the shader.
     GLint position = glGetAttribLocation(shader->programID(), "positionIn");
     glEnableVertexAttribArray(position);
-    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices);
+    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh.mVertices);
     
-//    // Texture coords.  Note the [0] at the end, very important
-//    GLint texcoord = glGetAttribLocation(shader->programID(), "texcoordIn");
-//    glEnableVertexAttribArray(texcoord);
-//    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]);
+    // Texture coords.  Note the [0] at the end, very important
+    GLint texcoord = glGetAttribLocation(shader->programID(), "texcoordIn");
+    glEnableVertexAttribArray(texcoord);
+    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh.mTextureCoords[0]);
     
     // Normals
     GLint normal = glGetAttribLocation(shader->programID(), "normalIn");
     glEnableVertexAttribArray(normal);
-    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals);
+    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh.mNormals);
 }
 
 
@@ -418,8 +425,10 @@ void setMatrices() {
 
 
 //////////////////// from DEMO //////////////////////////
-void setMaterial(const aiMesh * mesh) {
-    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+void setMaterial(int meshNum) {
+    
+    aiMesh mesh = *meshes[meshNum].mesh;
+    aiMaterial* material = scene->mMaterials[mesh.mMaterialIndex];
     aiColor3D color;
     
     // Get a handle to the diffuse, specular, and ambient variables
@@ -451,22 +460,21 @@ void setMaterial(const aiMesh * mesh) {
 
 
 //////////////////// from DEMO //////////////////////////
-void setTextures() {
+void setTextures(int meshNum) {    
     // Get a "handle" to the texture variables inside our shader.  Then 
     // pass two textures to the shader: one for diffuse, and the other for
     // transparency.
     GLint diffuse = glGetUniformLocation(shader->programID(), "diffuseMap");
     glUniform1i(diffuse, 0); // The diffuse map will be GL_TEXTURE0
     glActiveTexture(GL_TEXTURE0);
-    diffuseMap->Bind();
+    meshes[meshNum].diffuseMap->Bind();
     
     // Transparency
     GLint specular = glGetUniformLocation(shader->programID(), "specularMap");
     glUniform1i(specular, 1); // The transparency map will be GL_TEXTURE1
     glActiveTexture(GL_TEXTURE1);
-    specularMap->Bind();
+    meshes[meshNum].specularMap->Bind();
 }
-
 
 
 void renderFrame() {
@@ -485,9 +493,9 @@ void renderFrame() {
     for (int i = 0; i < meshes.size(); i++) {
         setMatrices();
         
-        setMaterial(meshes[i].mesh);
-        setTextures();
-        setMeshData(meshes[i].mesh);
+        setMaterial(i);
+        setTextures(i);
+        setMeshData(i);
         
         // Draw the mesh
         if (i != 3 && i != 24 && i != 5 && i != 30 && i != 36 && i != 26 && i != 28 && i != 39 && i != 44) {
