@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		44607ACD14FA65D90062C603 /* STPoint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607AC114FA65D90062C603 /* STPoint2.cpp */; };
+		44607ACE14FA65D90062C603 /* STPoint3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607AC414FA65D90062C603 /* STPoint3.cpp */; };
+		44607ACF14FA65D90062C603 /* STVector2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607AC714FA65D90062C603 /* STVector2.cpp */; };
+		44607AD014FA65D90062C603 /* STVector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607ACA14FA65D90062C603 /* STVector3.cpp */; };
 		44BAA4B814F8FC870059A1D9 /* armadillo_n.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49714F8FC870059A1D9 /* armadillo_n.jpg */; };
 		44BAA4B914F8FC870059A1D9 /* armadillo.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49814F8FC870059A1D9 /* armadillo.3ds */; };
 		44BAA4BA14F8FC870059A1D9 /* armadillo.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49914F8FC870059A1D9 /* armadillo.blend */; };
@@ -149,6 +153,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		44607AC114FA65D90062C603 /* STPoint2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STPoint2.cpp; sourceTree = "<group>"; };
+		44607AC214FA65D90062C603 /* STPoint2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPoint2.h; sourceTree = "<group>"; };
+		44607AC314FA65D90062C603 /* STPoint2.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = STPoint2.inl; sourceTree = "<group>"; };
+		44607AC414FA65D90062C603 /* STPoint3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STPoint3.cpp; sourceTree = "<group>"; };
+		44607AC514FA65D90062C603 /* STPoint3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPoint3.h; sourceTree = "<group>"; };
+		44607AC614FA65D90062C603 /* STPoint3.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = STPoint3.inl; sourceTree = "<group>"; };
+		44607AC714FA65D90062C603 /* STVector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STVector2.cpp; sourceTree = "<group>"; };
+		44607AC814FA65D90062C603 /* STVector2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STVector2.h; sourceTree = "<group>"; };
+		44607AC914FA65D90062C603 /* STVector2.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = STVector2.inl; sourceTree = "<group>"; };
+		44607ACA14FA65D90062C603 /* STVector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STVector3.cpp; sourceTree = "<group>"; };
+		44607ACB14FA65D90062C603 /* STVector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STVector3.h; sourceTree = "<group>"; };
+		44607ACC14FA65D90062C603 /* STVector3.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = STVector3.inl; sourceTree = "<group>"; };
+		44607AD114FA66200062C603 /* stForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stForward.h; sourceTree = "<group>"; };
+		44607AD214FA66560062C603 /* STUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STUtil.h; sourceTree = "<group>"; };
 		44BAA49714F8FC870059A1D9 /* armadillo_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = armadillo_n.jpg; sourceTree = "<group>"; };
 		44BAA49814F8FC870059A1D9 /* armadillo.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.3ds; sourceTree = "<group>"; };
 		44BAA49914F8FC870059A1D9 /* armadillo.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend; sourceTree = "<group>"; };
@@ -223,6 +241,7 @@
 			isa = PBXGroup;
 			children = (
 				08FB7795FE84155DC02AAC07 /* Source */,
+				44607AC014FA65D90062C603 /* FromST */,
 				44F8D32914F85853007222ED /* models */,
 				44F8D34B14F85854007222ED /* shaders */,
 				C6A0FF2B0290797F04C91782 /* Documentation */,
@@ -248,6 +267,27 @@
 				8DD76FB20486AB0100D96B5E /* CS248-Assignment3 */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		44607AC014FA65D90062C603 /* FromST */ = {
+			isa = PBXGroup;
+			children = (
+				44607AD114FA66200062C603 /* stForward.h */,
+				44607AD214FA66560062C603 /* STUtil.h */,
+				44607AC114FA65D90062C603 /* STPoint2.cpp */,
+				44607AC214FA65D90062C603 /* STPoint2.h */,
+				44607AC314FA65D90062C603 /* STPoint2.inl */,
+				44607AC414FA65D90062C603 /* STPoint3.cpp */,
+				44607AC514FA65D90062C603 /* STPoint3.h */,
+				44607AC614FA65D90062C603 /* STPoint3.inl */,
+				44607AC714FA65D90062C603 /* STVector2.cpp */,
+				44607AC814FA65D90062C603 /* STVector2.h */,
+				44607AC914FA65D90062C603 /* STVector2.inl */,
+				44607ACA14FA65D90062C603 /* STVector3.cpp */,
+				44607ACB14FA65D90062C603 /* STVector3.h */,
+				44607ACC14FA65D90062C603 /* STVector3.inl */,
+			);
+			path = FromST;
 			sourceTree = "<group>";
 		};
 		44F8D32914F85853007222ED /* models */ = {
@@ -387,6 +427,10 @@
 			files = (
 				44F8D32514F8583A007222ED /* Main.cpp in Sources */,
 				44F8D32814F85845007222ED /* Shader.cpp in Sources */,
+				44607ACD14FA65D90062C603 /* STPoint2.cpp in Sources */,
+				44607ACE14FA65D90062C603 /* STPoint3.cpp in Sources */,
+				44607ACF14FA65D90062C603 /* STVector2.cpp in Sources */,
+				44607AD014FA65D90062C603 /* STVector3.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

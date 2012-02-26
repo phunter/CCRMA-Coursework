@@ -5,12 +5,15 @@
 #include "aiPostProcess.h"
 #include "aiScene.h"
 
+#include "STPoint3.h"
+#include "STVector3.h"
 
 //#define MODEL_PATH "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/CS248-Assignment3/models/teapot.3ds"
 //#define MODEL_PATH "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/CS248-Assignment3/models/cathedral.3ds"
 //#define MODEL_PATH "models/dragon.dae"
-#define MODEL_PATH "models/cathedral.3ds"
 //#define MODEL_PATH "models/teapot.3ds"
+#define MODEL_PATH "models/cathedral.3ds"
+//#define MODEL_PATH "models/armadillo.3ds"
 
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
@@ -28,33 +31,45 @@ sf::Clock clck;
 // exits.
 Assimp::Importer importer;
 const aiScene* scene;
-const aiMesh* mesh;
-std::vector<unsigned> indexBuffer;
+
+//const aiMesh* mesh;
+//std::vector<unsigned> indexBuffer;
 
 GLuint scene_list = 0;
 
 // current rotation angle
-static float angle = 0.f;
+static float h_angle = 3.14159/2;
+static float v_angle = 0.0f;
+STPoint3 current_location = STPoint3(0.0,2.0,0.0);
+STVector3 current_forward = STVector3(sin(h_angle),0.0,cos(h_angle));
 
 
+struct meshObject {
+    const aiMesh* mesh;
+    std::vector<unsigned> indexBuffer;
+};
 
-// vertex shader
+std::vector<meshObject> meshes;
+
+// shader
 std::auto_ptr<Shader> shader;
 
 // Texture
 std::auto_ptr<sf::Image> diffuseMap;
 std::auto_ptr<sf::Image> specularMap;
+sf::Image white = sf::Image(1,1,sf::Color::White);
 
 void initOpenGL();
 void loadAssets();
 void handleInput();
-void setMeshData();
+void setMeshData(const aiMesh * mesh);
 void renderFrame();
 void setMatrices();
-void setMaterial();
+void setMaterial(const aiMesh * mesh);
 void setTextures();
 void setMeshData();
-
+void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd);
+//void recursive_render(const struct aiScene *sc, const struct aiNode* nd);
 
 int main(int argc, char** argv) {
 
@@ -90,7 +105,7 @@ void initOpenGL() {
     // This initializes OpenGL with some common defaults.  More info here:
     // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
     glClearDepth(1.0f);
-    glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+    glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
 }
@@ -114,32 +129,34 @@ void loadAssets() {
         exit(-1);
     }
 
-    //////////////////////////////////////////////////////////////////////////
-    // TODO: LOAD YOUR SHADERS/TEXTURES
-    //////////////////////////////////////////////////////////////////////////
-  
     printf("scene->HasLights() = %d\nscene->HasMaterials() = %d\nscene->HasMeshes() = %d\nscene->HasTextures() = %d\n",
            scene->HasLights(), scene->HasMaterials(),scene->HasMeshes(),scene->HasTextures());
     
     printf("scene->mNumMaterials = %d\nscene->mNumMeshes = %d\nscene->mNumTextures = %d\n",
            scene->mNumMaterials,scene->mNumMeshes,scene->mNumTextures);
+    
 
+    //////////////////////////////////////////////////////////////////////////
+    // TODO: LOAD YOUR SHADERS/TEXTURES
+    //////////////////////////////////////////////////////////////////////////
     
-    // Just render the first mesh in the imported scene file
-    mesh = scene->mMeshes[0];
+    // if the display list has not been made yet, create a new one and
+    // fill it with scene contents
+	if(scene_list == 0) {
+	    scene_list = glGenLists(1);
+	    glNewList(scene_list, GL_COMPILE);
+        // now begin at the root node of the imported data and traverse
+        // the scenegraph by multiplying subsequent local transforms
+        // together on GL's matrix stack.
+	    recursive_load_meshes(scene, scene->mRootNode);
+	    glEndList();
+	}
     
-    // Set up the index buffer.  Each face should have 3 vertices since we
-    // specified aiProcess_Triangulate
-    indexBuffer.reserve(mesh->mNumFaces * 3);
-    for (unsigned i = 0; i < mesh->mNumFaces; i++) {
-        for (unsigned j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
-            //printf("indexBuffer.push_back(mesh->mFaces[%d].mIndices[%d] to position %lu\n", i,j, indexBuffer.size());
-            indexBuffer.push_back(mesh->mFaces[i].mIndices[j]);
-        }
-    }
-	
+    glCallList(scene_list);
+    
+    
     // Load the vertex shader
-    shader.reset(new Shader("shaders/phongDemo"));
+    shader.reset(new Shader("shaders/phong"));
 	if (!shader->loaded()) {
 		std::cerr << "Shader failed to load" << std::endl;
 		std::cerr << shader->errors() << std::endl;
@@ -147,10 +164,14 @@ void loadAssets() {
 	}
     
     // Load the textures
-    diffuseMap.reset(new sf::Image());
-    diffuseMap->LoadFromFile("models/dragon-diffuse.jpg");
-    specularMap.reset(new sf::Image());
-    specularMap->LoadFromFile("models/dragon-specular.jpg");
+//    diffuseMap.reset(new sf::Image());
+//    diffuseMap->LoadFromFile("models/dragon-diffuse.jpg");
+//    specularMap.reset(new sf::Image());
+//    specularMap->LoadFromFile("models/dragon-specular.jpg");
+
+    diffuseMap.reset(new sf::Image(white));
+    specularMap.reset(new sf::Image(white));
+    
 }
 
 
@@ -180,27 +201,57 @@ void handleInput() {
                 
                 // Key presses
             case sf::Event::KeyPressed:
-                printf("%d\n",evt.Key.Code);
-                if (evt.Key.Code == sf::Key::Escape) {
-                    window.Close();
+                switch (evt.Key.Code) {
+                    case sf::Key::Escape:
+                        window.Close();
+                        break;
+                    case sf::Key::A:
+                        current_location.x += .1;
+                        break;
+                    case sf::Key::D:
+                        current_location.x -= .1;
+                        break;
+                    case sf::Key::W:
+                        current_location += .3*current_forward;
+                        break;
+                    case sf::Key::S:
+                        current_location -= .3*current_forward;
+                        break;
+                        
+                    case sf::Key::Left:
+                        h_angle += .1;
+                        current_forward = STVector3(sin(h_angle),0,cos(h_angle));
+                        break;
+                    case sf::Key::Right:
+                        h_angle -= .1;
+                        current_forward = STVector3(sin(h_angle),0,cos(h_angle));
+                        break;
+                        
+                    default:
+                        break;
                 }
-                if (evt.Key.Code == sf::Key::A) {
-                    printf("LOLZ it's an A\n");
-                }
-                if (evt.Key.Code == sf::Key::Left) {
-                    angle += .1;
-                    printf("left\n");
-                }
-                if (evt.Key.Code == sf::Key::Right) {
-                    printf("right\n");
-                    angle -= .1;
-                }
-                if (evt.Key.Code == sf::Key::Up) {
-                    printf("up\n");
-                }
-                if (evt.Key.Code == sf::Key::Down) {
-                    printf("down\n");
-                }
+                
+//                printf("%d\n",evt.Key.Code);
+//                if (evt.Key.Code == sf::Key::Escape) {
+//                    window.Close();
+//                }
+//                if (evt.Key.Code == sf::Key::A) {
+//                    current_location.x += .1;
+//                }
+//                if (evt.Key.Code == sf::Key::Left) {
+//                    angle += .1;
+//                    printf("left\n");
+//                }
+//                if (evt.Key.Code == sf::Key::Right) {
+//                    printf("right\n");
+//                    angle -= .1;
+//                }
+//                if (evt.Key.Code == sf::Key::Up) {
+//                    printf("up\n");
+//                }
+//                if (evt.Key.Code == sf::Key::Down) {
+//                    printf("down\n");
+//                }
             default: 
                 break;
         }
@@ -208,77 +259,11 @@ void handleInput() {
 }
 
 
-void apply_material(const struct aiMaterial *mtl)
-{
-//	float c[4];
-//    
-//	GLenum fill_mode;
-//	int ret1, ret2;
-//	struct aiColor4D diffuse;
-//	struct aiColor4D specular;
-//	struct aiColor4D ambient;
-//	struct aiColor4D emission;
-//	float shininess, strength;
-//	int two_sided;
-//	int wireframe;
-//	int max;
-//    
-//	set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-//		color4_to_float4(&diffuse, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
-//    
-//	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
-//		color4_to_float4(&specular, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
-//    
-//	set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient))
-//		color4_to_float4(&ambient, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, c);
-//    
-//	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
-//		color4_to_float4(&emission, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, c);
-//    
-//	max = 1;
-//	ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
-//	if(ret1 == AI_SUCCESS) {
-//    	max = 1;
-//    	ret2 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
-//		if(ret2 == AI_SUCCESS)
-//			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess * strength);
-//        else
-//        	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-//    }
-//	else {
-//		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
-//		set_float4(c, 0.0f, 0.0f, 0.0f, 0.0f);
-//		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
-//	}
-//    
-//	max = 1;
-//	if(AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_ENABLE_WIREFRAME, &wireframe, &max))
-//		fill_mode = wireframe ? GL_LINE : GL_FILL;
-//	else
-//		fill_mode = GL_FILL;
-//	glPolygonMode(GL_FRONT_AND_BACK, fill_mode);
-//    
-//	max = 1;
-//	if((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
-//		glDisable(GL_CULL_FACE);
-//	else 
-//		glEnable(GL_CULL_FACE);
-}
 
 
-// ----------------------------------------------------------------------------
-void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
-{
-	int i;
-	unsigned int n = 0, t;
+void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
+ 
+	unsigned int n = 0;
 	struct aiMatrix4x4 m = nd->mTransformation;
     
 	// update transform    
@@ -286,66 +271,103 @@ void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 	glPushMatrix();
 	glMultMatrixf((float*)&m);
     
+    
 	// draw all meshes assigned to this node
 	for (; n < nd->mNumMeshes; ++n) {
-		mesh = scene->mMeshes[nd->mMeshes[n]];
+        meshObject newMesh;
+		newMesh.mesh = scene->mMeshes[nd->mMeshes[n]];
         
-		//apply_material(sc->mMaterials[mesh->mMaterialIndex]);
-//        setMaterial();
-//        setTextures();
-//        setMeshData();
+        // Set up the index buffer.  Each face should have 3 vertices since we
+        // specified aiProcess_Triangulate
+        newMesh.indexBuffer.reserve(newMesh.mesh->mNumFaces * 3);
+        for (unsigned i = 0; i < newMesh.mesh->mNumFaces; i++) {
+            for (unsigned j = 0; j < newMesh.mesh->mFaces[i].mNumIndices; j++) {
+                newMesh.indexBuffer.push_back(newMesh.mesh->mFaces[i].mIndices[j]);
+            }
+        }
         
-		if(mesh->mNormals == NULL) {
-			glDisable(GL_LIGHTING);
-		} else {
-			glEnable(GL_LIGHTING);
-		}
-        
-		for (t = 0; t < mesh->mNumFaces; ++t) {
-			const struct aiFace* face = &mesh->mFaces[t];
-			GLenum face_mode;
-            
-			switch(face->mNumIndices) {
-				case 1: face_mode = GL_POINTS; break;
-				case 2: face_mode = GL_LINES; break;
-				case 3: face_mode = GL_TRIANGLES; break;
-				default: face_mode = GL_POLYGON; break;
-			}
-            
-			glBegin(face_mode);
-            
-			for(i = 0; i < face->mNumIndices; i++) {
-				int index = face->mIndices[i];
-				if(mesh->mColors[0] != NULL)
-					glColor4fv((GLfloat*)&mesh->mColors[0][index]);
-				if(mesh->mNormals != NULL) 
-					glNormal3fv(&mesh->mNormals[index].x);
-				glVertex3fv(&mesh->mVertices[index].x);
-			}
-            
-			glEnd();
-		}
+        meshes.push_back(newMesh);
 	}
     
 	// draw all children
 	for (n = 0; n < nd->mNumChildren; ++n) {
-		recursive_render(sc, nd->mChildren[n]);
+		recursive_load_meshes(sc, nd->mChildren[n]);
 	}
     
 	glPopMatrix();
 }
 
-//////////////////// from DEMO //////////////////////////
-void setMeshData() {
+// ----------------------------------------------------------------------------
+//void recursive_render(const struct aiScene *sc, const struct aiNode* nd)
+//{
+//	int i;
+//	unsigned int n = 0, t;
+//	struct aiMatrix4x4 m = nd->mTransformation;
+//    
+//	// update transform    
+//	aiTransposeMatrix4(&m);
+//	glPushMatrix();
+//	glMultMatrixf((float*)&m);
+//    
+//	// draw all meshes assigned to this node
+//	for (; n < nd->mNumMeshes; ++n) {
+//		mesh = scene->mMeshes[nd->mMeshes[n]];
+//        
+//        setMaterial();
+//        setTextures();
+////        setMeshData();
+//        
+//		if(mesh->mNormals == NULL) {
+//			glDisable(GL_LIGHTING);
+//		} else {
+//			glEnable(GL_LIGHTING);
+//		}
+//        
+//		for (t = 0; t < mesh->mNumFaces; ++t) {
+//			const struct aiFace* face = &mesh->mFaces[t];
+//			GLenum face_mode;
+//            
+//			switch(face->mNumIndices) {
+//				case 1: face_mode = GL_POINTS; break;
+//				case 2: face_mode = GL_LINES; break;
+//				case 3: face_mode = GL_TRIANGLES; break;
+//				default: face_mode = GL_POLYGON; break;
+//			}
+//            
+//			glBegin(face_mode);
+//            
+//			for(i = 0; i < face->mNumIndices; i++) {
+//				int index = face->mIndices[i];
+//				if(mesh->mColors[0] != NULL)
+//					glColor4fv((GLfloat*)&mesh->mColors[0][index]);
+//				if(mesh->mNormals != NULL) 
+//					glNormal3fv(&mesh->mNormals[index].x);
+//				glVertex3fv(&mesh->mVertices[index].x);
+//			}
+//            
+//			glEnd();
+//		}
+//	}
+//    
+//	// draw all children
+//	for (n = 0; n < nd->mNumChildren; ++n) {
+//		recursive_render(sc, nd->mChildren[n]);
+//	}
+//    
+//	glPopMatrix();
+//}
+
+//////////////////// from DEMO /////////////////////
+void setMeshData(const aiMesh * mesh) {
     // Get a handle to the variables for the vertex data inside the shader.
     GLint position = glGetAttribLocation(shader->programID(), "positionIn");
     glEnableVertexAttribArray(position);
     glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices);
     
-    // Texture coords.  Note the [0] at the end, very important
-    GLint texcoord = glGetAttribLocation(shader->programID(), "texcoordIn");
-    glEnableVertexAttribArray(texcoord);
-    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]);
+//    // Texture coords.  Note the [0] at the end, very important
+//    GLint texcoord = glGetAttribLocation(shader->programID(), "texcoordIn");
+//    glEnableVertexAttribArray(texcoord);
+//    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]);
     
     // Normals
     GLint normal = glGetAttribLocation(shader->programID(), "normalIn");
@@ -353,6 +375,15 @@ void setMeshData() {
     glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals);
 }
 
+
+void applyMatrixTransform(const struct aiNode* nd) {
+	struct aiMatrix4x4 m = nd->mTransformation;
+    
+	// update transform    
+	aiTransposeMatrix4(&m);
+	glPushMatrix();
+	glMultMatrixf((float*)&m);
+}
 
 //////////////////// from DEMO //////////////////////////
 void setMatrices() {
@@ -367,18 +398,27 @@ void setMatrices() {
     gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0.0f, 2.0f, -12.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    gluLookAt(current_location.x, current_location.y, current_location.z, 
+              current_location.x + current_forward.x,
+              current_location.y + current_forward.y,
+              current_location.z + current_forward.z, 0.0f, 1.0f, 0.0f);
     
     // Add a little rotation, using the elapsed time for smooth animation
     static float elapsed = 0.0f;
     elapsed += clck.GetElapsedTime();
     clck.Reset();
-    glRotatef(20*angle, 0, 1, 0);
+
+//    glRotatef(20*angle, 0, 1, 0);
+//    glTranslatef(current_location.x, current_location.y, current_location.z);
+
+    
+    glTranslatef(10, 0, 0);
+    applyMatrixTransform(scene->mRootNode);
 }
 
 
 //////////////////// from DEMO //////////////////////////
-void setMaterial() {
+void setMaterial(const aiMesh * mesh) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     aiColor3D color;
     
@@ -391,12 +431,12 @@ void setMaterial() {
     
     // Specular material
     GLint specular = glGetUniformLocation(shader->programID(), "Ks");
-    material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    material->Get(AI_MATKEY_COLOR_SPECULAR, color);
     glUniform3f(specular, color.r, color.g, color.b);
     
     // Ambient material
     GLint ambient = glGetUniformLocation(shader->programID(), "Ka");
-    material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    material->Get(AI_MATKEY_COLOR_AMBIENT, color);
     glUniform3f(ambient, color.r, color.g, color.b);
     
     // Specular power
@@ -440,37 +480,20 @@ void renderFrame() {
     
 
     //////////////////// from DEMO //////////////////////////
-    //glUseProgram(shader->programID());
+    glUseProgram(shader->programID());
     
-    setMatrices();
-//    setTextures();
-    //setMaterial();
-    
-    // if the display list has not been made yet, create a new one and
-    // fill it with scene contents
-	if(scene_list == 0) {
-	    scene_list = glGenLists(1);
-	    glNewList(scene_list, GL_COMPILE);
-        // now begin at the root node of the imported data and traverse
-        // the scenegraph by multiplying subsequent local transforms
-        // together on GL's matrix stack.
-	    recursive_render(scene, scene->mRootNode);
-	    glEndList();
-	}
-    
-    glCallList(scene_list);
-    
-    //setMeshData();
-    
-    // Draw the mesh
-    
-    //printf("index buffer is length %lu", indexBuffer.size());
-    glDrawElements(GL_TRIANGLES, 3*mesh->mNumFaces, GL_UNSIGNED_INT, &indexBuffer[0]);
+    for (int i = 0; i < meshes.size(); i++) {
+        setMatrices();
+        
+        setMaterial(meshes[i].mesh);
+        setTextures();
+        setMeshData(meshes[i].mesh);
+        
+        // Draw the mesh
+        if (i != 3 && i != 24 && i != 5 && i != 30 && i != 36 && i != 26 && i != 28 && i != 39 && i != 44) {
+            glDrawElements(GL_TRIANGLES, 3*meshes[i].mesh->mNumFaces, GL_UNSIGNED_INT, &meshes[i].indexBuffer[0]);
+        }
+    }
 }
-
-
-
-
-
 
 

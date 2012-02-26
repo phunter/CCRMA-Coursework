@@ -1,0 +1,492 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		44BAA4B814F8FC870059A1D9 /* armadillo_n.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49714F8FC870059A1D9 /* armadillo_n.jpg */; };
+		44BAA4B914F8FC870059A1D9 /* armadillo.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49814F8FC870059A1D9 /* armadillo.3ds */; };
+		44BAA4BA14F8FC870059A1D9 /* armadillo.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49914F8FC870059A1D9 /* armadillo.blend */; };
+		44BAA4BB14F8FC870059A1D9 /* armadillo.blend1 in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49A14F8FC870059A1D9 /* armadillo.blend1 */; };
+		44BAA4BC14F8FC870059A1D9 /* armadillo.blend2 in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49B14F8FC870059A1D9 /* armadillo.blend2 */; };
+		44BAA4BD14F8FC870059A1D9 /* cathedral.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49C14F8FC870059A1D9 /* cathedral.3ds */; };
+		44BAA4BE14F8FC870059A1D9 /* cathedral.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49D14F8FC870059A1D9 /* cathedral.blend */; };
+		44BAA4BF14F8FC870059A1D9 /* cathedral.blend1 in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49E14F8FC870059A1D9 /* cathedral.blend1 */; };
+		44BAA4C014F8FC870059A1D9 /* cathedral.blend2 in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA49F14F8FC870059A1D9 /* cathedral.blend2 */; };
+		44BAA4C114F8FC870059A1D9 /* coal_d.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A014F8FC870059A1D9 /* coal_d.jpg */; };
+		44BAA4C214F8FC870059A1D9 /* coal_d.png in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A114F8FC870059A1D9 /* coal_d.png */; };
+		44BAA4C314F8FC870059A1D9 /* dragon-diffuse.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A214F8FC870059A1D9 /* dragon-diffuse.jpg */; };
+		44BAA4C414F8FC870059A1D9 /* dragon-specular.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A314F8FC870059A1D9 /* dragon-specular.jpg */; };
+		44BAA4C514F8FC870059A1D9 /* dragon-transparency.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A414F8FC870059A1D9 /* dragon-transparency.jpg */; };
+		44BAA4C614F8FC870059A1D9 /* dragon.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A514F8FC870059A1D9 /* dragon.3ds */; };
+		44BAA4C714F8FC870059A1D9 /* dragon.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A614F8FC870059A1D9 /* dragon.blend */; };
+		44BAA4C814F8FC870059A1D9 /* dragon.blend1 in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A714F8FC870059A1D9 /* dragon.blend1 */; };
+		44BAA4C914F8FC870059A1D9 /* dragon.dae in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A814F8FC870059A1D9 /* dragon.dae */; };
+		44BAA4CA14F8FC870059A1D9 /* floor_d.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4A914F8FC870059A1D9 /* floor_d.jpg */; };
+		44BAA4CB14F8FC870059A1D9 /* floor_n.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4AA14F8FC870059A1D9 /* floor_n.jpg */; };
+		44BAA4CC14F8FC870059A1D9 /* floor_s.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4AB14F8FC870059A1D9 /* floor_s.jpg */; };
+		44BAA4CD14F8FC870059A1D9 /* glass_d.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4AC14F8FC870059A1D9 /* glass_d.jpg */; };
+		44BAA4CE14F8FC870059A1D9 /* sphere.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4AD14F8FC870059A1D9 /* sphere.3ds */; };
+		44BAA4CF14F8FC870059A1D9 /* sphere.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4AE14F8FC870059A1D9 /* sphere.blend */; };
+		44BAA4D014F8FC870059A1D9 /* stone_d.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4AF14F8FC870059A1D9 /* stone_d.jpg */; };
+		44BAA4D114F8FC870059A1D9 /* stone_dcopy.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B014F8FC870059A1D9 /* stone_dcopy.jpg */; };
+		44BAA4D214F8FC870059A1D9 /* stone_n.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B114F8FC870059A1D9 /* stone_n.jpg */; };
+		44BAA4D314F8FC870059A1D9 /* stone_s.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B214F8FC870059A1D9 /* stone_s.jpg */; };
+		44BAA4D414F8FC870059A1D9 /* teapot.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B314F8FC870059A1D9 /* teapot.3ds */; };
+		44BAA4D514F8FC870059A1D9 /* teapot.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B414F8FC870059A1D9 /* teapot.blend */; };
+		44BAA4D614F8FC870059A1D9 /* tiles_d.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B514F8FC870059A1D9 /* tiles_d.jpg */; };
+		44BAA4D714F8FC870059A1D9 /* tiles_n.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B614F8FC870059A1D9 /* tiles_n.jpg */; };
+		44BAA4D814F8FC870059A1D9 /* tiles_s.jpg in Copy Models */ = {isa = PBXBuildFile; fileRef = 44BAA4B714F8FC870059A1D9 /* tiles_s.jpg */; };
+		44BAA4E114F919460059A1D9 /* phong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4DD14F919460059A1D9 /* phong.frag.glsl */; };
+		44BAA4E214F919460059A1D9 /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4DE14F919460059A1D9 /* phong.vert.glsl */; };
+		44BAA4E314F919460059A1D9 /* phongDemo.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */; };
+		44BAA4E414F919460059A1D9 /* phongDemo.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */; };
+		44F8D32514F8583A007222ED /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D32414F8583A007222ED /* Main.cpp */; };
+		44F8D32814F85845007222ED /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D32614F85845007222ED /* Shader.cpp */; };
+		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
+		8DD76FB00486AB0100D96B5E /* CS248-Assignment3.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6A0FF2C0290799A04C91782 /* CS248-Assignment3.1 */; };
+		C9EA8F0C12EE77060002670E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8F0B12EE77060002670E /* OpenGL.framework */; };
+		C9EA8FDF12EE79EB0002670E /* sfml-graphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FD912EE79EB0002670E /* sfml-graphics.framework */; };
+		C9EA8FE012EE79EB0002670E /* sfml-network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FDA12EE79EB0002670E /* sfml-network.framework */; };
+		C9EA8FE112EE79EB0002670E /* sfml-system.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FDB12EE79EB0002670E /* sfml-system.framework */; };
+		C9EA8FE212EE79EB0002670E /* sfml-window.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FDC12EE79EB0002670E /* sfml-window.framework */; };
+		C9EA8FE312EE79EB0002670E /* SFML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FDD12EE79EB0002670E /* SFML.framework */; };
+		C9EA905812EE7B1B0002670E /* sfml-graphics.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C9EA8FD912EE79EB0002670E /* sfml-graphics.framework */; };
+		C9EA905912EE7B1B0002670E /* sfml-network.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C9EA8FDA12EE79EB0002670E /* sfml-network.framework */; };
+		C9EA905A12EE7B1B0002670E /* sfml-system.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C9EA8FDB12EE79EB0002670E /* sfml-system.framework */; };
+		C9EA905B12EE7B1B0002670E /* sfml-window.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C9EA8FDC12EE79EB0002670E /* sfml-window.framework */; };
+		C9EA905C12EE7B1B0002670E /* SFML.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = C9EA8FDD12EE79EB0002670E /* SFML.framework */; };
+		E7FBA82714EDF2E00028D7C0 /* libassimp.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76FAF0486AB0100D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76FB00486AB0100D96B5E /* CS248-Assignment3.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		C98951FD12EF80A600B97901 /* Copy Shaders */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = shaders;
+			dstSubfolderSpec = 7;
+			files = (
+				44BAA4E114F919460059A1D9 /* phong.frag.glsl in Copy Shaders */,
+				44BAA4E214F919460059A1D9 /* phong.vert.glsl in Copy Shaders */,
+				44BAA4E314F919460059A1D9 /* phongDemo.frag.glsl in Copy Shaders */,
+				44BAA4E414F919460059A1D9 /* phongDemo.vert.glsl in Copy Shaders */,
+			);
+			name = "Copy Shaders";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9EA905412EE7AEF0002670E /* Copy Files */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E7FBA82714EDF2E00028D7C0 /* libassimp.dylib in Copy Files */,
+				C9EA905812EE7B1B0002670E /* sfml-graphics.framework in Copy Files */,
+				C9EA905912EE7B1B0002670E /* sfml-network.framework in Copy Files */,
+				C9EA905A12EE7B1B0002670E /* sfml-system.framework in Copy Files */,
+				C9EA905B12EE7B1B0002670E /* sfml-window.framework in Copy Files */,
+				C9EA905C12EE7B1B0002670E /* SFML.framework in Copy Files */,
+			);
+			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9EA90C412EE7F1D0002670E /* Copy Models */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = models;
+			dstSubfolderSpec = 7;
+			files = (
+				44BAA4B814F8FC870059A1D9 /* armadillo_n.jpg in Copy Models */,
+				44BAA4B914F8FC870059A1D9 /* armadillo.3ds in Copy Models */,
+				44BAA4BA14F8FC870059A1D9 /* armadillo.blend in Copy Models */,
+				44BAA4BB14F8FC870059A1D9 /* armadillo.blend1 in Copy Models */,
+				44BAA4BC14F8FC870059A1D9 /* armadillo.blend2 in Copy Models */,
+				44BAA4BD14F8FC870059A1D9 /* cathedral.3ds in Copy Models */,
+				44BAA4BE14F8FC870059A1D9 /* cathedral.blend in Copy Models */,
+				44BAA4BF14F8FC870059A1D9 /* cathedral.blend1 in Copy Models */,
+				44BAA4C014F8FC870059A1D9 /* cathedral.blend2 in Copy Models */,
+				44BAA4C114F8FC870059A1D9 /* coal_d.jpg in Copy Models */,
+				44BAA4C214F8FC870059A1D9 /* coal_d.png in Copy Models */,
+				44BAA4C314F8FC870059A1D9 /* dragon-diffuse.jpg in Copy Models */,
+				44BAA4C414F8FC870059A1D9 /* dragon-specular.jpg in Copy Models */,
+				44BAA4C514F8FC870059A1D9 /* dragon-transparency.jpg in Copy Models */,
+				44BAA4C614F8FC870059A1D9 /* dragon.3ds in Copy Models */,
+				44BAA4C714F8FC870059A1D9 /* dragon.blend in Copy Models */,
+				44BAA4C814F8FC870059A1D9 /* dragon.blend1 in Copy Models */,
+				44BAA4C914F8FC870059A1D9 /* dragon.dae in Copy Models */,
+				44BAA4CA14F8FC870059A1D9 /* floor_d.jpg in Copy Models */,
+				44BAA4CB14F8FC870059A1D9 /* floor_n.jpg in Copy Models */,
+				44BAA4CC14F8FC870059A1D9 /* floor_s.jpg in Copy Models */,
+				44BAA4CD14F8FC870059A1D9 /* glass_d.jpg in Copy Models */,
+				44BAA4CE14F8FC870059A1D9 /* sphere.3ds in Copy Models */,
+				44BAA4CF14F8FC870059A1D9 /* sphere.blend in Copy Models */,
+				44BAA4D014F8FC870059A1D9 /* stone_d.jpg in Copy Models */,
+				44BAA4D114F8FC870059A1D9 /* stone_dcopy.jpg in Copy Models */,
+				44BAA4D214F8FC870059A1D9 /* stone_n.jpg in Copy Models */,
+				44BAA4D314F8FC870059A1D9 /* stone_s.jpg in Copy Models */,
+				44BAA4D414F8FC870059A1D9 /* teapot.3ds in Copy Models */,
+				44BAA4D514F8FC870059A1D9 /* teapot.blend in Copy Models */,
+				44BAA4D614F8FC870059A1D9 /* tiles_d.jpg in Copy Models */,
+				44BAA4D714F8FC870059A1D9 /* tiles_n.jpg in Copy Models */,
+				44BAA4D814F8FC870059A1D9 /* tiles_s.jpg in Copy Models */,
+			);
+			name = "Copy Models";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		44BAA49714F8FC870059A1D9 /* armadillo_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = armadillo_n.jpg; sourceTree = "<group>"; };
+		44BAA49814F8FC870059A1D9 /* armadillo.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.3ds; sourceTree = "<group>"; };
+		44BAA49914F8FC870059A1D9 /* armadillo.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend; sourceTree = "<group>"; };
+		44BAA49A14F8FC870059A1D9 /* armadillo.blend1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend1; sourceTree = "<group>"; };
+		44BAA49B14F8FC870059A1D9 /* armadillo.blend2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend2; sourceTree = "<group>"; };
+		44BAA49C14F8FC870059A1D9 /* cathedral.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = cathedral.3ds; sourceTree = "<group>"; };
+		44BAA49D14F8FC870059A1D9 /* cathedral.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = cathedral.blend; sourceTree = "<group>"; };
+		44BAA49E14F8FC870059A1D9 /* cathedral.blend1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = cathedral.blend1; sourceTree = "<group>"; };
+		44BAA49F14F8FC870059A1D9 /* cathedral.blend2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = cathedral.blend2; sourceTree = "<group>"; };
+		44BAA4A014F8FC870059A1D9 /* coal_d.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = coal_d.jpg; sourceTree = "<group>"; };
+		44BAA4A114F8FC870059A1D9 /* coal_d.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = coal_d.png; sourceTree = "<group>"; };
+		44BAA4A214F8FC870059A1D9 /* dragon-diffuse.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "dragon-diffuse.jpg"; sourceTree = "<group>"; };
+		44BAA4A314F8FC870059A1D9 /* dragon-specular.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "dragon-specular.jpg"; sourceTree = "<group>"; };
+		44BAA4A414F8FC870059A1D9 /* dragon-transparency.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "dragon-transparency.jpg"; sourceTree = "<group>"; };
+		44BAA4A514F8FC870059A1D9 /* dragon.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = dragon.3ds; sourceTree = "<group>"; };
+		44BAA4A614F8FC870059A1D9 /* dragon.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = dragon.blend; sourceTree = "<group>"; };
+		44BAA4A714F8FC870059A1D9 /* dragon.blend1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = dragon.blend1; sourceTree = "<group>"; };
+		44BAA4A814F8FC870059A1D9 /* dragon.dae */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = dragon.dae; sourceTree = "<group>"; };
+		44BAA4A914F8FC870059A1D9 /* floor_d.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = floor_d.jpg; sourceTree = "<group>"; };
+		44BAA4AA14F8FC870059A1D9 /* floor_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = floor_n.jpg; sourceTree = "<group>"; };
+		44BAA4AB14F8FC870059A1D9 /* floor_s.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = floor_s.jpg; sourceTree = "<group>"; };
+		44BAA4AC14F8FC870059A1D9 /* glass_d.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = glass_d.jpg; sourceTree = "<group>"; };
+		44BAA4AD14F8FC870059A1D9 /* sphere.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = sphere.3ds; sourceTree = "<group>"; };
+		44BAA4AE14F8FC870059A1D9 /* sphere.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = sphere.blend; sourceTree = "<group>"; };
+		44BAA4AF14F8FC870059A1D9 /* stone_d.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stone_d.jpg; sourceTree = "<group>"; };
+		44BAA4B014F8FC870059A1D9 /* stone_dcopy.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stone_dcopy.jpg; sourceTree = "<group>"; };
+		44BAA4B114F8FC870059A1D9 /* stone_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stone_n.jpg; sourceTree = "<group>"; };
+		44BAA4B214F8FC870059A1D9 /* stone_s.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stone_s.jpg; sourceTree = "<group>"; };
+		44BAA4B314F8FC870059A1D9 /* teapot.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = teapot.3ds; sourceTree = "<group>"; };
+		44BAA4B414F8FC870059A1D9 /* teapot.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = teapot.blend; sourceTree = "<group>"; };
+		44BAA4B514F8FC870059A1D9 /* tiles_d.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_d.jpg; sourceTree = "<group>"; };
+		44BAA4B614F8FC870059A1D9 /* tiles_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_n.jpg; sourceTree = "<group>"; };
+		44BAA4B714F8FC870059A1D9 /* tiles_s.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_s.jpg; sourceTree = "<group>"; };
+		44BAA4DD14F919460059A1D9 /* phong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.frag.glsl; sourceTree = "<group>"; };
+		44BAA4DE14F919460059A1D9 /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.vert.glsl; sourceTree = "<group>"; };
+		44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongDemo.frag.glsl; sourceTree = "<group>"; };
+		44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongDemo.vert.glsl; sourceTree = "<group>"; };
+		44F8D32414F8583A007222ED /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
+		44F8D32614F85845007222ED /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shader.cpp; sourceTree = "<group>"; };
+		44F8D32714F85845007222ED /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
+		7E36360E12FCF52A00D6344A /* libassimp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libassimp.dylib; sourceTree = SOURCE_ROOT; };
+		8DD76FB20486AB0100D96B5E /* CS248-Assignment3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CS248-Assignment3"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6A0FF2C0290799A04C91782 /* CS248-Assignment3.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = "CS248-Assignment3.1"; sourceTree = "<group>"; };
+		C9EA8F0B12EE77060002670E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		C9EA8FD912EE79EB0002670E /* sfml-graphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "sfml-graphics.framework"; sourceTree = "<group>"; };
+		C9EA8FDA12EE79EB0002670E /* sfml-network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "sfml-network.framework"; sourceTree = "<group>"; };
+		C9EA8FDB12EE79EB0002670E /* sfml-system.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "sfml-system.framework"; sourceTree = "<group>"; };
+		C9EA8FDC12EE79EB0002670E /* sfml-window.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "sfml-window.framework"; sourceTree = "<group>"; };
+		C9EA8FDD12EE79EB0002670E /* SFML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SFML.framework; sourceTree = "<group>"; };
+		E700C5D414E90AB80056CBB4 /* sndfile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = sndfile.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76FAD0486AB0100D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9EA8F0C12EE77060002670E /* OpenGL.framework in Frameworks */,
+				C9EA8FDF12EE79EB0002670E /* sfml-graphics.framework in Frameworks */,
+				C9EA8FE012EE79EB0002670E /* sfml-network.framework in Frameworks */,
+				C9EA8FE112EE79EB0002670E /* sfml-system.framework in Frameworks */,
+				C9EA8FE212EE79EB0002670E /* sfml-window.framework in Frameworks */,
+				C9EA8FE312EE79EB0002670E /* SFML.framework in Frameworks */,
+				7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* CS248-Assignment3 */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				44F8D32914F85853007222ED /* models */,
+				44F8D34B14F85854007222ED /* shaders */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+				C9EA90E912EE7FA60002670E /* Dependencies */,
+			);
+			name = "CS248-Assignment3";
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				44F8D32614F85845007222ED /* Shader.cpp */,
+				44F8D32714F85845007222ED /* Shader.h */,
+				44F8D32414F8583A007222ED /* Main.cpp */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76FB20486AB0100D96B5E /* CS248-Assignment3 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		44F8D32914F85853007222ED /* models */ = {
+			isa = PBXGroup;
+			children = (
+				44BAA49714F8FC870059A1D9 /* armadillo_n.jpg */,
+				44BAA49814F8FC870059A1D9 /* armadillo.3ds */,
+				44BAA49914F8FC870059A1D9 /* armadillo.blend */,
+				44BAA49A14F8FC870059A1D9 /* armadillo.blend1 */,
+				44BAA49B14F8FC870059A1D9 /* armadillo.blend2 */,
+				44BAA49C14F8FC870059A1D9 /* cathedral.3ds */,
+				44BAA49D14F8FC870059A1D9 /* cathedral.blend */,
+				44BAA49E14F8FC870059A1D9 /* cathedral.blend1 */,
+				44BAA49F14F8FC870059A1D9 /* cathedral.blend2 */,
+				44BAA4A014F8FC870059A1D9 /* coal_d.jpg */,
+				44BAA4A114F8FC870059A1D9 /* coal_d.png */,
+				44BAA4A214F8FC870059A1D9 /* dragon-diffuse.jpg */,
+				44BAA4A314F8FC870059A1D9 /* dragon-specular.jpg */,
+				44BAA4A414F8FC870059A1D9 /* dragon-transparency.jpg */,
+				44BAA4A514F8FC870059A1D9 /* dragon.3ds */,
+				44BAA4A614F8FC870059A1D9 /* dragon.blend */,
+				44BAA4A714F8FC870059A1D9 /* dragon.blend1 */,
+				44BAA4A814F8FC870059A1D9 /* dragon.dae */,
+				44BAA4A914F8FC870059A1D9 /* floor_d.jpg */,
+				44BAA4AA14F8FC870059A1D9 /* floor_n.jpg */,
+				44BAA4AB14F8FC870059A1D9 /* floor_s.jpg */,
+				44BAA4AC14F8FC870059A1D9 /* glass_d.jpg */,
+				44BAA4AD14F8FC870059A1D9 /* sphere.3ds */,
+				44BAA4AE14F8FC870059A1D9 /* sphere.blend */,
+				44BAA4AF14F8FC870059A1D9 /* stone_d.jpg */,
+				44BAA4B014F8FC870059A1D9 /* stone_dcopy.jpg */,
+				44BAA4B114F8FC870059A1D9 /* stone_n.jpg */,
+				44BAA4B214F8FC870059A1D9 /* stone_s.jpg */,
+				44BAA4B314F8FC870059A1D9 /* teapot.3ds */,
+				44BAA4B414F8FC870059A1D9 /* teapot.blend */,
+				44BAA4B514F8FC870059A1D9 /* tiles_d.jpg */,
+				44BAA4B614F8FC870059A1D9 /* tiles_n.jpg */,
+				44BAA4B714F8FC870059A1D9 /* tiles_s.jpg */,
+			);
+			path = models;
+			sourceTree = "<group>";
+		};
+		44F8D34B14F85854007222ED /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				44BAA4DD14F919460059A1D9 /* phong.frag.glsl */,
+				44BAA4DE14F919460059A1D9 /* phong.vert.glsl */,
+				44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */,
+				44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */,
+			);
+			path = shaders;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6A0FF2C0290799A04C91782 /* CS248-Assignment3.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+		C9EA90E912EE7FA60002670E /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				E700C5D314E90AB80056CBB4 /* Frameworks */,
+				7E36360E12FCF52A00D6344A /* libassimp.dylib */,
+				C9EA8FD912EE79EB0002670E /* sfml-graphics.framework */,
+				C9EA8FDA12EE79EB0002670E /* sfml-network.framework */,
+				C9EA8FDB12EE79EB0002670E /* sfml-system.framework */,
+				C9EA8FDC12EE79EB0002670E /* sfml-window.framework */,
+				C9EA8FDD12EE79EB0002670E /* SFML.framework */,
+				C9EA8F0B12EE77060002670E /* OpenGL.framework */,
+			);
+			name = Dependencies;
+			sourceTree = "<group>";
+		};
+		E700C5D314E90AB80056CBB4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E700C5D414E90AB80056CBB4 /* sndfile.framework */,
+			);
+			path = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76FA90486AB0100D96B5E /* CS248-Assignment3 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "CS248-Assignment3" */;
+			buildPhases = (
+				8DD76FAB0486AB0100D96B5E /* Sources */,
+				8DD76FAD0486AB0100D96B5E /* Frameworks */,
+				8DD76FAF0486AB0100D96B5E /* CopyFiles */,
+				C9EA905412EE7AEF0002670E /* Copy Files */,
+				C9EA90C412EE7F1D0002670E /* Copy Models */,
+				C98951FD12EF80A600B97901 /* Copy Shaders */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CS248-Assignment3";
+			productInstallPath = "$(HOME)/bin";
+			productName = "CS248-Assignment3";
+			productReference = 8DD76FB20486AB0100D96B5E /* CS248-Assignment3 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CS248-Assignment3" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* CS248-Assignment3 */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76FA90486AB0100D96B5E /* CS248-Assignment3 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76FAB0486AB0100D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44F8D32514F8583A007222ED /* Main.cpp in Sources */,
+				44F8D32814F85845007222ED /* Shader.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB928608733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/Frameworks\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				PRODUCT_NAME = "CS248-Assignment3";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1DEB928708733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/Frameworks\"",
+				);
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				PRODUCT_NAME = "CS248-Assignment3";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		1DEB928A08733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = include;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1DEB928B08733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "CS248-Assignment3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928608733DD80010E9CD /* Debug */,
+				1DEB928708733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "CS248-Assignment3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928A08733DD80010E9CD /* Debug */,
+				1DEB928B08733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7E3635D712FCEEB500D6344A /* monkey.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 7E3635D412FCEEAD00D6344A /* monkey.blend */; };
 		7E3635D812FCEEB600D6344A /* teapot.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 7E3635D512FCEEAD00D6344A /* teapot.3ds */; };
 		7E3635D912FCEEB600D6344A /* teapot.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 7E3635D612FCEEAD00D6344A /* teapot.blend */; };
 		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
@@ -80,7 +79,6 @@
 			dstPath = models;
 			dstSubfolderSpec = 7;
 			files = (
-				7E3635D712FCEEB500D6344A /* monkey.blend in Copy Models */,
 				7E3635D812FCEEB600D6344A /* teapot.3ds in Copy Models */,
 				7E3635D912FCEEB600D6344A /* teapot.blend in Copy Models */,
 			);
@@ -90,7 +88,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7E3635D412FCEEAD00D6344A /* monkey.blend */ = {isa = PBXFileReference; lastKnownFileType = file; name = monkey.blend; path = ../models/monkey.blend; sourceTree = SOURCE_ROOT; };
 		7E3635D512FCEEAD00D6344A /* teapot.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; name = teapot.3ds; path = ../models/teapot.3ds; sourceTree = SOURCE_ROOT; };
 		7E3635D612FCEEAD00D6344A /* teapot.blend */ = {isa = PBXFileReference; lastKnownFileType = file; name = teapot.blend; path = ../models/teapot.blend; sourceTree = SOURCE_ROOT; };
 		7E36360E12FCF52A00D6344A /* libassimp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libassimp.dylib; sourceTree = SOURCE_ROOT; };
@@ -182,7 +179,6 @@
 		C9EA90BA12EE7EDB0002670E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				7E3635D412FCEEAD00D6344A /* monkey.blend */,
 				7E3635D512FCEEAD00D6344A /* teapot.3ds */,
 				7E3635D612FCEEAD00D6344A /* teapot.blend */,
 			);
