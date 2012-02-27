@@ -76,8 +76,8 @@ struct meshObject {
     std::vector<unsigned> indexBuffer;
     
     aiString diff_string;
-//    int diff_index;
-//    int spec_index;
+    aiString spec_string;
+    aiString norm_string;
 };
 
 std::vector<meshObject> meshes_1;
@@ -147,7 +147,7 @@ void initOpenGL() {
     // This initializes OpenGL with some common defaults.  More info here:
     // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
     glClearDepth(1.0f);
-    glClearColor(0.45f, 0.45f, 0.45f, 1.0f);
+    glClearColor(0.35f, 0.45f, 0.8f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
 }
@@ -216,27 +216,11 @@ void loadAssets() {
     
     glCallList(scene_list2);
 
-    
-//    // Load the vertex shader
-//    shader1.reset(new Shader("shaders/phong"));
-//	if (!shader1->loaded()) {
-//		std::cerr << "Shader failed to load" << std::endl;
-//		std::cerr << shader1->errors() << std::endl;
-//		exit(-1);
-//	}
-//    
-//    // Load the vertex shader
-//    shader2.reset(new Shader("shaders/phongDemo"));
-//	if (!shader2->loaded()) {
-//		std::cerr << "Shader failed to load" << std::endl;
-//		std::cerr << shader2->errors() << std::endl;
-//		exit(-1);
-//	}
-    
-    Shader * shader1 = new Shader("shaders/phong");
+        
+    Shader * shader1 = new Shader("shaders/phongNorm");
     shaders.push_back(shader1);
     
-    Shader * shader2 = new Shader("shaders/phongDemo");
+    Shader * shader2 = new Shader("shaders/phongNorm");
     shaders.push_back(shader2);
 }
 
@@ -452,28 +436,26 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
             aiString norm = aiString(prefix);
             norm.Append("_n.jpg");
             
+            sf::Image * diffuseMap = &TextureMap[diff.data];
+            sf::Image * specularMap = &TextureMap[spec.data];
+            sf::Image * normalMap = &TextureMap[norm.data];
             
-            sf::Image * tmp_diff, * tmp_spec, * tmp_norm;
+            // don't load it if it's already been loaded!
+            if (diffuseMap->GetWidth() == 0) {
+                diffuseMap->LoadFromFile(diff.data);
+            }
             
-//            if (diffuseMap->GetWidth() == 0) {
-//                diffuseMap->LoadFromFile(diff.data);
-//            }
+            if (specularMap->GetWidth() == 0) {
+                specularMap->LoadFromFile(spec.data);
+            }
             
-            bool d, s, n;
-            d = tmp_diff->LoadFromFile(diff.data);
-            s = tmp_spec->LoadFromFile(spec.data);
-            n = tmp_norm->LoadFromFile(norm.data);
+            if (normalMap->GetWidth() == 0) {
+                normalMap->LoadFromFile(norm.data);
+            }
             
-            printf("Prefix: %s, d = %d, s = %d, n = %d\n",prefix.data, d, s, n);
-            
-//            sf::Image * diffuseMap = &TextureMap[diff.data];
-//            
-//            // don't load it if it's already been loaded!
-//            if (diffuseMap->GetWidth() == 0) {
-//                diffuseMap->LoadFromFile(diff.data);
-//            }
-//            
-//            newMesh.diff_string = diff;
+            newMesh.diff_string = diff;
+            newMesh.spec_string = spec;
+            newMesh.norm_string = norm;
         }
         else {
             newMesh.diff_string = aiString("");
@@ -527,6 +509,11 @@ void setMeshData(int meshNum, int shaderNum) {
     GLint normal = glGetAttribLocation(shaders[shaderNum]->programID(), "normalIn");
     glEnableVertexAttribArray(normal);
     glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals);
+    
+    // Tangent Vectors
+    GLint tangent = glGetAttribLocation(shaders[shaderNum]->programID(), "tangentIn");
+    glEnableVertexAttribArray(tangent);
+    glVertexAttribPointer(tangent, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTangents);
 }
 
 
@@ -606,17 +593,32 @@ void setMaterial(const aiScene * scene, int meshNum, int shaderNum) {
 //////////////////// from DEMO //////////////////////////
 void setTextures(int meshNum, int shaderNum) {
     sf::Image * diffMap;
+    sf::Image * specMap;
+    sf::Image * normMap;
     
-    if ((*currentMesh_vec)[meshNum].diff_string != aiString("")) {
+    // Diffuse
+    if (TextureMap[(*currentMesh_vec)[meshNum].diff_string.data].GetWidth() != 0) {
         diffMap = &TextureMap[(*currentMesh_vec)[meshNum].diff_string.data];
-//        printf("meshes[meshNum].diff_string = %s\n", meshes[meshNum].diff_string.data);
-//        printf("GetWidth() = %d, GetHeight() = %d\n", diffMap->GetWidth(), diffMap->GetHeight());
     }
     else {
         diffMap = &white;
-//        printf("whiteness!\n");
     }
-        
+    // Specular
+    if (TextureMap[(*currentMesh_vec)[meshNum].spec_string.data].GetWidth() != 0) {
+        specMap = &TextureMap[(*currentMesh_vec)[meshNum].spec_string.data];
+    }
+    else {
+        specMap = diffMap;
+    }
+    // Normal
+    if (TextureMap[(*currentMesh_vec)[meshNum].norm_string.data].GetWidth() != 0) {
+        normMap = &TextureMap[(*currentMesh_vec)[meshNum].norm_string.data];
+    }
+    else {
+        normMap = &white;
+    }
+    
+            
     // Get a "handle" to the texture variables inside our shader.  Then 
     // pass two textures to the shader: one for diffuse, and the other for
     // specular.
@@ -625,18 +627,22 @@ void setTextures(int meshNum, int shaderNum) {
     glActiveTexture(GL_TEXTURE0);
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
     diffMap->Bind();
-//    diffuseMap->Bind();
     
     GLint specular = glGetUniformLocation(shaders[shaderNum]->programID(), "specularMap");
-    glUniform1i(specular, 1); // The transparency map will be GL_TEXTURE1
+    glUniform1i(specular, 1); // The specular map will be GL_TEXTURE1
     glActiveTexture(GL_TEXTURE1);
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-    diffMap->Bind();
-//    specularMap->Bind();
+    specMap->Bind();
+    
+    GLint normal = glGetUniformLocation(shaders[shaderNum]->programID(), "normalMap");
+    glUniform1i(normal, 2); // The normal map will be GL_TEXTURE2
+    glActiveTexture(GL_TEXTURE2);
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    
+    normMap->Bind();
 }
 
 

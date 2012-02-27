@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		440F110B14FBB66200B1CF97 /* phongNorm.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 440F110914FBB66200B1CF97 /* phongNorm.frag.glsl */; };
+		440F110C14FBB66200B1CF97 /* phongNorm.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 440F110A14FBB66200B1CF97 /* phongNorm.vert.glsl */; };
 		44607ACD14FA65D90062C603 /* STPoint2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607AC114FA65D90062C603 /* STPoint2.cpp */; };
 		44607ACE14FA65D90062C603 /* STPoint3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607AC414FA65D90062C603 /* STPoint3.cpp */; };
 		44607ACF14FA65D90062C603 /* STVector2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44607AC714FA65D90062C603 /* STVector2.cpp */; };
@@ -87,6 +89,8 @@
 				44BAA4E214F919460059A1D9 /* phong.vert.glsl in Copy Shaders */,
 				44BAA4E314F919460059A1D9 /* phongDemo.frag.glsl in Copy Shaders */,
 				44BAA4E414F919460059A1D9 /* phongDemo.vert.glsl in Copy Shaders */,
+				440F110B14FBB66200B1CF97 /* phongNorm.frag.glsl in Copy Shaders */,
+				440F110C14FBB66200B1CF97 /* phongNorm.vert.glsl in Copy Shaders */,
 			);
 			name = "Copy Shaders";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -153,6 +157,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		440F110914FBB66200B1CF97 /* phongNorm.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongNorm.frag.glsl; sourceTree = "<group>"; };
+		440F110A14FBB66200B1CF97 /* phongNorm.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongNorm.vert.glsl; sourceTree = "<group>"; };
 		44607AC114FA65D90062C603 /* STPoint2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STPoint2.cpp; sourceTree = "<group>"; };
 		44607AC214FA65D90062C603 /* STPoint2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STPoint2.h; sourceTree = "<group>"; };
 		44607AC314FA65D90062C603 /* STPoint2.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = STPoint2.inl; sourceTree = "<group>"; };
@@ -337,6 +343,8 @@
 				44BAA4DE14F919460059A1D9 /* phong.vert.glsl */,
 				44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */,
 				44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */,
+				440F110914FBB66200B1CF97 /* phongNorm.frag.glsl */,
+				440F110A14FBB66200B1CF97 /* phongNorm.vert.glsl */,
 			);
 			path = shaders;
 			sourceTree = "<group>";
