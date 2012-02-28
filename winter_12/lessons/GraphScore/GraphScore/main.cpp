@@ -194,8 +194,8 @@ void ReadMessage() {
 
 void display(void)
 {
-    //glClearColor(.9f, .9f, .8f, 1.0f);
-    glClearColor(1.f, 1.f, 1.f, 1.0f);
+    glClearColor(.9f, .9f, .8f, 1.0f);
+    //glClearColor(1.f, 1.f, 1.f, 1.0f);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     STPoint3 * cam_pos = cam->getPosition();

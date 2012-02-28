@@ -50,6 +50,8 @@
 		44BAA4E214F919460059A1D9 /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4DE14F919460059A1D9 /* phong.vert.glsl */; };
 		44BAA4E314F919460059A1D9 /* phongDemo.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */; };
 		44BAA4E414F919460059A1D9 /* phongDemo.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */; };
+		44BF032114FCA6FC00CCB40A /* phongEnvMap.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BF031F14FCA6FC00CCB40A /* phongEnvMap.frag.glsl */; };
+		44BF032214FCA6FC00CCB40A /* phongEnvMap.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BF032014FCA6FC00CCB40A /* phongEnvMap.vert.glsl */; };
 		44F8D32514F8583A007222ED /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D32414F8583A007222ED /* Main.cpp */; };
 		44F8D32814F85845007222ED /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D32614F85845007222ED /* Shader.cpp */; };
 		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
@@ -89,6 +91,8 @@
 				44BAA4E214F919460059A1D9 /* phong.vert.glsl in Copy Shaders */,
 				44BAA4E314F919460059A1D9 /* phongDemo.frag.glsl in Copy Shaders */,
 				44BAA4E414F919460059A1D9 /* phongDemo.vert.glsl in Copy Shaders */,
+				44BF032114FCA6FC00CCB40A /* phongEnvMap.frag.glsl in Copy Shaders */,
+				44BF032214FCA6FC00CCB40A /* phongEnvMap.vert.glsl in Copy Shaders */,
 				440F110B14FBB66200B1CF97 /* phongNorm.frag.glsl in Copy Shaders */,
 				440F110C14FBB66200B1CF97 /* phongNorm.vert.glsl in Copy Shaders */,
 			);
@@ -210,6 +214,8 @@
 		44BAA4DE14F919460059A1D9 /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.vert.glsl; sourceTree = "<group>"; };
 		44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongDemo.frag.glsl; sourceTree = "<group>"; };
 		44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongDemo.vert.glsl; sourceTree = "<group>"; };
+		44BF031F14FCA6FC00CCB40A /* phongEnvMap.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongEnvMap.frag.glsl; sourceTree = "<group>"; };
+		44BF032014FCA6FC00CCB40A /* phongEnvMap.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongEnvMap.vert.glsl; sourceTree = "<group>"; };
 		44F8D32414F8583A007222ED /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		44F8D32614F85845007222ED /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shader.cpp; sourceTree = "<group>"; };
 		44F8D32714F85845007222ED /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
@@ -343,6 +349,8 @@
 				44BAA4DE14F919460059A1D9 /* phong.vert.glsl */,
 				44BAA4DF14F919460059A1D9 /* phongDemo.frag.glsl */,
 				44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */,
+				44BF031F14FCA6FC00CCB40A /* phongEnvMap.frag.glsl */,
+				44BF032014FCA6FC00CCB40A /* phongEnvMap.vert.glsl */,
 				440F110914FBB66200B1CF97 /* phongNorm.frag.glsl */,
 				440F110A14FBB66200B1CF97 /* phongNorm.vert.glsl */,
 			);

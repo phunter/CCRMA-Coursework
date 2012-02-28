@@ -10,16 +10,27 @@
 #include "STPoint3.h"
 #include "STVector3.h"
 
+#include <sstream>
+
+
 //#define MODEL_PATH "models/dragon.dae"
 //#define MODEL_PATH "models/teapot.3ds"
 //#define CATHEDRAL_PATH "models/dragon.dae"
 #define CATHEDRAL_PATH "models/cathedral.3ds"
-#define STATUE_PATH "models/armadillo.3ds"
-//#define STATUE_PATH "models/sphere.3ds"
+//#define STATUE_PATH "models/armadillo.3ds"
+#define STATUE_PATH "models/sphere.3ds"
 
 
 #define MY_PI 3.14159265
+#define CUBE_MAP_SIZE 600
 
+#define GL_CHECK(x) {\
+(x);\
+GLenum error = glGetError();\
+if (GL_NO_ERROR != error) {\
+printf("%s", gluErrorString(error));\
+}\
+}
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
 // and using rendering settings
@@ -40,12 +51,15 @@ Assimp::Importer importer1;
 Assimp::Importer importer2;
 const aiScene* scene1;
 const aiScene* scene2;
+const aiScene* cur_scene;
 
 //const aiMesh* mesh;
 //std::vector<unsigned> indexBuffer;
 
 GLuint scene_list1 = 0;
 GLuint scene_list2 = 0;
+
+GLuint cubeMap;
 
 // current rotation angle
 static float h_angle = 0.0;
@@ -57,7 +71,8 @@ STPoint2 cur_mouse = STPoint2(0.0,0.0);
 STPoint2 last_mouse = STPoint2(0.0,0.0);
 STVector2 mouse_move = STVector2(0.0,0.0);
 
-STPoint3 current_location = STPoint3(0.0,2.0,0.0);
+STPoint3 current_location = STPoint3(-10,2,0);
+STPoint3 statue_location = STPoint3(0,3,0.0);
 
 STVector3 Up = STVector3(0.0,1.0,0.0);
 STVector3 current_forward = STVector3(sin(v_angle)*cos(h_angle),cos(v_angle),sin(v_angle)*sin(h_angle));
@@ -84,29 +99,27 @@ std::vector<meshObject> meshes_1;
 std::vector<meshObject> meshes_2;
 std::vector<meshObject> * currentMesh_vec;
 
-std::map<std::string, sf::Image> TextureMap;
+std::map<aiMaterial*, sf::Image*> diffuse_textures;
+std::map<aiMaterial*, sf::Image*> specular_textures;
+std::map<aiMaterial*, sf::Image*> normal_textures;
 
 // shader
 std::vector<Shader*> shaders;
-//std::auto_ptr<Shader> shader1;
-//std::auto_ptr<Shader> shader2;
-
-// Texture
-//std::auto_ptr<sf::Image> diffuseMap;
-//std::auto_ptr<sf::Image> specularMap;
-
 
 sf::Image white = sf::Image(1,1,sf::Color::White);
 
 void initOpenGL();
 void loadAssets();
+void generateEnvironmentMap();
 void handleInput();
 void updatePositions();
 
 void renderFrame();
+void applyMatrixTransform(const struct aiNode* nd);
 void setMatrices(const aiScene * scene);
 void setMaterial(const aiScene * scene, int meshNum, int shaderNum);
-void setTextures(int meshNum, int shaderNum);
+//void setTexturesEnv(int i, int shaderNum);
+void setTextures(int meshNum, int shaderNum, bool cube);
 void setMeshData(int meshNum, int shaderNum);
 void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd);
 //void recursive_render(const struct aiScene *sc, const struct aiNode* nd);
@@ -115,6 +128,13 @@ int main(int argc, char** argv) {
 
     initOpenGL();
     loadAssets();
+    
+    // square Viewport
+    glViewport(0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE);
+    generateEnvironmentMap();
+    
+    // go to our window Viewport
+    glViewport(0, 0, window.GetWidth(), window.GetHeight());
 
     // Put your game loop here (i.e., render with OpenGL, update animation)
     while (window.IsOpened()) {
@@ -127,8 +147,6 @@ int main(int argc, char** argv) {
     
     return 0;
 }
-
-
 
 void initOpenGL() {
     // Initialize GLEW on Windows, to make sure that OpenGL 2.0 is loaded
@@ -143,16 +161,12 @@ void initOpenGL() {
         exit(-1);
     }
 #endif
-
     // This initializes OpenGL with some common defaults.  More info here:
     // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
     glClearDepth(1.0f);
     glClearColor(0.35f, 0.45f, 0.8f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    glViewport(0, 0, window.GetWidth(), window.GetHeight());
 }
-
-
 
 void loadAssets() {
     // Read in an asset file, and do some post-processing.  There is much 
@@ -186,11 +200,6 @@ void loadAssets() {
 //    printf("scene->mNumMaterials = %d\nscene->mNumMeshes = %d\nscene->mNumTextures = %d\n",
 //           scene->mNumMaterials,scene->mNumMeshes,scene->mNumTextures);
     
-
-    //////////////////////////////////////////////////////////////////////////
-    // TODO: LOAD YOUR SHADERS/TEXTURES
-    //////////////////////////////////////////////////////////////////////////
-    
     currentMesh_vec = &meshes_1;
     // if the display list has not been made yet, create a new one and
     // fill it with scene contents
@@ -220,8 +229,120 @@ void loadAssets() {
     Shader * shader1 = new Shader("shaders/phongNorm");
     shaders.push_back(shader1);
     
-    Shader * shader2 = new Shader("shaders/phongNorm");
+    Shader * shader2 = new Shader("shaders/phongEnvMap");
     shaders.push_back(shader2);
+}
+
+void environmentMatrixTransform(const aiScene * scene, int face) {
+    
+    STVector3 facingDir, upDir;
+    switch (face) {
+        case 0:
+            facingDir = STVector3(1,0,0);
+            upDir = STVector3(0,1,0);
+            break;
+        case 1:
+            facingDir = STVector3(-1,0,0);
+            upDir = STVector3(0,1,0);
+            break;
+        case 2:
+            facingDir = STVector3(0,1,0);
+            upDir = STVector3(-1,0,0);
+            break;
+        case 3:
+            facingDir = STVector3(0,-1,0);
+            upDir = STVector3(1,0,0);
+            break;
+        case 4:
+            facingDir = STVector3(0,0,1);
+            upDir = STVector3(0,1,0);
+            break;
+        case 5:
+            facingDir = STVector3(0,0,-1);
+            upDir = STVector3(0,1,0);
+            break;
+            
+        default:
+            printf("Your face is invalid!\n");
+            break;
+    }
+    
+    GLfloat aspectRatio = 1.0f;
+    GLfloat nearClip = 0.1f;
+    GLfloat farClip = 500.0f;
+    GLfloat fieldOfView = 90.0f; // Degrees
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(statue_location.x, statue_location.y, statue_location.z, 
+              statue_location.x + facingDir.x,
+              statue_location.y + facingDir.y,
+              statue_location.z + facingDir.z,
+              upDir.x, upDir.y, upDir.z);
+    
+    applyMatrixTransform(scene->mRootNode);
+}
+
+void renderEnvironmentMap(int face) {
+    // Always clear the frame buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    cur_scene = scene1;
+    currentMesh_vec = &meshes_1;
+    int shaderNum = 0;
+    for (int i = 0; i < currentMesh_vec->size(); i++) {
+        
+        glUseProgram(shaders[shaderNum]->programID());
+        
+        environmentMatrixTransform(scene1, face);
+        
+        setMaterial(scene1, i, shaderNum);
+        setTextures(i, shaderNum, true);
+        setMeshData(i, shaderNum);
+        
+        // Draw the mesh
+        if ((*currentMesh_vec)[i].mesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE) {
+            glDrawElements(GL_TRIANGLES, 3*(*currentMesh_vec)[i].mesh->mNumFaces, GL_UNSIGNED_INT, &(*currentMesh_vec)[i].indexBuffer[0]);
+        }
+    }
+}
+
+void generateEnvironmentMap() {
+    
+    // create a texture
+    glGenTextures(1, &cubeMap);
+    
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+    
+    for (uint face = 0; face < 6; face++) {
+        
+        renderEnvironmentMap(face);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA8, CUBE_MAP_SIZE, CUBE_MAP_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glCopyTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, 0, 0, 0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE);       
+        
+        // for rendering to image (debugging)
+        sf::Uint8 *pixelArray = new sf::Uint8[CUBE_MAP_SIZE*CUBE_MAP_SIZE*4];
+        
+        glReadPixels(0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); // this gives me nice images
+//        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); /// this gives me black images
+        
+        // FOR TESTING: SAVE TO FILE
+        std::ostringstream out;
+        out << "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/test/cube_" << face << ".jpg";
+        sf::Image img(CUBE_MAP_SIZE, CUBE_MAP_SIZE, sf::Color::White);
+        img.LoadFromPixels(CUBE_MAP_SIZE, CUBE_MAP_SIZE, pixelArray);
+        img.SaveToFile(out.str());
+    }
 }
 
 
@@ -322,69 +443,10 @@ void handleInput() {
                     case sf::Key::Escape:
                         window.Close();
                         break;
-//                    case sf::Key::W:
-//                        //                        current_location += .3*current_forward;
-//                        printf("W down\n");
-//                        go_forward = true;
-//                        break;
-//                    case sf::Key::S:
-//                        //                        current_location -= .3*current_forward;
-//                        go_backward = true;
-//                        break;
-//                        
-//                    case sf::Key::A:
-//                        current_location -= .3*current_right;
-//                        break;
-//                    case sf::Key::D:
-//                        current_location += .3*current_right;
-//                        break;
-//                        
-//                    case sf::Key::Space:
-//                        current_location += .3*Up;
-//                        break;
-//                    case sf::Key::C:
-//                        current_location -= .3*Up;
-//                        break;
-//                        
-//                    case sf::Key::Left:
-//                        printf("Left Arrow\n");
-//                        break;
-//                    case sf::Key::Right:                        
-//                        printf("Left Arrow\n");
-//                        break;
                         
                     default:
                         break;
                 }
-//                
-//            case sf::Event::KeyReleased:
-//                switch (evt.Key.Code) {
-//                    case sf::Key::W:
-//                        printf("W up\n");
-//                        go_forward = false;
-//                        break;
-//                    case sf::Key::S:
-//                        go_backward = false;
-//                        break;
-//                        
-//                    case sf::Key::A:
-//                        
-//                        break;
-//                    case sf::Key::D:
-//                        
-//                        break;
-//                        
-//                    case sf::Key::Space:
-//                        
-//                        break;
-//                    case sf::Key::C:
-//                        
-//                        break;
-//                        
-//                    default:
-//                        break;
-//                }
-
                 
             default: 
                 break;
@@ -411,9 +473,9 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
         meshObject newMesh;
 		newMesh.mesh = sc->mMeshes[nd->mMeshes[n]];
         
-        // Set up the index buffer. Each face should have 3 vertices since we
+       // Set up the index buffer. Each face should have 3 vertices since we
         // specified aiProcess_Triangulate
-        newMesh.indexBuffer.reserve(newMesh.mesh->mNumFaces * 3);
+         newMesh.indexBuffer.reserve(newMesh.mesh->mNumFaces * 3);
         for (unsigned i = 0; i < newMesh.mesh->mNumFaces; i++) {
             for (unsigned j = 0; j < newMesh.mesh->mFaces[i].mNumIndices; j++) {
                 newMesh.indexBuffer.push_back(newMesh.mesh->mFaces[i].mIndices[j]);
@@ -435,23 +497,62 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
             spec.Append("_s.jpg");
             aiString norm = aiString(prefix);
             norm.Append("_n.jpg");
+
             
-            sf::Image * diffuseMap = &TextureMap[diff.data];
-            sf::Image * specularMap = &TextureMap[spec.data];
-            sf::Image * normalMap = &TextureMap[norm.data];
+            sf::Image * diffuseMap, * specularMap, * normalMap;
             
-            // don't load it if it's already been loaded!
-            if (diffuseMap->GetWidth() == 0) {
-                diffuseMap->LoadFromFile(diff.data);
+            std::map<aiMaterial*, sf::Image*>::iterator itr;
+            itr = diffuse_textures.find(mat);
+            if (itr == diffuse_textures.end())
+            {
+                // No material loaded yet
+                diffuseMap = new sf::Image();
+                bool loaded = diffuseMap->LoadFromFile(diff.data);
+                if (loaded) {
+                    printf("Loaded diffuse texture %s\n", diff.data);
+                    diffuse_textures.insert(std::pair<aiMaterial *, sf::Image*>(mat, diffuseMap));
+//                    diffuseMap->Bind();
+//                    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+//                    glGenerateMipmapEXT(GL_TEXTURE_2D);
+                }
+                else
+                {
+                    delete diffuseMap;
+                }
+            }
+            itr = specular_textures.find(mat);
+            if (itr == specular_textures.end())
+            {
+                // No texture loaded yet
+                specularMap = new sf::Image();
+                bool loaded = specularMap->LoadFromFile(spec.data);
+                if (loaded) {
+                    specular_textures.insert(std::pair<aiMaterial *, sf::Image *>(mat, specularMap));
+//                    specularMap->Bind();
+//                    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+//                    glGenerateMipmapEXT(GL_TEXTURE_2D);
+                }
+                else {
+                    delete specularMap;
+                }
+            }
+            itr = normal_textures.find(mat);
+            if (itr == normal_textures.end())
+            {
+                // No texture loaded yet
+                normalMap = new sf::Image();
+                bool loaded = normalMap->LoadFromFile(norm.data);
+                if (loaded) {
+                    normal_textures.insert(std::pair<aiMaterial *, sf::Image *>(mat, normalMap));
+//                    normalMap->Bind();
+//                    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
+//                    glGenerateMipmapEXT(GL_TEXTURE_2D);
+                }
+                else {
+                    delete normalMap;
+                }
             }
             
-            if (specularMap->GetWidth() == 0) {
-                specularMap->LoadFromFile(spec.data);
-            }
-            
-            if (normalMap->GetWidth() == 0) {
-                normalMap->LoadFromFile(norm.data);
-            }
             
             newMesh.diff_string = diff;
             newMesh.spec_string = spec;
@@ -461,24 +562,6 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
             newMesh.diff_string = aiString("");
         }
         
-        
-            
-            
-//        aiString* spec = new aiString(*prefix);
-//        spec->Append("_s.jpg");
-//
-//        
-//        std::auto_ptr<sf::Image> diffuseMap, specularMap;
-//        
-//        diffuseMap.reset(new sf::Image());
-//        diffuseMap->LoadFromFile(diff->data);
-//        
-//        specularMap.reset(new sf::Image());
-//        specularMap->LoadFromFile(spec->data);
-        
-//        diffuseMap.reset(new sf::Image(white));
-//        specularMap.reset(new sf::Image(white));
-//        
         currentMesh_vec->push_back(newMesh);
 	}
     
@@ -544,12 +627,6 @@ void setMatrices(const aiScene * scene) {
               current_location.y + current_forward.y,
               current_location.z + current_forward.z, 0.0f, 1.0f, 0.0f);
     
-    // Add a little rotation, using the elapsed time for smooth animation
-//    static float elapsed = 0.0f;
-//    elapsed += clck.GetElapsedTime();
-//    clck.Reset();
-    
-    glTranslatef(10, 0, 0);
     applyMatrixTransform(scene->mRootNode);
 }
 
@@ -589,114 +666,124 @@ void setMaterial(const aiScene * scene, int meshNum, int shaderNum) {
     }
 }
 
-
-//////////////////// from DEMO //////////////////////////
-void setTextures(int meshNum, int shaderNum) {
+void setTextures(int meshNum, int shaderNum, bool cube) {
     sf::Image * diffMap;
     sf::Image * specMap;
-    sf::Image * normMap;
+    sf::Image * normMap;    
     
-    // Diffuse
-    if (TextureMap[(*currentMesh_vec)[meshNum].diff_string.data].GetWidth() != 0) {
-        diffMap = &TextureMap[(*currentMesh_vec)[meshNum].diff_string.data];
+    aiMaterial *mat = cur_scene->mMaterials[(*currentMesh_vec)[meshNum].mesh->mMaterialIndex];
+
+    std::map<aiMaterial*, sf::Image*>::iterator itr;
+    itr = diffuse_textures.find(mat);
+
+    aiString root;
+    mat->GetTexture(aiTextureType_DIFFUSE, 0, &root);
+
+    if (itr != diffuse_textures.end()) {
+        diffMap = itr->second;
     }
-    else {
-        diffMap = &white;
+    else
+    {
+        diffMap = &white;   
     }
-    // Specular
-    if (TextureMap[(*currentMesh_vec)[meshNum].spec_string.data].GetWidth() != 0) {
-        specMap = &TextureMap[(*currentMesh_vec)[meshNum].spec_string.data];
+        
+    itr = specular_textures.find(mat);
+    if (itr != specular_textures.end()) {
+        specMap = specular_textures[mat];
     }
-    else {
-        specMap = diffMap;
-    }
-    // Normal
-    if (TextureMap[(*currentMesh_vec)[meshNum].norm_string.data].GetWidth() != 0) {
-        normMap = &TextureMap[(*currentMesh_vec)[meshNum].norm_string.data];
-    }
-    else {
-        normMap = &white;
-    }
+    else specMap = diffMap;
     
-            
+    itr = normal_textures.find(mat);
+    if (itr != normal_textures.end()) {
+        normMap = normal_textures[mat];
+    }
+    else normMap = &white;    
+    
     // Get a "handle" to the texture variables inside our shader.  Then 
     // pass two textures to the shader: one for diffuse, and the other for
     // specular.
     GLint diffuse = glGetUniformLocation(shaders[shaderNum]->programID(), "diffuseMap");
     glUniform1i(diffuse, 0); // The diffuse map will be GL_TEXTURE0
     glActiveTexture(GL_TEXTURE0);
+    diffMap->Bind();
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    diffMap->Bind();
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
     
     GLint specular = glGetUniformLocation(shaders[shaderNum]->programID(), "specularMap");
     glUniform1i(specular, 1); // The specular map will be GL_TEXTURE1
     glActiveTexture(GL_TEXTURE1);
+    specMap->Bind();
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    specMap->Bind();
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
     
     GLint normal = glGetUniformLocation(shaders[shaderNum]->programID(), "normalMap");
     glUniform1i(normal, 2); // The normal map will be GL_TEXTURE2
     glActiveTexture(GL_TEXTURE2);
+    normMap->Bind();
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    
-    normMap->Bind();
-}
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
+    if (cube) {
+        GLint environ = glGetUniformLocation(shaders[shaderNum]->programID(), "environMap");
+        glUniform1i(environ, 3); // The environment map will be GL_TEXTURE3
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    }
+}
 
 void renderFrame() {
     // Always clear the frame buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    //////////////////////////////////////////////////////////////////////////
-    // TODO: ADD YOUR RENDERING CODE HERE.  You may use as many .cpp files 
-    // in this assignment as you wish.
-    //////////////////////////////////////////////////////////////////////////
-    
-
-    //////////////////// from DEMO //////////////////////////
     int shaderNum;
     
+    cur_scene = scene1;
     currentMesh_vec = &meshes_1;
     shaderNum = 0;
     for (int i = 0; i < currentMesh_vec->size(); i++) {
 
         glUseProgram(shaders[shaderNum]->programID());
         
-        setMatrices(scene1);
+        setMatrices(cur_scene);
         
-        setMaterial(scene1, i, shaderNum);
-        setTextures(i, shaderNum);
+        setMaterial(cur_scene, i, shaderNum);
+        setTextures(i, shaderNum, false);
         setMeshData(i, shaderNum);
         
         // Draw the mesh
-        if (i != 3 && i != 24 && i != 5 && i != 30 && i != 36 && i != 26 && i != 28 && i != 39 && i != 44) {
+        if ((*currentMesh_vec)[i].mesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE) {
             glDrawElements(GL_TRIANGLES, 3*(*currentMesh_vec)[i].mesh->mNumFaces, GL_UNSIGNED_INT, &(*currentMesh_vec)[i].indexBuffer[0]);
         }
     }
     
+    cur_scene = scene2;
     currentMesh_vec = &meshes_2;
     shaderNum = 1;
     for (int i = 0; i < currentMesh_vec->size(); i++) {
         
         glUseProgram(shaders[shaderNum]->programID());
         
-        setMatrices(scene2);
+        setMatrices(cur_scene);
         
-        setMaterial(scene2, i, shaderNum);
-        setTextures(i, shaderNum);
+        setMaterial(cur_scene, i, shaderNum);
+        setTextures(i, shaderNum, false);
         setMeshData(i, shaderNum);
         
         // Draw the mesh
-        if (i != 3 && i != 24 && i != 5 && i != 30 && i != 36 && i != 26 && i != 28 && i != 39 && i != 44) {
+        if ((*currentMesh_vec)[i].mesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE) {
             glDrawElements(GL_TRIANGLES, 3*(*currentMesh_vec)[i].mesh->mNumFaces, GL_UNSIGNED_INT, &(*currentMesh_vec)[i].indexBuffer[0]);
         }
     }
-
-    
-    
 }
 
 
