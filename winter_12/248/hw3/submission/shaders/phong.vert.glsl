@@ -2,10 +2,12 @@
 // These are the "input" to our shader.  They are read from the vertex
 // arrays that we specified in the C++ code.
 attribute vec3 positionIn;
+attribute vec2 texcoordIn;
 attribute vec3 normalIn;
 
 // These are the "output" values of our shader.  OpenGL will interpolate
 // these for us (good riddance project 2!)
+varying vec2 texcoord;
 varying vec3 normal;
 varying vec3 eyePosition;
 
@@ -21,4 +23,7 @@ void main() {
 
 	// Transform the normal, just like in Assignment 2.
 	normal = gl_NormalMatrix * normalIn;
+
+	// Just copy the texture coordinates
+	texcoord = texcoordIn;
 }

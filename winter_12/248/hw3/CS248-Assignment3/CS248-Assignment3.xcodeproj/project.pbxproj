@@ -52,6 +52,7 @@
 		44BAA4E414F919460059A1D9 /* phongDemo.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */; };
 		44BF032114FCA6FC00CCB40A /* phongEnvMap.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BF031F14FCA6FC00CCB40A /* phongEnvMap.frag.glsl */; };
 		44BF032214FCA6FC00CCB40A /* phongEnvMap.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44BF032014FCA6FC00CCB40A /* phongEnvMap.vert.glsl */; };
+		44C46C0214FDC592007D7FB9 /* DepthRenderTarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44C46C0014FDC592007D7FB9 /* DepthRenderTarget.cpp */; };
 		44F8D32514F8583A007222ED /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D32414F8583A007222ED /* Main.cpp */; };
 		44F8D32814F85845007222ED /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44F8D32614F85845007222ED /* Shader.cpp */; };
 		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
@@ -216,6 +217,8 @@
 		44BAA4E014F919460059A1D9 /* phongDemo.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongDemo.vert.glsl; sourceTree = "<group>"; };
 		44BF031F14FCA6FC00CCB40A /* phongEnvMap.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongEnvMap.frag.glsl; sourceTree = "<group>"; };
 		44BF032014FCA6FC00CCB40A /* phongEnvMap.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phongEnvMap.vert.glsl; sourceTree = "<group>"; };
+		44C46C0014FDC592007D7FB9 /* DepthRenderTarget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DepthRenderTarget.cpp; sourceTree = "<group>"; };
+		44C46C0114FDC592007D7FB9 /* DepthRenderTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DepthRenderTarget.h; sourceTree = "<group>"; };
 		44F8D32414F8583A007222ED /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		44F8D32614F85845007222ED /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shader.cpp; sourceTree = "<group>"; };
 		44F8D32714F85845007222ED /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
@@ -268,6 +271,8 @@
 			children = (
 				44F8D32614F85845007222ED /* Shader.cpp */,
 				44F8D32714F85845007222ED /* Shader.h */,
+				44C46C0014FDC592007D7FB9 /* DepthRenderTarget.cpp */,
+				44C46C0114FDC592007D7FB9 /* DepthRenderTarget.h */,
 				44F8D32414F8583A007222ED /* Main.cpp */,
 			);
 			name = Source;
@@ -447,6 +452,7 @@
 				44607ACE14FA65D90062C603 /* STPoint3.cpp in Sources */,
 				44607ACF14FA65D90062C603 /* STVector2.cpp in Sources */,
 				44607AD014FA65D90062C603 /* STVector3.cpp in Sources */,
+				44C46C0214FDC592007D7FB9 /* DepthRenderTarget.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

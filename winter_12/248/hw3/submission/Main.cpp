@@ -13,8 +13,8 @@
 #include <sstream>
 
 #define CATHEDRAL_PATH "models/cathedral.3ds"
-#define STATUE_PATH "models/armadillo.3ds"
-//#define STATUE_PATH "models/sphere.3ds"
+//#define STATUE_PATH "models/armadillo.3ds"
+#define STATUE_PATH "models/sphere.3ds"
 
 #define MY_PI 3.14159265
 #define CUBE_MAP_SIZE 600
