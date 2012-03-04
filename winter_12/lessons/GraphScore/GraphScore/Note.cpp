@@ -358,7 +358,7 @@ void Note::AttractToZ() {
     STVector3 dir = path / mag;
     
     // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-    float dimensionality = 0.2; //.06;
+    float dimensionality = 0.1; //.06;
     
     centerPosition = me + (ground - me) * dimensionality;
 }

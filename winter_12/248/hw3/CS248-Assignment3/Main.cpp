@@ -13,8 +13,8 @@
 #include <sstream>
 
 #define CATHEDRAL_PATH "models/cathedral.3ds"
-#define STATUE_PATH "models/armadillo.3ds"
-//#define STATUE_PATH "models/sphere.3ds"
+//#define STATUE_PATH "models/armadillo.3ds"
+#define STATUE_PATH "models/sphere.3ds"
 
 #define MY_PI 3.14159265
 #define CUBE_MAP_SIZE 600
@@ -23,7 +23,7 @@
 (x);\
 GLenum error = glGetError();\
 if (GL_NO_ERROR != error) {\
-printf("%s", gluErrorString(error));\
+printf("%s\n", gluErrorString(error));\
 }\
 }
 
@@ -327,9 +327,9 @@ void generateEnvironmentMap() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     
     for (uint face = 0; face < 6; face++) {
         
@@ -339,18 +339,18 @@ void generateEnvironmentMap() {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA8, CUBE_MAP_SIZE, CUBE_MAP_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glCopyTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, 0, 0, 0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE);
         
-        // for rendering to image (debugging)
-        sf::Uint8 *pixelArray = new sf::Uint8[CUBE_MAP_SIZE*CUBE_MAP_SIZE*4];
-        
+//        // THIS CODE SOLELY FOR TESTING: SAVE TO FILE
+//        // for rendering to image (debugging)
+//        sf::Uint8 *pixelArray = new sf::Uint8[CUBE_MAP_SIZE*CUBE_MAP_SIZE*4];
+//        
 //        glReadPixels(0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); // this gives me nice images
-        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); /// this gives me black images
-        
-        // FOR TESTING: SAVE TO FILE
-        std::ostringstream out;
-        out << "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/test/cube_" << face << ".jpg";
-        sf::Image img(CUBE_MAP_SIZE, CUBE_MAP_SIZE, sf::Color::White);
-        img.LoadFromPixels(CUBE_MAP_SIZE, CUBE_MAP_SIZE, pixelArray);
-        img.SaveToFile(out.str());
+//        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); /// this gives me black images
+//    
+//        std::ostringstream out;
+//        out << "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/test/cube_" << face << ".jpg";
+//        sf::Image img(CUBE_MAP_SIZE, CUBE_MAP_SIZE, sf::Color::White);
+//        img.LoadFromPixels(CUBE_MAP_SIZE, CUBE_MAP_SIZE, pixelArray);
+//        img.SaveToFile(out.str());
     }
 }
 
@@ -523,8 +523,7 @@ void recursive_load_meshes(const struct aiScene *sc, const struct aiNode* nd) {
 //                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 //                    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 //                    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE );
-//                    glGenerateMipmapEXT(GL_TEXTURE_2D);
-
+//                    glGenerateMipmap(GL_TEXTURE_2D);
                 }
                 else
                 {
@@ -655,12 +654,7 @@ void setMatrices(const aiScene * scene) {
     int shaderNum = 1;
     GLfloat* vMatrix = new GLfloat[16];
     glGetFloatv(GL_MODELVIEW_MATRIX, vMatrix);
-    
-//    // Ugly, ugly, UGLY!
-//    aiMatrix4x4 invertMe = aiMatrix4x4(vMatrix[0], vMatrix[1], vMatrix[2], vMatrix[3], vMatrix[4], vMatrix[5], vMatrix[6], vMatrix[7], vMatrix[8], vMatrix[9], vMatrix[10], vMatrix[11], vMatrix[12], vMatrix[13], vMatrix[14], vMatrix[15]);
-//    aiMatrix4x4 inverted = invertMe.Inverse();
-//    GLfloat* vInvMatrix = new GLfloat{ inverted.a1, inverted.a2, inverted.a3, inverted.a4, inverted.b1, inverted.b2, inverted.b3, inverted.b4, inverted.c1, inverted.c2, inverted.c3, inverted.c4};
-    
+        
     GLint vM = glGetUniformLocation(shaders[shaderNum]->programID(), "viewMatrix");
     glUniformMatrix4fv(vM,1,true,vMatrix);
     
@@ -668,7 +662,6 @@ void setMatrices(const aiScene * scene) {
 }
 
 
-//////////////////// from DEMO //////////////////////////
 void setMaterial(const aiScene * scene, int meshNum, int shaderNum) {
     
     const aiMesh * mesh = (*currentMesh_vec)[meshNum].mesh;
@@ -749,8 +742,8 @@ void setTextures(int meshNum, int shaderNum, bool cube) {
     diffMap->Bind();
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     
     GLint specular = glGetUniformLocation(shaders[shaderNum]->programID(), "specularMap");
     glUniform1i(specular, 1); // The specular map will be GL_TEXTURE1
@@ -758,8 +751,8 @@ void setTextures(int meshNum, int shaderNum, bool cube) {
     specMap->Bind();
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     
     GLint normal = glGetUniformLocation(shaders[shaderNum]->programID(), "normalMap");
     glUniform1i(normal, 2); // The normal map will be GL_TEXTURE2
@@ -767,8 +760,8 @@ void setTextures(int meshNum, int shaderNum, bool cube) {
     normMap->Bind();
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     
     // if environment mapping, pass in the cubeMap texture
     if (cube) {
@@ -778,8 +771,8 @@ void setTextures(int meshNum, int shaderNum, bool cube) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+//        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     }
 }
 

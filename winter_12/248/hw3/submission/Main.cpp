@@ -13,8 +13,8 @@
 #include <sstream>
 
 #define CATHEDRAL_PATH "models/cathedral.3ds"
-//#define STATUE_PATH "models/armadillo.3ds"
-#define STATUE_PATH "models/sphere.3ds"
+#define STATUE_PATH "models/armadillo.3ds"
+//#define STATUE_PATH "models/sphere.3ds"
 
 #define MY_PI 3.14159265
 #define CUBE_MAP_SIZE 600
@@ -339,18 +339,18 @@ void generateEnvironmentMap() {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA8, CUBE_MAP_SIZE, CUBE_MAP_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         glCopyTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, 0, 0, 0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE);
         
-        // for rendering to image (debugging)
-        sf::Uint8 *pixelArray = new sf::Uint8[CUBE_MAP_SIZE*CUBE_MAP_SIZE*4];
-        
+//        // THIS CODE SOLELY FOR TESTING: SAVE TO FILE
+//        // for rendering to image (debugging)
+//        sf::Uint8 *pixelArray = new sf::Uint8[CUBE_MAP_SIZE*CUBE_MAP_SIZE*4];
+//        
 //        glReadPixels(0, 0, CUBE_MAP_SIZE, CUBE_MAP_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); // this gives me nice images
-        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); /// this gives me black images
-        
-        // FOR TESTING: SAVE TO FILE
-        std::ostringstream out;
-        out << "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/test/cube_" << face << ".jpg";
-        sf::Image img(CUBE_MAP_SIZE, CUBE_MAP_SIZE, sf::Color::White);
-        img.LoadFromPixels(CUBE_MAP_SIZE, CUBE_MAP_SIZE, pixelArray);
-        img.SaveToFile(out.str());
+//        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray); /// this gives me black images
+//    
+//        std::ostringstream out;
+//        out << "/Users/phunter/CCRMA-Coursework/winter_12/248/hw3/test/cube_" << face << ".jpg";
+//        sf::Image img(CUBE_MAP_SIZE, CUBE_MAP_SIZE, sf::Color::White);
+//        img.LoadFromPixels(CUBE_MAP_SIZE, CUBE_MAP_SIZE, pixelArray);
+//        img.SaveToFile(out.str());
     }
 }
 

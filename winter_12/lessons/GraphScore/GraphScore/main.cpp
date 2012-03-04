@@ -60,9 +60,9 @@ queue <NoteMessage*> g_messages;
 Camera *cam;
 
 // function prototypes
-void repelAll();
-void fadeColors();
-void triggerNote(int node, int excitement);
+//void repelAll();
+//void fadeColors();
+//void triggerNote(int node, int excitement);
 void ReadMessage();
 
 ////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ void display(void)
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     STPoint3 * cam_pos = cam->getPosition();
-    STPoint3 * look_pos = cam->getTargetNotePosition();
+    //STPoint3 * look_pos = cam->getTargetNotePosition();
     
     glLoadIdentity();
     
@@ -213,26 +213,6 @@ void display(void)
     
     glutSwapBuffers();
 }
-
-//void repelAll() {
-//    for (int i = 0; i < g_notes.size() - 1; i++) {
-//        for (int j = i+1; j < g_notes.size(); j++) {
-//            if (g_notes[i] != NULL && g_notes[j] != NULL) {
-//                g_notes[i]->RepelFrom(g_notes[j]);
-//            }
-//        }
-//    }
-//}
-
-//void fadeColors()
-//{
-//    for (int i = 0; i < g_notes.size(); i++) {
-//        if (g_notes[i] != NULL) {
-//            g_notes[i]->setExcite(max(g_notes[i]->getExcite() - .01, 0.0));
-//        }
-//    }
-//    //printf("thing = %f\n", g_notes[0].getExcite());
-//}
 
 void reshape(int w, int h)
 {
