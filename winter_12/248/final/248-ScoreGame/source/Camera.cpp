@@ -2,7 +2,7 @@
 //  Camera.cpp
 //  GraphScore
 //
-//  Created by phunter on 11/28/11.
+//  Created by Hunter McCurry on 11/28/11.
 //  Copyright 2011 Hunter McCurry. All rights reserved.
 //
 
@@ -16,7 +16,10 @@ Camera::Camera(float x, float y, float z, float def_height)
     position.x = x;
     position.y = y;
     position.z = z;
+    
+    look_position = position;
     phantom_position = position;
+    start_position = position;
 }
 
 float Camera::easeRamp(float input) {
@@ -35,6 +38,11 @@ float Camera::easeBumpReverse(float input) {
     return pow(input,2) - pow(input,3);
 }
 
+float Camera::raisedCos(float input) {
+    // input and output scaled from 0 to 1
+    return 1.0 - (.5 * cos(input * 2 * M_PI) + .5);
+}
+
 float Camera::GetDefaultHeight() {
     return default_height;
 }
@@ -46,6 +54,7 @@ void Camera::UpdateDefaultHeight(float def_height) {
 void Camera::setTargetNote(Note * t)
 {
     target_note = t;
+    start_position = position;
     computeTravelDist();
 }
 
@@ -63,35 +72,33 @@ aiVector3D * Camera::getPosition() {
     return &position;
 }
 
-void Camera::computeTravelDist(){
-    
-    aiVector3D target_pos = aiVector3D(*target_note->getLocation());
-    cam_travel_dist = (target_pos - aiVector3D(position)).Length();
+aiVector3D * Camera::getLookAt() {
+    return &look_position;
 }
 
-//void Camera::calculateSpeed() {
-//    last_speed = speed;
-//    speed = (STVector3(position) - STVector3(last_position)).Length();
-//}
-//
-//void Camera::calculateAccelteration() {
-//    calculateSpeed();
-//    acceleration = fabs(last_speed - speed);
-//    printf("acceleration = %f\n",acceleration);
-//}
+void Camera::computeTravelDist(){
+    target_position = aiVector3D(*target_note->getLocation());
+    cam_travel_dist = (target_position - start_position).Length();
+}
 
-void Camera::updateCam() {
+
+void Camera::updateCam(float delta) {
     computeTravelDist();
-    nudgeCam();
+    
+    slewLookAt(delta);
+    newNudgeCam(delta);
+    
+    //printf("Camera position is (%f,%f,%f)\n",position.x,position.y,position.z);
 }
 
 void Camera::nudgeCam() {
+  
+    // this changed FIX IF USED AGAIN
+//    target_position = target_note->getLocation();
     
-    target = target_note->getLocation();
+    //printf("target_position is (%f,%f,%f)\n", target_position->x,target_position->y,target_position->z);
     
-    //printf("position is (%f,%f,%f)\n", target_pos.x,target_pos.y,target_pos.z);
-    
-    aiVector3D remaining_path = (aiVector3D(*target) - aiVector3D(phantom_position));
+    aiVector3D remaining_path = (aiVector3D(target_position) - aiVector3D(phantom_position));
     remaining_path.z = 0.0; // so camera height doesn't factor in
     
     //printf("mult thing %f\n", easeBump(1.0-remaining_path.Length()/cam_travel_dist));
@@ -108,6 +115,40 @@ void Camera::nudgeCam() {
     slewRealCam();
 }
 
-void Camera::slewRealCam() {
-    position += .1 * (aiVector3D(phantom_position) - aiVector3D(position));
+void Camera::newNudgeCam(float delta) {
+    
+    aiVector3D remaining_path = target_position - position;
+    remaining_path.z = 0.0; // so camera height doesn't factor in
+        
+    float pcnt_there = 1.0-remaining_path.Length()/cam_travel_dist;
+        
+    float easeVal = raisedCos(pcnt_there);
+    position += .006 * easeVal * remaining_path.Length() * remaining_path;
+        
+    position.z += .02 * cam_travel_dist * easeVal;
+    position.z = default_height + .9 * (position.z - default_height);
 }
+
+void Camera::slewLookAt(float delta) {
+
+    aiVector3D remaining_path = target_position - look_position;
+    remaining_path.z = 0.0; // so camera height doesn't factor in
+    
+    float pcnt_left = remaining_path.Length()/cam_travel_dist;
+        
+    float easeVal = raisedCos(pcnt_left);
+    look_position += .0061 * easeVal * remaining_path.Length() * remaining_path;
+}
+
+
+void Camera::slewRealCam() {
+    position += .01 * (aiVector3D(phantom_position) - aiVector3D(position));
+}
+
+
+
+
+
+
+
+

@@ -28,7 +28,7 @@ class Note;
 struct Connection {
     Note *next_note;
     float ideal_dist;
-    int time_count;
+    float time_count;
 };
 
 struct Spelling {
@@ -52,7 +52,7 @@ public:
     void DeleteTwoWayConnection(int mapped_midi_num);
     
     void ResetTimeCount(int mapped_midi_num);
-    void IncrementTimeCount();
+    void IncrementTimeCount(float delta);
     void TrimOldConnections();
     
     aiVector3D * getLocation();
@@ -63,11 +63,11 @@ public:
     float easeBump(float input);
     
     void Nudge(aiVector3D displacement);
-    void MoveFromConnections();
-    void MoveFromDissonance(Note *other, float diss_val);
-    void AttractFromDissonance(Note *other, float diss_val);
-    void RepelFrom(Note *other);
-    void AttractToZ();
+    void MoveFromConnections(float delta);
+    void MoveFromDissonance(Note *other, float diss_val, float delta);
+    void AttractFromDissonance(Note *other, float diss_val, float delta);
+    void RepelFrom(Note *other, float delta);
+    void AttractToZ(float delta);
     
     void DisplayNotes(float h);
     void DisplayConnections(float h);
@@ -80,6 +80,8 @@ public:
     void DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled);
     
     void DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices);
+    void DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, int segments, int segmentFaces);
+    
     bool maybe();
     
 private:
@@ -89,7 +91,7 @@ private:
     float radius;
     float width_max;
     int max_connections;
-    int max_connection_time;
+    float max_connection_time;
     
     int mapped_midi;
     // for now, 0 is middle line, +or- 4 is top/bottom line

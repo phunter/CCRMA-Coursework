@@ -28,32 +28,28 @@ Note * Graph::GetNote(int mapped_midi) {
 
 void Graph::AddConnectExcite(int mapped_midi, float dist) {
     
-    if (note_graph[mapped_midi] == NULL) { // if the note doesn't exist yet, add it
+    printf("distance is %f\n",dist);
+    
+    // Ff the note doesn't exist yet, add it
+    if (note_graph[mapped_midi] == NULL) {
         
         // Calculate starting position for new note
-        float xdir = 0;
-        float ydir = 0;
-        float zdir = 0;
+        float xdir = (float)rand()/RAND_MAX - .5;
+        float ydir = (float)rand()/RAND_MAX - .5;
+        float zdir = (float)rand()/RAND_MAX - .5;        
         
-        while (fabs(xdir < .1)) {
-            xdir = (float)rand()/RAND_MAX - .5;
-        }
-        while (fabs(ydir < .1)) {
-            ydir = (float)rand()/RAND_MAX - .5;
-        }
-        while (fabs(zdir < .1)) {
-            zdir = (float)rand()/RAND_MAX - .5;
-        }
         aiVector3D new_dir = aiVector3D(xdir, ydir, zdir);
-        //STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, 0.0);
         new_dir.Normalize();
+        
+        //STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, 0.0);
         
         aiVector3D new_pos;
         if (cur_size == 0) {
-            new_pos = aiVector3D(0.0,0.0,0.0);
+            new_pos = new_dir * dist;
+            //new_pos = aiVector3D(0.0,0.0,0.0);
         }
         else {
-            new_pos = *note_graph[cur_note]->getLocation() + .1 * dist * new_dir;
+            new_pos = *note_graph[cur_note]->getLocation() + .5 * dist * new_dir;
         }
             
         AddNote(mapped_midi, new_pos);
@@ -73,8 +69,8 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
             
         }
         else { // update connection length between current and previous note
-            note_graph[cur_note]->updateConnection(prev_note, dist);
-            //note_graph[cur_note]->updateTwoWayConnection(prev_note, dist);
+            //note_graph[cur_note]->updateConnection(prev_note, dist);
+            note_graph[cur_note]->updateTwoWayConnection(prev_note, dist);
         }
     }
     
@@ -92,76 +88,80 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.y,
                                     start_pos.z,
                                     mapped_midi,
-                                    .003,
-                                    10000);
+                                    .9, // .9
+                                    5);
     cur_size++;
 }
 
-void Graph::UpdateGraph() {
-    AttractToZPlane();
-    MoveAllFromConnections();
+void Graph::UpdateGraph(float delta) {
+    AttractToZPlane(delta);
+    MoveAllFromConnections(delta);
     
-    //MoveFromDissonance();
-    AttractFromDissonance();
+    MoveFromDissonance(delta);
+    //AttractFromDissonance(delta);
     
-    RepelAll();
+    RepelAll(delta);
     
     
-    IncrementTimeCounts();
+    IncrementTimeCounts(delta);
     TrimOldConnections();
 }
 
-void Graph::MoveAllFromConnections() {
+void Graph::MoveAllFromConnections(float delta) {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            note_graph[i]->MoveFromConnections();
+            note_graph[i]->MoveFromConnections(delta);
         }
     }
 }
 
-void Graph::MoveFromDissonance() {
+void Graph::MoveFromDissonance(float delta) {
     for (int i = 0; i < max_size - 1; i++) {
         for (int j = i+1; j < max_size; j++) {
             if (note_graph[i] != NULL && note_graph[j] != NULL) {
-                note_graph[i]->MoveFromDissonance(note_graph[j], diss_mat->Get(i, j));
+                note_graph[i]->MoveFromDissonance(note_graph[j], diss_mat->Get(i, j), delta);
             }
         }
     }
 }
 
-void Graph::AttractFromDissonance() {
+void Graph::AttractFromDissonance(float delta) {
     for (int i = 0; i < max_size - 1; i++) {
         for (int j = i+1; j < max_size; j++) {
             if (note_graph[i] != NULL && note_graph[j] != NULL) {
-                note_graph[i]->AttractFromDissonance(note_graph[j], diss_mat->Get(i, j));
+                note_graph[i]->AttractFromDissonance(note_graph[j], diss_mat->Get(i, j), delta);
             }
         }
     }
 }
 
-void Graph::RepelAll() {
+void Graph::RepelAll(float delta) {
     for (int i = 0; i < max_size - 1; i++) {
         for (int j = i+1; j < max_size; j++) {
             if (note_graph[i] != NULL && note_graph[j] != NULL) {
-                note_graph[i]->RepelFrom(note_graph[j]);
+                note_graph[i]->RepelFrom(note_graph[j], delta);
             }
         }
     }
 }
 
-void Graph::AttractToZPlane() {
+void Graph::AttractToZPlane(float delta) {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            note_graph[i]->AttractToZ();
+            
+            //aiVector3D * loc = note_graph[i]->getLocation();
+            //printf("note %d's position is (%f,%f,%f)\n",i,loc->x,loc->y,loc->z);
+            
+            note_graph[i]->AttractToZ(delta);
         }
     }
 
 }
 
-void Graph::IncrementTimeCounts() {
+void Graph::IncrementTimeCounts(float delta) {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            note_graph[i]->IncrementTimeCount();
+            note_graph[i]->IncrementTimeCount(delta);
         }
     }
 }

@@ -34,13 +34,13 @@ public:
 //    Spelling SpellNote(int mapped_midi);
     void ExciteNote();
     
-    void UpdateGraph();
-    void RepelAll();
-    void MoveAllFromConnections();
-    void MoveFromDissonance();
-    void AttractFromDissonance();
-    void AttractToZPlane();
-    void IncrementTimeCounts();
+    void UpdateGraph(float timeDelta);
+    void RepelAll(float delta);
+    void MoveAllFromConnections(float delta);
+    void MoveFromDissonance(float delta);
+    void AttractFromDissonance(float delta);
+    void AttractToZPlane(float delta);
+    void IncrementTimeCounts(float delta);
     void TrimOldConnections();
     
     void Display(float cam_height);

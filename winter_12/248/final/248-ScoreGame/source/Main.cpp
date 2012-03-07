@@ -55,6 +55,9 @@ Graph *graph;
 vector <Note*> g_notes(max_notes);
 Note * curNote;
 
+// clock stuff
+float lastTime = 0.0;
+
 // Dissonance Matrix
 Dissonance * dissonance;
 
@@ -167,7 +170,7 @@ void ReadMessage() {
     //printf("message received is 'note %d, vel %d'\n", note, vel);
     g_messages.pop();
     
-    graph->AddConnectExcite(note, 0.0 + 1.5 * (vel / 127.0));
+    graph->AddConnectExcite(note, 0.1 + 3.5 * (vel / 127.0));
     cam->setTargetNote(graph->GetNote(note));
 }
 
@@ -235,18 +238,97 @@ void handleInput() {
     sf::Event evt;
     while (window.GetEvent(evt)) {
         switch (evt.Type) {
-        case sf::Event::Closed: 
-            // Close the window.  This will cause the game loop to exit,
-            // because the IsOpened() function will no longer return true.
-            window.Close(); 
-            break;
-        case sf::Event::Resized: 
-            // If the window is resized, then we need to change the perspective
-            // transformation and viewport
-            glViewport(0, 0, evt.Size.Width, evt.Size.Height);
-            break;
-        default: 
-            break;
+            case sf::Event::Closed: 
+                // Close the window.  This will cause the game loop to exit,
+                // because the IsOpened() function will no longer return true.
+                window.Close();
+                break;
+            case sf::Event::Resized: 
+                // If the window is resized, then we need to change the perspective
+                // transformation and viewport
+                glViewport(0, 0, evt.Size.Width, evt.Size.Height);
+                break;
+            case sf::Event::KeyPressed:
+                NoteMessage *note_message;
+                switch (evt.Key.Code) {
+                    case sf::Key::Escape:
+                        window.Close();
+                        break;
+                    case sf::Key::W:
+                        graph->Clear();
+                        break;
+                    case sf::Key::Comma:
+                        cam->UpdateDefaultHeight(cam->GetDefaultHeight() + .1);
+                        break;
+                    case sf::Key::Period:
+                        cam->UpdateDefaultHeight(cam->GetDefaultHeight() - .1);
+                        break;
+                    case sf::Key::Num1:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 20;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num2:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 21;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num3:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 22;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num4:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 23;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num5:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 24;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num6:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 25;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num7:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 26;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num8:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 27;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num9:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 28;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;
+                    case sf::Key::Num0:
+                        note_message = new NoteMessage;
+                        note_message->note_num = 29;
+                        note_message->note_vel = 80;
+                        g_messages.push(note_message);
+                        break;                
+                    default:
+                        break;
+                }                
+                
+            default: 
+                break;
         }
     }
 }
@@ -259,12 +341,12 @@ void renderFrame() {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     aiVector3D * cam_pos = cam->getPosition();
-    //aiVector3D * look_pos = cam->getTargetNotePosition();
+    aiVector3D * look_pos = cam->getLookAt();
     
     glLoadIdentity();
     
-    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, cam_pos->x, cam_pos->y, 0.0, 0.0, 1.0, 0.0);
-    //gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
+//    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, cam_pos->x, cam_pos->y, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     
     
     graph->Display(cam_pos->z);
@@ -274,9 +356,21 @@ void renderFrame() {
 }
 
 void updateState() {
-    graph->UpdateGraph();
     
-    cam->updateCam();
+    static float elapsed = 0.0f;
+    elapsed += clck.GetElapsedTime();
+    clck.Reset();
+    
+    float delta = elapsed - lastTime;
+    lastTime = elapsed;
+    
+    //printf("delta is %f\n", delta);
+    
+    delta = .002;
+    
+    graph->UpdateGraph(delta);
+    
+    cam->updateCam(delta);
     
     if (g_messages.size() > 0) {
         ReadMessage();
@@ -285,6 +379,8 @@ void updateState() {
 
 
 int main(int argc, char** argv) {
+    
+    printf("Initialize output\n");
     
     if (argc != 2) {
 		exit(0);
@@ -307,7 +403,9 @@ int main(int argc, char** argv) {
     
     cam = new Camera(0.0, 0.0, 1.0, 2.0);
     
+    // Main Loop
     while (window.IsOpened()) {
+        
         handleInput();
         renderFrame();
         updateState();

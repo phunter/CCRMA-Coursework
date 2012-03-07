@@ -14,7 +14,9 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
 {
     color = aiColor4D((float)rand()/RAND_MAX,(float)rand()/RAND_MAX,(float)rand()/RAND_MAX,1.0);
     centerPosition = aiVector3D(x,y,z);
-    printf("centerPosition.x = %f, centerPosition.y = %f\n", centerPosition.x, centerPosition.y);
+    
+//    printf("centerPosition.x = %f, centerPosition.y = %f\n", centerPosition.x, centerPosition.y);
+
     radius = .2;
     width_max = (10 * radius) / .2;
     
@@ -106,10 +108,10 @@ void Note::ResetTimeCount(int mapped_midi_num) {
     connection_list[mapped_midi_num]->time_count = 0;
 }
 
-void Note::IncrementTimeCount() {
+void Note::IncrementTimeCount(float delta) {
     for (int i = 0; i < connection_list.size(); i++) {
         if (connection_list[i] != NULL) {
-            connection_list[i]->time_count++;
+            connection_list[i]->time_count += delta;
         }
     }
 }
@@ -242,7 +244,7 @@ void Note::Nudge(aiVector3D displacement)
     centerPosition += displacement;
 }
 
-void Note::MoveFromConnections()
+void Note::MoveFromConnections(float delta)
 {
     for (int i = 0; i < max_connections; i++) {
         
@@ -253,7 +255,7 @@ void Note::MoveFromConnections()
             float mag = path.Length();
             aiVector3D dir = path / mag;
             
-            aiVector3D newPos = me + ((him - me) * (mag - connection_list[i]->ideal_dist))*speed;
+            aiVector3D newPos = me + ((him - me) * (mag - connection_list[i]->ideal_dist))*speed*delta;
             centerPosition = newPos;
         }
     }
@@ -267,7 +269,7 @@ float Note::easeBump(float input) {
     return pow(input,3) - 2*pow(input,2) + input;
 }
 
-void Note::MoveFromDissonance(Note *other, float diss_val) {
+void Note::MoveFromDissonance(Note *other, float diss_val, float delta) {
     
     aiVector3D me = centerPosition;
     aiVector3D him = *other->getLocation();
@@ -283,7 +285,7 @@ void Note::MoveFromDissonance(Note *other, float diss_val) {
     float from_diss_val = 20.0 * easeRamp(diss_val) ;//(3.0 * log(diss_val+2.0)); //12.0 * pow(1-easeBump(diss_val),7.0);
     
     float speed_due_to_dist = 2.0; //1.0/(pow(mag,20)+ 1.0); // speed is inversely porportional to mag
-    float how_fast = speed * speed_due_to_dist; //* (1.0/(mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag + 1.0));
+    float how_fast = speed_due_to_dist * speed * delta;
     
     aiVector3D newPos = me + ((him - me) * (mag - (from_max_midi_num + from_midi_diff + from_diss_val))) * how_fast;
     
@@ -293,7 +295,7 @@ void Note::MoveFromDissonance(Note *other, float diss_val) {
     other->Nudge(nudgeVec/2);
 }
 
-void Note::AttractFromDissonance(Note *other, float diss_val) {
+void Note::AttractFromDissonance(Note *other, float diss_val, float delta) {
     
     aiVector3D me = centerPosition;
     aiVector3D him = *other->getLocation();
@@ -304,7 +306,7 @@ void Note::AttractFromDissonance(Note *other, float diss_val) {
     // determines at which point dissonance transfers from attract to repel
     float crossing_val = .1;
     
-    float how_fast = speed; //* (1.0/(mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag * mag + 1.0));
+    float how_fast = (4/(pow(mag,1) + .00001)) * speed * delta;
     
     int note_distance = abs(mapped_midi - other->getMappedMidi());
     float from_midi_diff = .1 * pow((float)note_distance,.5);
@@ -324,7 +326,7 @@ void Note::AttractFromDissonance(Note *other, float diss_val) {
 }
 
 
-void Note::RepelFrom(Note *other) {
+void Note::RepelFrom(Note *other, float delta) {
     
     aiVector3D me = centerPosition;
     aiVector3D him = *other->getLocation();
@@ -343,13 +345,13 @@ void Note::RepelFrom(Note *other) {
         nudgeVec = -(overlap/2)*dir;
     }
     // general repulsion
-    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * speed * 5; // repulsion diminishes with square of distance
+    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * 5 * speed * delta; // repulsion diminishes with square of distance
         
     centerPosition = me - nudgeVec/2;
     other->Nudge(nudgeVec/2);
 }
 
-void Note::AttractToZ() {
+void Note::AttractToZ(float delta) {
     
     aiVector3D me = centerPosition;
     aiVector3D ground = aiVector3D(me.x, me.y, 0.0);
@@ -358,9 +360,10 @@ void Note::AttractToZ() {
     aiVector3D dir = path / mag;
     
     // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-    float dimensionality = 0.1; //.06;
+    float dimensionality = 0.0005; //.06;
+    float how_fast = 1000.0 * speed * delta;
     
-    centerPosition = me + (ground - me) * dimensionality;
+    centerPosition = me + (ground - me) * dimensionality * how_fast;
 }
 
 
@@ -370,17 +373,19 @@ void Note::DisplayNotes(float h)
     width_max = ((10 * radius) / .2) / h;
             
     glEnable( GL_LINE_SMOOTH );
-    
+
     // color inside of in bubble
     glColor4f(color.r, color.g, color.b, excitement);
 //    DrawCircle(centerPosition, radius, 24, true);    
     DrawCircle(centerPosition, radius, 50, true);
     
     // draw outer bubble
-    glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
-    glLineWidth(.8*width_max);
-//    DrawCircle(centerPosition, radius, 50, false);
-    DrawCircle(centerPosition, radius, 100, false);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.8); 
+//    glLineWidth(.8*width_max);
+//    DrawCircle(centerPosition, radius, 100, false);
+    glDisable(GL_LINE_SMOOTH);
+    DrawTorus(centerPosition, radius, .014, 26, 8);
+    glEnable(GL_LINE_SMOOTH);
     
     // draw staff lines
     glPushMatrix();
@@ -425,7 +430,7 @@ bool Note::IsConnectedTo(int mapped_midi_num) {
 void Note::DrawConnections()
 {
     glLineWidth(.8*width_max);
-    glColor4f(0.0,0.0,0.0,1.0);
+    glColor4f(0.0,0.0,0.0,0.4);
 //    glBegin(GL_LINES);
     
     for (int i = 0; i < max_connections; i++) {
@@ -435,12 +440,10 @@ void Note::DrawConnections()
 
             aiVector3D direction = goal - orig;
 
-            aiVector3D XY_direction = aiVector3D(direction.x, direction.y, 0.0); // ignore Z for now
+            aiVector3D XY_direction = aiVector3D(direction.x, direction.y, 0.0); // ignore Z
             
             XY_direction.Normalize();
             
-//            aiVector3D dir = path / path.Length();
-//            
             aiVector3D start = orig + XY_direction*radius;
             aiVector3D finish = goal - XY_direction*radius;
 //            printf("orig at (%f,%f,%f)\n",orig.x,orig.y,orig.z);
@@ -449,7 +452,7 @@ void Note::DrawConnections()
 //            printf("finish at (%f,%f,%f)\n",finish.x,finish.y,finish.z);
 
             
-            DrawCylinder(start, finish, .013, 8);
+            DrawCylinder(start, finish, .014, 8);
 //            glVertex3f(start.x, start.y, start.z);
 //            glVertex3f(finish.x, finish.y, finish.z);
         }
@@ -471,7 +474,7 @@ void Note::DrawStaffLines()
     
     glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z);
                 
-    glBegin(GL_LINES);
+//    glBegin(GL_LINES);
 
     for (int i = -2; i < 3; i++) {
         float tmpLineLen = staffLen;
@@ -493,11 +496,14 @@ void Note::DrawStaffLines()
             tmpLineLen = ledgerLen;
         }
         
-        glVertex3f(-tmpLineLen, i * lineHeight, 0.0);
-        glVertex3f(tmpLineLen, i * lineHeight, 0.0);
+        DrawCylinder(aiVector3D(-tmpLineLen, i * lineHeight, 0.0),
+                     aiVector3D(tmpLineLen, i * lineHeight, 0.0),
+                     .005, 4);
+//        glVertex3f(-tmpLineLen, i * lineHeight, 0.0);
+//        glVertex3f(tmpLineLen, i * lineHeight, 0.0);
     }    
         
-    glEnd();
+//    glEnd();
 }
 
 void Note::NoteHead()
@@ -598,9 +604,9 @@ void Note::DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled) {
 }
 
 void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices) {
-    // 1) cylinder bottom centered at (0,0,0), top at (0,0,length(endTwo - endOne))
+    // 1) translate to endOne
     // 2) rotate to angle(endOne,endTwo)
-    // 3) translate to endOne
+    // 3) cylinder bottom centered at (0,0,0), top at (0,0,length(endTwo - endOne))
     
     // DRAW
     // top & bottom circle
@@ -614,23 +620,21 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     
     glTranslatef(endOne.x, endOne.y, endOne.z);
     
-    aiVector3D zComponent = aiVector3D(sqrt(pow(connectionVector.x, 2) + pow(connectionVector.y, 2)), 0.0, connectionVector.z);
-    zComponent.Normalize();
-    float pos = 1;
-//    if (zComponent.z < 0.0) {
-//        pos = -1;
-//    }
-    float rotateDegrees = pos * ((M_PI/2.0)-asin(zComponent.z)) * 180.0 / M_PI;
+    // get put x-y distance in one dimension of 2D vector
+    aiVector2D xyDirection = aiVector2D(connectionVector.x, connectionVector.y);
+    aiVector2D heightTriangle = aiVector2D(xyDirection.Length(), connectionVector.z);
     
-//    printf("sin of %f\n", (M_PI/2.0)-connectionVector.z
-    printf("rotate %f degrees\n", rotateDegrees);
+    //aiVector2D zComponent = aiVector2D(sqrt(pow(connectionVector.x, 2) + pow(connectionVector.y, 2)), connectionVector.z);
+    heightTriangle.Normalize();
+    float rotateDegrees = ((M_PI/2.0)-asin(heightTriangle.y)) * 180.0 / M_PI;
+    
     glRotatef(rotateDegrees, rotationVector.x, rotationVector.y, rotationVector.z);
 
     
     aiVector3D bottomCenter = aiVector3D(0.0,0.0,0.0);
     aiVector3D topCenter = aiVector3D(0.0,0.0,length);
     
-    glColor4f(0.0, 0.0, 0.0, .9);
+//    glColor4f(0.0, 0.0, 0.0, .9);
     
     // draw bottom circle
     glBegin(GL_TRIANGLE_FAN);
@@ -664,16 +668,71 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     } 
     glEnd();
 
-
     glPopMatrix();
     
 }
 
-bool Note::maybe() {
-    float rand_num = (float)rand()/RAND_MAX;
-    if (rand_num > .5) {
-        return true;
+void Note::DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments) {
+    
+    glPushMatrix();
+    
+    glTranslatef(center.x, center.y, center.z);
+
+    glPointSize(4);
+    glBegin(GL_QUADS);
+    
+    //Draw order:
+    // for outerSegment i, draw innerSegment j
+    
+    float outerAngle1, outerAngle2, innerAngle1, innerAngle2;
+    
+    for (int i = 0; i < outerSegments; i++) {
+        outerAngle1 = i*2*M_PI/outerSegments; 
+        outerAngle2 = (i+1)*2*M_PI/outerSegments;
+        
+        for (int j = 0; j < innerSegments; j++) {
+            innerAngle1 = j*2*M_PI/innerSegments; 
+            innerAngle2 = (j+1)*2*M_PI/innerSegments;
+
+            aiVector3D outerInfluence1 = centerRadius * aiVector3D( cos(outerAngle1), sin(outerAngle1), 0.0);
+            aiVector3D outerInfluence2 = centerRadius * aiVector3D( cos(outerAngle2), sin(outerAngle2), 0.0);
+            
+            // here x and y components vary both by inner and outer angles! z component only by inner angle.
+                        
+            //positon = center + outerInfluence + innerInfluence
+            aiVector3D o1i1 = outerInfluence1 + edgeRadius * aiVector3D(cos(outerAngle1) * cos(innerAngle1),
+                                                                        sin(outerAngle1) * cos(innerAngle1),
+                                                                        sin(innerAngle1));
+            aiVector3D o1i2 = outerInfluence1 + edgeRadius * aiVector3D(cos(outerAngle1) * cos(innerAngle2),
+                                                                        sin(outerAngle1) * cos(innerAngle2),
+                                                                        sin(innerAngle2));
+            aiVector3D o2i1 = outerInfluence2 + edgeRadius * aiVector3D(cos(outerAngle2) * cos(innerAngle1),
+                                                                        sin(outerAngle2) * cos(innerAngle1),
+                                                                        sin(innerAngle1));
+            aiVector3D o2i2 = outerInfluence2 + edgeRadius * aiVector3D(cos(outerAngle2) * cos(innerAngle2),
+                                                                        sin(outerAngle2) * cos(innerAngle2),
+                                                                        sin(innerAngle2));
+            
+            // counter-clockwise order
+            //glColor4f(1, 0, 0, .8);
+            glVertex3f(o1i1.x,o1i1.y,o1i1.z);
+            //glColor4f(0, 1, 0, .8);
+            glVertex3f(o2i1.x,o2i1.y,o2i1.z);
+            //glColor4f(.3, .3, 0, .8);
+            glVertex3f(o2i2.x,o2i2.y,o2i2.z);
+            //glColor4f(0, 0, 1, .8);
+            glVertex3f(o1i2.x,o1i2.y,o1i2.z);
+            
+        }
     }
-    else return false;
+    
+    glEnd();
+    
+    glPopMatrix();
+}
+
+
+bool Note::maybe() {
+    return (float)rand()/RAND_MAX > .5;
 }
 

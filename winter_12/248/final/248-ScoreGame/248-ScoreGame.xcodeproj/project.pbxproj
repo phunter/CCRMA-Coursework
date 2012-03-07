@@ -425,7 +425,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/Frameworks\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -435,8 +434,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../vs2008/lib\"",
-					"\"$(SRCROOT)/../vs2010/lib\"",
 				);
 				PRODUCT_NAME = "248-ScoreGame";
 				SDKROOT = macosx10.6;
@@ -451,15 +448,12 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/Frameworks\"",
 				);
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../vs2008/lib\"",
-					"\"$(SRCROOT)/../vs2010/lib\"",
 				);
 				PRODUCT_NAME = "248-ScoreGame";
 				SDKROOT = macosx10.6;
