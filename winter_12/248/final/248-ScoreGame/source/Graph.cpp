@@ -28,7 +28,7 @@ Note * Graph::GetNote(int mapped_midi) {
 
 void Graph::AddConnectExcite(int mapped_midi, float dist) {
     
-    printf("distance is %f\n",dist);
+    //printf("distance is %f\n",dist);
     
     // Ff the note doesn't exist yet, add it
     if (note_graph[mapped_midi] == NULL) {
@@ -88,8 +88,8 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.y,
                                     start_pos.z,
                                     mapped_midi,
-                                    .9, // .9
-                                    5);
+                                    .9,
+                                    12);
     cur_size++;
 }
 
@@ -97,8 +97,8 @@ void Graph::UpdateGraph(float delta) {
     AttractToZPlane(delta);
     MoveAllFromConnections(delta);
     
-    MoveFromDissonance(delta);
-    //AttractFromDissonance(delta);
+    //MoveFromDissonance(delta);
+    AttractFromDissonance(delta);
     
     RepelAll(delta);
     
@@ -179,7 +179,7 @@ void Graph::Display(float cam_height) {
     // first draw the connections
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            note_graph[i]->DisplayConnections(cam_height);
+            note_graph[i]->DisplayConnections();
         }
     }
     // then draw the notes

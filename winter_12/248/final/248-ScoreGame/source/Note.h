@@ -70,9 +70,8 @@ public:
     void AttractToZ(float delta);
     
     void DisplayNotes(float h);
-    void DisplayConnections(float h);
+    void DisplayConnections();
     bool IsConnectedTo(int mapped_midi_num);
-    void DrawConnections();
     void DrawStaffLines();
     void NoteHead();
     void DrawFlat();

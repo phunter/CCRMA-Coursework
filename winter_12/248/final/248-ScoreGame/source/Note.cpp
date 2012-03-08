@@ -345,7 +345,7 @@ void Note::RepelFrom(Note *other, float delta) {
         nudgeVec = -(overlap/2)*dir;
     }
     // general repulsion
-    nudgeVec += (1.0 / (pow(mag,4) + .3)) * dir * 5 * speed * delta; // repulsion diminishes with square of distance
+    nudgeVec += (1.0 / (pow(mag,2) + .3)) * dir * 5 * speed * delta; // repulsion diminishes with square of distance
         
     centerPosition = me - nudgeVec/2;
     other->Nudge(nudgeVec/2);
@@ -360,7 +360,7 @@ void Note::AttractToZ(float delta) {
     aiVector3D dir = path / mag;
     
     // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-    float dimensionality = 0.0005; //.06;
+    float dimensionality = 0.001; //.06;
     float how_fast = 1000.0 * speed * delta;
     
     centerPosition = me + (ground - me) * dimensionality * how_fast;
@@ -380,7 +380,7 @@ void Note::DisplayNotes(float h)
     DrawCircle(centerPosition, radius, 50, true);
     
     // draw outer bubble
-    glColor4f(0.0f, 0.0f, 0.0f, 0.8); 
+    glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
 //    glLineWidth(.8*width_max);
 //    DrawCircle(centerPosition, radius, 100, false);
     glDisable(GL_LINE_SMOOTH);
@@ -396,16 +396,6 @@ void Note::DisplayNotes(float h)
     glPushMatrix();    
     NoteHead();
     glPopMatrix();
-    
-    glDisable( GL_LINE_SMOOTH );
-}
-
-void Note::DisplayConnections(float h) {
-    
-    glEnable( GL_LINE_SMOOTH );
-    
-    // Draw connections
-    DrawConnections();
     
     glDisable( GL_LINE_SMOOTH );
 }
@@ -427,10 +417,11 @@ bool Note::IsConnectedTo(int mapped_midi_num) {
 //    return false;
 }
 
-void Note::DrawConnections()
+void Note::DisplayConnections()
 {
-    glLineWidth(.8*width_max);
-    glColor4f(0.0,0.0,0.0,0.4);
+
+//    glLineWidth(.8*width_max);
+//    glEnable(GL_SMOOTH);
 //    glBegin(GL_LINES);
     
     for (int i = 0; i < max_connections; i++) {
@@ -452,6 +443,9 @@ void Note::DrawConnections()
 //            printf("finish at (%f,%f,%f)\n",finish.x,finish.y,finish.z);
 
             
+            float connectionOpac = 1.0 - .9 * (connection_list[i]->time_count / max_connection_time);
+            glColor4f(0.0, 0.0, 0.0, connectionOpac);
+            
             DrawCylinder(start, finish, .014, 8);
 //            glVertex3f(start.x, start.y, start.z);
 //            glVertex3f(finish.x, finish.y, finish.z);
@@ -459,6 +453,7 @@ void Note::DrawConnections()
     }
     
 //    glEnd();
+//     glDisable(GL_SMOOTH);
 }
 
 void Note::DrawStaffLines()

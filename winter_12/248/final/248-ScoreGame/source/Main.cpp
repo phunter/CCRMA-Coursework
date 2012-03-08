@@ -170,7 +170,7 @@ void ReadMessage() {
     //printf("message received is 'note %d, vel %d'\n", note, vel);
     g_messages.pop();
     
-    graph->AddConnectExcite(note, 0.1 + 3.5 * (vel / 127.0));
+    graph->AddConnectExcite(note, 0.1 + 1.5 * (vel / 127.0));
     cam->setTargetNote(graph->GetNote(note));
 }
 
@@ -201,7 +201,7 @@ void initOpenGL() {
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, .5, 300.0);
+    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
     glMatrixMode (GL_MODELVIEW);
 
 
@@ -346,6 +346,7 @@ void renderFrame() {
     glLoadIdentity();
     
 //    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, cam_pos->x, cam_pos->y, 0.0, 0.0, 1.0, 0.0);
+//    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z + 2.0, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     
     
@@ -401,14 +402,16 @@ int main(int argc, char** argv) {
     
     graph = new Graph(max_notes, dissonance);
     
-    cam = new Camera(0.0, 0.0, 1.0, 2.0);
+    cam = new Camera(0.0, 0.0, 4.0);
     
     // Main Loop
     while (window.IsOpened()) {
         
+        printf("what the shit\n");
+        
         handleInput();
-        renderFrame();
         updateState();
+        renderFrame();
         window.Display();
     }
     

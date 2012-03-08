@@ -15,7 +15,7 @@
 
 class Camera {
 public:
-    Camera(float x, float y, float z, float def_height);
+    Camera(float x, float y, float def_height);
     
     float easeRamp(float input);
     float easeRampReverse(float input);    
@@ -49,8 +49,10 @@ private:
     
     Note * target_note;
     aiVector3D target_position;
+    
     aiVector3D phantom_position;
-    aiVector3D position;
+    
+    aiVector3D cam_position;
     aiVector3D look_position;
     
     aiVector3D start_position;
