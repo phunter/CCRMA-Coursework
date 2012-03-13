@@ -12,14 +12,13 @@
 #include "Framework.h"
 //#include "stgl.h"
 //#include "stglut.h"
+//#include "Connection.h"
 #include <vector>
 
 //#include "STPoint2.h"
 //#include "STPoint3.h"
 //#include "STVector3.h"
 //#include "STColor4f.h"
-
-// #include "Connection.h"
 
 using namespace std;
 
@@ -44,6 +43,8 @@ public:
     float getExcite();
     void setExcite(float e);
     
+    void GetCurConnections(vector<int> * note_list);
+    
     void addTwoWayConnection(Note *note, float dist);
     void addConnection(Note *note, float dist);
     void updateConnection(int mapped_midi_num, float dist);
@@ -67,7 +68,7 @@ public:
     void MoveFromDissonance(Note *other, float diss_val, float delta);
     void AttractFromDissonance(Note *other, float diss_val, float delta);
     void RepelFrom(Note *other, float delta);
-    void AttractToZ(float delta);
+    void AttractToXY(float delta);
     
     void DisplayNotes(float h);
     void DisplayConnections();

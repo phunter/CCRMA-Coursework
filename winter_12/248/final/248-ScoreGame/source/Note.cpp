@@ -7,7 +7,6 @@
 //
 
 #include "Note.h"
-//#include "stgl.h"
 
 // position: (x,y), relative midi note: mapped_midi_num, speed s, max_connection_time: t
 Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
@@ -49,6 +48,14 @@ float Note::getExcite() {
 
 void Note::setExcite(float e) {
     excitement = e;
+}
+
+void Note::GetCurConnections(vector<int> * note_list) {
+    for (int i = 0; i < connection_list.size(); i++) {
+        if (connection_list[i] != NULL) {
+            note_list->push_back(connection_list[i]->next_note->getMappedMidi());
+        }
+    }
 }
 
 void Note::addConnection(Note * note, float dist)
@@ -351,19 +358,25 @@ void Note::RepelFrom(Note *other, float delta) {
     other->Nudge(nudgeVec/2);
 }
 
-void Note::AttractToZ(float delta) {
+void Note::AttractToXY(float delta) {
     
     aiVector3D me = centerPosition;
-    aiVector3D ground = aiVector3D(me.x, me.y, 0.0);
-    aiVector3D path = ground - me;
-    float mag = path.Length();
-    aiVector3D dir = path / mag;
     
-    // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-    float dimensionality = 0.001; //.06;
-    float how_fast = 1000.0 * speed * delta;
-    
-    centerPosition = me + (ground - me) * dimensionality * how_fast;
+    if (me.z < 0) {
+        centerPosition = aiVector3D(me.x, me.y, 0.01);
+    }
+    else {
+        aiVector3D projection = aiVector3D(me.x, me.y, 0.0);
+        aiVector3D path = projection - me;
+        float mag = path.Length();
+        aiVector3D dir = path / mag;
+        
+        // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
+        float dimensionality = 0.00001; //.06;
+        float how_fast = 1000.0 * speed * delta;
+        
+        centerPosition = me + (projection - me) * dimensionality * how_fast;
+    }
 }
 
 
@@ -372,7 +385,7 @@ void Note::DisplayNotes(float h)
     cam_height = h - centerPosition.z;
     width_max = ((10 * radius) / .2) / h;
             
-    glEnable( GL_LINE_SMOOTH );
+    //glEnable( GL_LINE_SMOOTH );
 
     // color inside of in bubble
     glColor4f(color.r, color.g, color.b, excitement);
@@ -383,9 +396,9 @@ void Note::DisplayNotes(float h)
     glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
 //    glLineWidth(.8*width_max);
 //    DrawCircle(centerPosition, radius, 100, false);
-    glDisable(GL_LINE_SMOOTH);
+    //glDisable(GL_LINE_SMOOTH);
     DrawTorus(centerPosition, radius, .014, 26, 8);
-    glEnable(GL_LINE_SMOOTH);
+    //glEnable(GL_LINE_SMOOTH);
     
     // draw staff lines
     glPushMatrix();
@@ -397,7 +410,7 @@ void Note::DisplayNotes(float h)
     NoteHead();
     glPopMatrix();
     
-    glDisable( GL_LINE_SMOOTH );
+    //glDisable( GL_LINE_SMOOTH );
 }
 
 bool Note::IsConnectedTo(int mapped_midi_num) {
@@ -419,10 +432,6 @@ bool Note::IsConnectedTo(int mapped_midi_num) {
 
 void Note::DisplayConnections()
 {
-
-//    glLineWidth(.8*width_max);
-//    glEnable(GL_SMOOTH);
-//    glBegin(GL_LINES);
     
     for (int i = 0; i < max_connections; i++) {
         if (connection_list[i] != NULL) {
@@ -451,9 +460,6 @@ void Note::DisplayConnections()
 //            glVertex3f(finish.x, finish.y, finish.z);
         }
     }
-    
-//    glEnd();
-//     glDisable(GL_SMOOTH);
 }
 
 void Note::DrawStaffLines()
@@ -504,7 +510,7 @@ void Note::DrawStaffLines()
 void Note::NoteHead()
 {
     glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z); 
-    glTranslatef(0.0, rel_space * (radius/8.0), 0.0);
+    glTranslatef(0.0, rel_space * (radius/8.0), 0.01);
     glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
     //glBegin(GL_TRIANGLE_FAN);
     //glVertex3f(0.0, 0.0, 0.0);

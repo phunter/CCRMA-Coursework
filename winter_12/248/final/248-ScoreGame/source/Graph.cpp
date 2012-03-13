@@ -14,6 +14,7 @@ Graph::Graph(int max_size_, Dissonance * diss_mat_) {
     diss_mat = diss_mat_;
     
     cur_size = 0;
+    current_note = -1;
     
     //midi_offset = midi_offset_;
 }
@@ -24,6 +25,20 @@ aiVector3D * Graph::GetLocation(int mapped_midi) {
 
 Note * Graph::GetNote(int mapped_midi) {
     return note_graph[mapped_midi];
+}
+
+Note * Graph::GetCurrentNote() {
+    return note_graph[current_note];
+}
+
+void Graph::SetCurrentNote(int mapped_midi) {
+    current_note = mapped_midi;
+}
+
+void Graph::GetCurConnections(vector<int> * note_list) {
+    if (current_note != -1 && note_graph[current_note] != NULL) {
+        note_graph[current_note]->GetCurConnections(note_list);
+    }
 }
 
 void Graph::AddConnectExcite(int mapped_midi, float dist) {
@@ -82,25 +97,28 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
     prev_note = cur_note;
     cur_note = mapped_midi;
     
-//    Spelling spelling = SpellNote(mapped_midi);
-    
     note_graph[cur_note] = new Note(start_pos.x,
                                     start_pos.y,
                                     start_pos.z,
                                     mapped_midi,
-                                    .9,
-                                    12);
+                                    2.0,
+                                    8.0);
     cur_size++;
 }
 
+void Graph::TriggerConnectedAudio() {
+}
+
+
 void Graph::UpdateGraph(float delta) {
-    AttractToZPlane(delta);
     MoveAllFromConnections(delta);
     
     //MoveFromDissonance(delta);
     AttractFromDissonance(delta);
     
     RepelAll(delta);
+    
+    AttractToXYPlane(delta);
     
     
     IncrementTimeCounts(delta);
@@ -145,14 +163,14 @@ void Graph::RepelAll(float delta) {
     }
 }
 
-void Graph::AttractToZPlane(float delta) {
+void Graph::AttractToXYPlane(float delta) {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
             
             //aiVector3D * loc = note_graph[i]->getLocation();
             //printf("note %d's position is (%f,%f,%f)\n",i,loc->x,loc->y,loc->z);
             
-            note_graph[i]->AttractToZ(delta);
+            note_graph[i]->AttractToXY(delta);
         }
     }
 
@@ -200,7 +218,6 @@ void Graph::ExciteNote() {
     
     //computeTravelDist();
     
-    
 }
 
 void Graph::FadeColors() {
@@ -215,6 +232,8 @@ void Graph::Clear() {
     cur_note = NULL;
     prev_note = NULL;
     cur_size = 0;
+    current_note = -1;
+    
     note_graph.clear();
     note_graph.resize(max_size);
 }

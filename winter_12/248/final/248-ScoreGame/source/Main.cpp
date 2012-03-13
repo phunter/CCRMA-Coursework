@@ -29,7 +29,7 @@ sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Sty
  
 // This is a clock you can use to control animation.  For more info, see:
 // http://www.sfml-dev.org/tutorials/1.6/window-time.php
-sf::Clock clck;
+sf::Clock graphics_clock, audio_clock;
 
 // This creates an asset importer using the Open Asset Import library.
 // It automatically manages resources for you, and frees them when the program
@@ -56,7 +56,8 @@ vector <Note*> g_notes(max_notes);
 Note * curNote;
 
 // clock stuff
-float lastTime = 0.0;
+float lastGraphicsTime = 0.0;
+float lastAudioTime = 0.0;
 
 // Dissonance Matrix
 Dissonance * dissonance;
@@ -72,6 +73,7 @@ void initOpenGL();
 void loadAssets();
 void handleInput();
 void renderFrame();
+void triggerAudio();
 void updateState();
 
 void ReadMessage();
@@ -171,7 +173,11 @@ void ReadMessage() {
     g_messages.pop();
     
     graph->AddConnectExcite(note, 0.1 + 1.5 * (vel / 127.0));
-    cam->setTargetNote(graph->GetNote(note));
+    
+    graph->SetCurrentNote(note);
+    cam->setTargetNote(graph->GetCurrentNote());
+    
+    //cam->setTargetNote(graph->GetNote(note));
 }
 
 
@@ -194,14 +200,14 @@ void initOpenGL() {
     glClearDepth(1.0f);
     glClearColor(.9f, .9f, .8f, 1.0f);
     
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable( GL_BLEND );
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
+    glFrustum (-.5, .5, -.5, .5, 0.5, 30.0);
     glMatrixMode (GL_MODELVIEW);
 
 
@@ -322,7 +328,10 @@ void handleInput() {
                         note_message->note_num = 29;
                         note_message->note_vel = 80;
                         g_messages.push(note_message);
-                        break;                
+                        break;
+                    case sf::Key::A:
+                        osc::SendMyNote( 22, 15 );
+                        break;
                     default:
                         break;
                 }                
@@ -349,6 +358,40 @@ void renderFrame() {
 //    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z + 2.0, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     
+
+    glBegin(GL_QUADS);
+    glColor4f(0.3,0.6,0.3,1.0);
+    glVertex3f(-3.0, -3.0, 0.0);
+    glVertex3f(-3.0, 3.0, 0.0);
+    glVertex3f(3.0, 3.0, 0.0);
+    glVertex3f(3.0, -3.0, 0.0);
+    
+    glColor4f(0.6,0.3,0.3,1.0);
+    glVertex3f(-3.0, 3.0, 0.0);
+    glVertex3f(-3.0, 6.0, 0.0);
+    glVertex3f(3.0, 6.0, 0.0);
+    glVertex3f(3.0, 3.0, 0.0);
+    
+    glColor4f(0.3,0.6,0.6,1.0);
+    glVertex3f(6.0, -3.0, 0.0);
+    glVertex3f(6.0, 3.0, 0.0);
+    glVertex3f(3.0, 3.0, 0.0);
+    glVertex3f(3.0, -3.0, 0.0);
+    
+    glColor4f(0.3,0.3,0.6,1.0);
+    glVertex3f(-3.0, -3.0, 0.0);
+    glVertex3f(-3.0, -6.0, 0.0);
+    glVertex3f(3.0, -6.0, 0.0);
+    glVertex3f(3.0, -3.0, 0.0);
+    
+    glColor4f(0.6,0.3,0.6,1.0);
+    glVertex3f(-3.0, -3.0, 0.0);
+    glVertex3f(-6.0, -3.0, 0.0);
+    glVertex3f(-6.0, 3.0, 0.0);
+    glVertex3f(-3.0, 3.0, 0.0);
+
+
+    glEnd();
     
     graph->Display(cam_pos->z);
     
@@ -356,14 +399,38 @@ void renderFrame() {
     
 }
 
+void triggerAudio() {
+    
+    static float elapsed = 0.0f;
+    elapsed += audio_clock.GetElapsedTime();
+
+    float delta = elapsed - lastAudioTime;
+    
+    vector<int> * note_list = new vector<int>;
+    graph->GetCurConnections(note_list);
+    
+    if (delta > 5) {
+        
+        audio_clock.Reset();
+        lastAudioTime = elapsed;
+        
+        for (int i = 0; i < note_list->size(); i++) {
+            // play note i's audio via osc message
+            printf("note number is: %d\n", note_list->at(i) );
+            osc::SendMyNote( note_list->at(i), 15 );
+        }
+
+    }    
+}
+
 void updateState() {
     
     static float elapsed = 0.0f;
-    elapsed += clck.GetElapsedTime();
-    clck.Reset();
+    elapsed += graphics_clock.GetElapsedTime();
+    graphics_clock.Reset();
     
-    float delta = elapsed - lastTime;
-    lastTime = elapsed;
+    float delta = elapsed - lastGraphicsTime;
+    lastGraphicsTime = elapsed;
     
     //printf("delta is %f\n", delta);
     
@@ -412,6 +479,8 @@ int main(int argc, char** argv) {
         handleInput();
         updateState();
         renderFrame();
+        triggerAudio();
+        
         window.Display();
     }
     
