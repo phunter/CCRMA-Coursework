@@ -107,8 +107,8 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.y,
                                     start_pos.z,
                                     mapped_midi,
-                                    2.0,
-                                    8.0);
+                                    .5,
+                                    10.0);
     cur_size++;
 }
 
@@ -119,8 +119,8 @@ void Graph::TriggerConnectedAudio() {
 void Graph::UpdateGraph(float delta) {
     MoveAllFromConnections(delta);
     
-    //MoveFromDissonance(delta);
-    AttractFromDissonance(delta);
+    MoveFromDissonance(delta);
+    //AttractFromDissonance(delta);
     
     RepelAll(delta);
     

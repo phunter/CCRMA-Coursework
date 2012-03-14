@@ -17,6 +17,7 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
 //    printf("centerPosition.x = %f, centerPosition.y = %f\n", centerPosition.x, centerPosition.y);
 
     radius = .2;
+    line_thickness = .014;
     width_max = (10 * radius) / .2;
     
     excitement = 0.0;
@@ -363,16 +364,16 @@ void Note::AttractToXY(float delta) {
     aiVector3D me = centerPosition;
     
     if (me.z < 0) {
-        centerPosition = aiVector3D(me.x, me.y, 0.0001);
+        centerPosition = aiVector3D(me.x, me.y, line_thickness);
     }
     else {
-        aiVector3D projection = aiVector3D(me.x, me.y, 0.0);
+        aiVector3D projection = aiVector3D(me.x, me.y, line_thickness);
         aiVector3D path = projection - me;
         float mag = path.Length();
         aiVector3D dir = path / mag;
         
         // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-        float dimensionality = 0.001; //.06;
+        float dimensionality = 0.0001; //.06;
         float how_fast = 1000.0 * speed * delta;
         
         centerPosition = me + (projection - me) * dimensionality * how_fast;
@@ -397,7 +398,7 @@ void Note::DisplayNotes(float h)
 //    glLineWidth(.8*width_max);
 //    DrawCircle(centerPosition, radius, 100, false);
     //glDisable(GL_LINE_SMOOTH);
-    DrawTorus(centerPosition, radius, .014, 26, 8);
+    DrawTorus(centerPosition, radius, line_thickness, 26, 8);
     //glEnable(GL_LINE_SMOOTH);
     
     // draw staff lines
@@ -455,7 +456,7 @@ void Note::DisplayConnections()
             float connectionOpac = 1.0 - .9 * (connection_list[i]->time_count / max_connection_time);
             glColor4f(0.0, 0.0, 0.0, connectionOpac);
             
-            DrawCylinder(start, finish, .014, 8);
+            DrawCylinder(start, finish, line_thickness, 8);
 //            glVertex3f(start.x, start.y, start.z);
 //            glVertex3f(finish.x, finish.y, finish.z);
         }

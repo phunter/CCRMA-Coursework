@@ -57,6 +57,11 @@ Note * curNote;
 
 int curMidiNote = -1;
 
+
+typedef vector<int> IntContainer;
+typedef IntContainer::iterator IntIterator;
+IntContainer connection_list;
+
 // clock stuff
 float lastGraphicsTime = 0.0;
 float lastAudioTime = 0.0;
@@ -75,6 +80,7 @@ void initOpenGL();
 void loadAssets();
 void handleInput();
 void renderFrame();
+void updateAudioConnections();
 void triggerAudio(int note_number, int on);
 void updateState();
 
@@ -141,10 +147,26 @@ namespace osc{
 		UdpTransmitSocket socket( host );
 		
 		p.Clear();
-		p << osc::BeginMessage( "/midi" )
-		<< midiPitch << midiVelocity << osc::EndMessage;
+		p << osc::BeginMessage( "/midi" ) << midiPitch << midiVelocity << osc::EndMessage;
 		socket.Send( p.Data(), p.Size() );
 	}
+    
+    void SendClearBuffers()
+	{
+		IpEndpointName host( hostName, outPortNum );
+		
+		char hostIpAddress[ IpEndpointName::ADDRESS_STRING_LENGTH ];
+		host.AddressAsString( hostIpAddress );
+		
+		char buffer[IP_MTU_SIZE];
+		osc::OutboundPacketStream p( buffer, IP_MTU_SIZE );
+		UdpTransmitSocket socket( host );
+		
+		p.Clear();
+		p << osc::BeginMessage( "/wipe" ) << osc::EndMessage;
+		socket.Send( p.Data(), p.Size() );
+	}
+
 	
 } // namespace osc
 ////////////////////////////////////////////////////////////////
@@ -174,13 +196,13 @@ void ReadMessage() {
     //printf("message received is 'note %d, vel %d'\n", note, vel);
     g_messages.pop();
     
-    graph->AddConnectExcite(note, 0.1 + 1.5 * (vel / 127.0));
+    graph->AddConnectExcite(note, 0.1 + 3.5 * (vel / 127.0));
     
-    //if (note != curMidiNote) {
-        triggerAudio(curMidiNote, 0);
+    if (note != curMidiNote) {
+        //triggerAudio(curMidiNote, 0);
         curMidiNote = note;
-        triggerAudio(curMidiNote, 1);
-    //}
+        //triggerAudio(curMidiNote, 1);
+    }
     
     graph->SetCurrentNote(note);
     cam->setTargetNote(graph->GetCurrentNote());
@@ -270,7 +292,9 @@ void handleInput() {
                         break;
                     case sf::Key::W:
                         graph->Clear();
+                        graph->SetCurrentNote(-1);
                         osc::SendMyNote( -1, 0 ); // all notes off
+                        osc::SendClearBuffers();
                         break;
                     case sf::Key::Comma:
                         cam->UpdateDefaultHeight(cam->GetDefaultHeight() + .1);
@@ -369,31 +393,31 @@ void renderFrame() {
     
 
     glBegin(GL_QUADS);
-    glColor4f(0.3,0.6,0.3,1.0);
+    glColor4f(0.3,0.6,0.3,0.6);
     glVertex3f(-3.0, -3.0, 0.0);
     glVertex3f(-3.0, 3.0, 0.0);
     glVertex3f(3.0, 3.0, 0.0);
     glVertex3f(3.0, -3.0, 0.0);
     
-    glColor4f(0.6,0.3,0.3,1.0);
+    glColor4f(0.6,0.3,0.3,0.6);
     glVertex3f(-3.0, 3.0, 0.0);
     glVertex3f(-3.0, 6.0, 0.0);
     glVertex3f(3.0, 6.0, 0.0);
     glVertex3f(3.0, 3.0, 0.0);
     
-    glColor4f(0.3,0.6,0.6,1.0);
+    glColor4f(0.3,0.6,0.6,0.6);
     glVertex3f(6.0, -3.0, 0.0);
     glVertex3f(6.0, 3.0, 0.0);
     glVertex3f(3.0, 3.0, 0.0);
     glVertex3f(3.0, -3.0, 0.0);
     
-    glColor4f(0.3,0.3,0.6,1.0);
+    glColor4f(0.3,0.3,0.6,0.6);
     glVertex3f(-3.0, -3.0, 0.0);
     glVertex3f(-3.0, -6.0, 0.0);
     glVertex3f(3.0, -6.0, 0.0);
     glVertex3f(3.0, -3.0, 0.0);
     
-    glColor4f(0.6,0.3,0.6,1.0);
+    glColor4f(0.6,0.3,0.6,0.6);
     glVertex3f(-3.0, -3.0, 0.0);
     glVertex3f(-6.0, -3.0, 0.0);
     glVertex3f(-6.0, 3.0, 0.0);
@@ -405,11 +429,30 @@ void renderFrame() {
     graph->Display(cam_pos->z);
     
     graph->FadeColors();
+}
+
+void updateAudioConnections() {
     
+    vector<int> * updated_connection_list = new vector<int>;
+    graph->GetConnections(curMidiNote, updated_connection_list);
+    
+    for (int i = 0; i < connection_list.size(); i++) {
+        
+        IntIterator itr = find(updated_connection_list->begin(), updated_connection_list->end(), i);
+        
+        if (connection_list[i] == 1 && itr == updated_connection_list->end()) { // currently active but not found
+            connection_list[i] = 0;
+            osc::SendMyNote( i, 0 );
+        }
+        else if (connection_list[i] == 0 && itr != updated_connection_list->end()) { // currently inactive but found
+            connection_list[i] = 1;
+            osc::SendMyNote( i, 1 );
+        }
+    }
 }
 
 void triggerAudio(int note_number, int on) {
-        
+    
     vector<int> * connection_list = new vector<int>;
     //graph->GetCurConnections(note_list);
     graph->GetConnections(note_number, connection_list);
@@ -420,31 +463,6 @@ void triggerAudio(int note_number, int on) {
         osc::SendMyNote( connection_list->at(i), on );
     }    
 }
-
-
-//void triggerAudio() {
-//    
-//    static float elapsed = 0.0f;
-//    elapsed += audio_clock.GetElapsedTime();
-//
-//    float delta = elapsed - lastAudioTime;
-//    
-//    vector<int> * note_list = new vector<int>;
-//    graph->GetCurConnections(note_list);
-//    
-//    if (delta > 5) {
-//        
-//        audio_clock.Reset();
-//        lastAudioTime = elapsed;
-//        
-//        for (int i = 0; i < note_list->size(); i++) {
-//            // play note i's audio via osc message
-//            // printf("note number is: %d\n", note_list->at(i) );
-//            osc::SendMyNote( note_list->at(i), 15 );
-//        }
-//
-//    }    
-//}
 
 void updateState() {
     
@@ -494,13 +512,19 @@ int main(int argc, char** argv) {
     
     cam = new Camera(0.0, 0.0, 4.0);
     
+    connection_list.resize(max_notes);
+    
+    // initialize connection_list to zeros
+    for (int i = 0; i < connection_list.size(); i++) {
+        connection_list[i] = 0;
+    }
+    
     // Main Loop
     while (window.IsOpened()) {
         
-        printf("what the shit\n");
-        
         handleInput();
         updateState();
+        updateAudioConnections();
         renderFrame();
         
         window.Display();

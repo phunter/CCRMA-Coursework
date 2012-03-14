@@ -89,6 +89,7 @@ private:
     aiColor4D color;
     aiVector3D centerPosition;
     float radius;
+    float line_thickness;
     float width_max;
     int max_connections;
     float max_connection_time;
