@@ -55,6 +55,8 @@ Graph *graph;
 vector <Note*> g_notes(max_notes);
 Note * curNote;
 
+int curMidiNote = -1;
+
 // clock stuff
 float lastGraphicsTime = 0.0;
 float lastAudioTime = 0.0;
@@ -73,7 +75,7 @@ void initOpenGL();
 void loadAssets();
 void handleInput();
 void renderFrame();
-void triggerAudio();
+void triggerAudio(int note_number, int on);
 void updateState();
 
 void ReadMessage();
@@ -174,6 +176,12 @@ void ReadMessage() {
     
     graph->AddConnectExcite(note, 0.1 + 1.5 * (vel / 127.0));
     
+    //if (note != curMidiNote) {
+        triggerAudio(curMidiNote, 0);
+        curMidiNote = note;
+        triggerAudio(curMidiNote, 1);
+    //}
+    
     graph->SetCurrentNote(note);
     cam->setTargetNote(graph->GetCurrentNote());
     
@@ -207,7 +215,7 @@ void initOpenGL() {
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 0.5, 30.0);
+    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
     glMatrixMode (GL_MODELVIEW);
 
 
@@ -262,6 +270,7 @@ void handleInput() {
                         break;
                     case sf::Key::W:
                         graph->Clear();
+                        osc::SendMyNote( -1, 0 ); // all notes off
                         break;
                     case sf::Key::Comma:
                         cam->UpdateDefaultHeight(cam->GetDefaultHeight() + .1);
@@ -399,29 +408,43 @@ void renderFrame() {
     
 }
 
-void triggerAudio() {
-    
-    static float elapsed = 0.0f;
-    elapsed += audio_clock.GetElapsedTime();
-
-    float delta = elapsed - lastAudioTime;
-    
-    vector<int> * note_list = new vector<int>;
-    graph->GetCurConnections(note_list);
-    
-    if (delta > 5) {
+void triggerAudio(int note_number, int on) {
         
-        audio_clock.Reset();
-        lastAudioTime = elapsed;
-        
-        for (int i = 0; i < note_list->size(); i++) {
-            // play note i's audio via osc message
-            printf("note number is: %d\n", note_list->at(i) );
-            osc::SendMyNote( note_list->at(i), 15 );
-        }
-
+    vector<int> * connection_list = new vector<int>;
+    //graph->GetCurConnections(note_list);
+    graph->GetConnections(note_number, connection_list);
+    
+    for (int i = 0; i < connection_list->size(); i++) {
+        // play note i's audio via osc message
+        // printf("note number is: %d\n", note_list->at(i) );
+        osc::SendMyNote( connection_list->at(i), on );
     }    
 }
+
+
+//void triggerAudio() {
+//    
+//    static float elapsed = 0.0f;
+//    elapsed += audio_clock.GetElapsedTime();
+//
+//    float delta = elapsed - lastAudioTime;
+//    
+//    vector<int> * note_list = new vector<int>;
+//    graph->GetCurConnections(note_list);
+//    
+//    if (delta > 5) {
+//        
+//        audio_clock.Reset();
+//        lastAudioTime = elapsed;
+//        
+//        for (int i = 0; i < note_list->size(); i++) {
+//            // play note i's audio via osc message
+//            // printf("note number is: %d\n", note_list->at(i) );
+//            osc::SendMyNote( note_list->at(i), 15 );
+//        }
+//
+//    }    
+//}
 
 void updateState() {
     
@@ -479,7 +502,6 @@ int main(int argc, char** argv) {
         handleInput();
         updateState();
         renderFrame();
-        triggerAudio();
         
         window.Display();
     }

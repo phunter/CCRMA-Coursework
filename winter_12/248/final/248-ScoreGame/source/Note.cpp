@@ -363,7 +363,7 @@ void Note::AttractToXY(float delta) {
     aiVector3D me = centerPosition;
     
     if (me.z < 0) {
-        centerPosition = aiVector3D(me.x, me.y, 0.01);
+        centerPosition = aiVector3D(me.x, me.y, 0.0001);
     }
     else {
         aiVector3D projection = aiVector3D(me.x, me.y, 0.0);
@@ -372,7 +372,7 @@ void Note::AttractToXY(float delta) {
         aiVector3D dir = path / mag;
         
         // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-        float dimensionality = 0.00001; //.06;
+        float dimensionality = 0.001; //.06;
         float how_fast = 1000.0 * speed * delta;
         
         centerPosition = me + (projection - me) * dimensionality * how_fast;

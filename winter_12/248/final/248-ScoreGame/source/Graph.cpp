@@ -41,6 +41,12 @@ void Graph::GetCurConnections(vector<int> * note_list) {
     }
 }
 
+void Graph::GetConnections(int note_number, vector<int> * connection_list) {
+    if (note_number != -1 && note_graph[note_number] != NULL) {
+        note_graph[note_number]->GetCurConnections(connection_list);
+    }
+}
+
 void Graph::AddConnectExcite(int mapped_midi, float dist) {
     
     //printf("distance is %f\n",dist);

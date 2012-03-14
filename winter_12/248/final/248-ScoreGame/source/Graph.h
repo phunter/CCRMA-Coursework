@@ -31,6 +31,7 @@ public:
     Note * GetCurrentNote();
     void SetCurrentNote(int mapped_midi);
     void GetCurConnections(vector<int> * note_list);
+    void GetConnections(int note_number, vector<int> * connection_list);
     
     void AddConnectExcite(int mapped_midi, float dist);
     void AddNote(int mapped_midi, aiVector3D start_pos);
