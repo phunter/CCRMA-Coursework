@@ -43,7 +43,7 @@ float Camera::easeBumpReverse(float input) {
 
 float Camera::raisedCos(float input) {
     // input and output scaled from 0 to 1
-    return 1.0 - (.5 * cos(input * 2 * M_PI) + .5);
+    return 1.0 - ((cos(input * 2 * M_PI) + 1)/2.0);
 }
 
 float Camera::GetDefaultHeight() {
@@ -97,7 +97,7 @@ void Camera::updateCam(float delta) {
 
 //void Camera::nudgeCam() {
 //  
-//    // this changed FIX IF USED AGAIN
+//    // this changed: FIX IF USED AGAIN
 ////    target_position = target_note->getLocation();
 //    
 //    //printf("target_position is (%f,%f,%f)\n", target_position->x,target_position->y,target_position->z);
@@ -130,7 +130,7 @@ void Camera::newNudgeCam(float delta) {
     phantom_position += .0005 * easeVal * pow(remaining_path.Length(),2) * remaining_path;
         
     // cam height
-    cam_position = phantom_position + aiVector3D(0.0, 0.0, default_height);
+    cam_position = phantom_position + aiVector3D(0.0, -1.0, default_height);
 }
 
 void Camera::slewLookAt(float delta) {
@@ -141,7 +141,7 @@ void Camera::slewLookAt(float delta) {
     float pcnt_left = remaining_path.Length()/(cam_travel_dist + .00001);
         
     float easeVal = raisedCos(pcnt_left);
-    look_position += .003 * easeVal * pow(remaining_path.Length(),2) * remaining_path;
+    look_position += .003 * (easeVal + .2) * pow(remaining_path.Length(),2) * remaining_path;
 }
 
 

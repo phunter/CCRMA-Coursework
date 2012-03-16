@@ -45,6 +45,7 @@ public:
     
     float getExcite();
     void setExcite(float e);
+    void FadeExcite();
     
     void GetCurConnections(vector<int> * note_list);
     
@@ -60,6 +61,8 @@ public:
     void TrimOldConnections();
     
     aiVector3D * getLocation();
+    float getRadius();
+    
     int getMappedMidi();
     Spelling SpellNote(int mapped_midi_num);
     
@@ -106,6 +109,7 @@ private:
     // constant
     aiColor4D color;
     aiVector3D centerPosition;
+    float default_radius;
     float radius;
     float line_thickness;
     float width_max;

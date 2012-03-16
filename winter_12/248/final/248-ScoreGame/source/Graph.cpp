@@ -108,8 +108,8 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.y,
                                     start_pos.z,
                                     mapped_midi,
-                                    .5,
-                                    10.0,
+                                    5.0,  // speed
+                                    50.0, // connection time
                                     shaders);
     cur_size++;
 }
@@ -121,8 +121,8 @@ void Graph::TriggerConnectedAudio() {
 void Graph::UpdateGraph(float delta) {
     MoveAllFromConnections(delta);
     
-    MoveFromDissonance(delta);
-    //AttractFromDissonance(delta);
+    //MoveFromDissonance(delta);
+    AttractFromDissonance(delta);
     
     RepelAll(delta);
     
@@ -248,7 +248,8 @@ void Graph::ExciteNote() {
 void Graph::FadeColors() {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            note_graph[i]->setExcite(max(note_graph[i]->getExcite() - .01, 0.0));
+            //note_graph[i]->setExcite(max(note_graph[i]->getExcite() - .01, 0.0));
+            note_graph[i]->FadeExcite();
         }
     }
 }

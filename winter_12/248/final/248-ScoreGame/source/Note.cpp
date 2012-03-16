@@ -16,7 +16,8 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
     
 //    printf("centerPosition.x = %f, centerPosition.y = %f\n", centerPosition.x, centerPosition.y);
 
-    radius = .2;
+    default_radius = .2;
+    radius = default_radius;
     //line_thickness = .03;
     line_thickness = .014;
     width_max = (10 * radius) / .2;
@@ -52,6 +53,11 @@ float Note::getExcite() {
 
 void Note::setExcite(float e) {
     excitement = e;
+}
+
+void Note::FadeExcite() {
+    excitement = max(excitement - .01, 0.0);
+    radius = default_radius + .1 * excitement;
 }
 
 void Note::GetCurConnections(vector<int> * note_list) {
@@ -140,6 +146,10 @@ void Note::TrimOldConnections() {
 aiVector3D * Note::getLocation()
 {
     return &centerPosition;
+}
+
+float Note::getRadius() {
+    return radius;
 }
 
 int Note::getMappedMidi() {
@@ -315,7 +325,7 @@ void Note::AttractFromDissonance(Note *other, float diss_val, float delta) {
     aiVector3D dir = path / mag;
         
     // determines at which point dissonance transfers from attract to repel
-    float crossing_val = .1;
+    float crossing_val = .4;
     
     float how_fast = (4/(pow(mag,1) + .00001)) * speed * delta;
     
@@ -328,7 +338,7 @@ void Note::AttractFromDissonance(Note *other, float diss_val, float delta) {
     aiVector3D nudgeVec;
     
     //float eps = .01;
-    aiVector3D newPos = me + dir * (how_fast/*/(pow(mag,1)+eps)*/) * (crossing_val - summed_diss);
+    aiVector3D newPos = me + dir * how_fast * (crossing_val - summed_diss);
     
     nudgeVec = me - newPos;
     
@@ -366,7 +376,7 @@ void Note::AttractToXY(float delta) {
     
     aiVector3D me = centerPosition;
     
-    if (me.z < 0) {
+    if (me.z < line_thickness) {
         centerPosition = aiVector3D(me.x, me.y, line_thickness);
     }
     else {
@@ -453,7 +463,7 @@ void Note::RenderNotes()
     /////////////////////////////////////////////////////////////////
     
 
-    RenderTorus(centerPosition, radius, line_thickness, 50, 8);
+    RenderTorus(centerPosition, radius, line_thickness, 50, 12);
 
     RenderStaffLines();
 
@@ -505,7 +515,7 @@ void Note::DisplayConnections()
             float connectionOpac = 1.0 - .9 * (connection_list[i]->time_count / max_connection_time);
             glColor4f(0.0, 0.0, 0.0, connectionOpac);
             
-            DrawCylinder(start, finish, line_thickness, 8);
+            DrawCylinder(start, finish, line_thickness, 12);
 //            glVertex3f(start.x, start.y, start.z);
 //            glVertex3f(finish.x, finish.y, finish.z);
         }
@@ -527,7 +537,7 @@ void Note::RenderConnections()
             XY_direction.Normalize();
             
             aiVector3D start = orig + XY_direction*radius;
-            aiVector3D finish = goal - XY_direction*radius;
+            aiVector3D finish = goal - XY_direction*connection_list[i]->next_note->getRadius();
             //            printf("orig at (%f,%f,%f)\n",orig.x,orig.y,orig.z);
             //            printf("goal at (%f,%f,%f)\n",goal.x,goal.y,goal.z);
             //            printf("start at (%f,%f,%f)\n",start.x,start.y,start.z);
@@ -649,7 +659,7 @@ void Note::RenderNoteHead()
     glTranslatef(0.0, rel_space * (radius/8.0), 0.0051);
 //    glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
 //    
-    DrawCircle(aiVector3D(0.0,0.0,0.0), radius*0.1, 40, 1);
+    RenderCircle(aiVector3D(0.0,0.0,0.0), radius*0.1, .9, 20);
 //    
 //    glLineWidth(.3*width_max);
 //    

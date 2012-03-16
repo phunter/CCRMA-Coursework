@@ -21,10 +21,12 @@
 		44337F0314FE4A5E009B2FA4 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44337EF614FE4A5E009B2FA4 /* OscReceivedElements.cpp */; };
 		44337F0414FE4A5E009B2FA4 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44337EF814FE4A5E009B2FA4 /* OscTypes.cpp */; };
 		44337F0614FE5797009B2FA4 /* diss_matrix.txt in Copy Files */ = {isa = PBXBuildFile; fileRef = 44337F0514FE5797009B2FA4 /* diss_matrix.txt */; };
-		443ACF48151097950030C12C /* phong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF44151097950030C12C /* phong.frag.glsl */; };
-		443ACF49151097950030C12C /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF45151097950030C12C /* phong.vert.glsl */; };
-		443ACF4A151097950030C12C /* simplePhong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF46151097950030C12C /* simplePhong.frag.glsl */; };
-		443ACF4B151097950030C12C /* simplePhong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF47151097950030C12C /* simplePhong.vert.glsl */; };
+		44C66F8315135A3700BA3B72 /* phong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7D15135A3700BA3B72 /* phong.frag.glsl */; };
+		44C66F8415135A3700BA3B72 /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7E15135A3700BA3B72 /* phong.vert.glsl */; };
+		44C66F8515135A3700BA3B72 /* simplePhong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7F15135A3700BA3B72 /* simplePhong.frag.glsl */; };
+		44C66F8615135A3700BA3B72 /* simplePhong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F8015135A3700BA3B72 /* simplePhong.vert.glsl */; };
+		44C66F8715135A3700BA3B72 /* simpleToon.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F8115135A3700BA3B72 /* simpleToon.frag.glsl */; };
+		44C66F8815135A3700BA3B72 /* simpleToon.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F8215135A3700BA3B72 /* simpleToon.vert.glsl */; };
 		44C9FCA614FE461000F33326 /* teapot.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44C9FCA414FE461000F33326 /* teapot.3ds */; };
 		44C9FCA714FE461000F33326 /* teapot.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44C9FCA514FE461000F33326 /* teapot.blend */; };
 		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
@@ -60,10 +62,12 @@
 			dstPath = shaders;
 			dstSubfolderSpec = 7;
 			files = (
-				443ACF48151097950030C12C /* phong.frag.glsl in Copy Shaders */,
-				443ACF49151097950030C12C /* phong.vert.glsl in Copy Shaders */,
-				443ACF4A151097950030C12C /* simplePhong.frag.glsl in Copy Shaders */,
-				443ACF4B151097950030C12C /* simplePhong.vert.glsl in Copy Shaders */,
+				44C66F8315135A3700BA3B72 /* phong.frag.glsl in Copy Shaders */,
+				44C66F8415135A3700BA3B72 /* phong.vert.glsl in Copy Shaders */,
+				44C66F8515135A3700BA3B72 /* simplePhong.frag.glsl in Copy Shaders */,
+				44C66F8615135A3700BA3B72 /* simplePhong.vert.glsl in Copy Shaders */,
+				44C66F8715135A3700BA3B72 /* simpleToon.frag.glsl in Copy Shaders */,
+				44C66F8815135A3700BA3B72 /* simpleToon.vert.glsl in Copy Shaders */,
 			);
 			name = "Copy Shaders";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -135,10 +139,6 @@
 		44337EF814FE4A5E009B2FA4 /* OscTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OscTypes.cpp; sourceTree = "<group>"; };
 		44337EF914FE4A5E009B2FA4 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		44337F0514FE5797009B2FA4 /* diss_matrix.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = diss_matrix.txt; sourceTree = "<group>"; };
-		443ACF44151097950030C12C /* phong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.frag.glsl; sourceTree = "<group>"; };
-		443ACF45151097950030C12C /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.vert.glsl; sourceTree = "<group>"; };
-		443ACF46151097950030C12C /* simplePhong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = simplePhong.frag.glsl; sourceTree = "<group>"; };
-		443ACF47151097950030C12C /* simplePhong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = simplePhong.vert.glsl; sourceTree = "<group>"; };
 		4448792514FE43DA00D88B27 /* armadillo.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.3ds; sourceTree = "<group>"; };
 		4448792614FE43DA00D88B27 /* armadillo.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend; sourceTree = "<group>"; };
 		4448792714FE43DA00D88B27 /* armadillo.blend1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend1; sourceTree = "<group>"; };
@@ -164,6 +164,12 @@
 		4448793D14FE43DA00D88B27 /* tiles_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_n.jpg; sourceTree = "<group>"; };
 		4448793E14FE43DA00D88B27 /* tiles_s.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_s.jpg; sourceTree = "<group>"; };
 		44C417DF151331A300586593 /* CustomVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomVertex.h; sourceTree = "<group>"; };
+		44C66F7D15135A3700BA3B72 /* phong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = phong.frag.glsl; path = shaders/phong.frag.glsl; sourceTree = "<group>"; };
+		44C66F7E15135A3700BA3B72 /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = phong.vert.glsl; path = shaders/phong.vert.glsl; sourceTree = "<group>"; };
+		44C66F7F15135A3700BA3B72 /* simplePhong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = simplePhong.frag.glsl; path = shaders/simplePhong.frag.glsl; sourceTree = "<group>"; };
+		44C66F8015135A3700BA3B72 /* simplePhong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = simplePhong.vert.glsl; path = shaders/simplePhong.vert.glsl; sourceTree = "<group>"; };
+		44C66F8115135A3700BA3B72 /* simpleToon.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = simpleToon.frag.glsl; path = shaders/simpleToon.frag.glsl; sourceTree = "<group>"; };
+		44C66F8215135A3700BA3B72 /* simpleToon.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = simpleToon.vert.glsl; path = shaders/simpleToon.vert.glsl; sourceTree = "<group>"; };
 		44C9FCA414FE461000F33326 /* teapot.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = teapot.3ds; sourceTree = "<group>"; };
 		44C9FCA514FE461000F33326 /* teapot.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = teapot.blend; sourceTree = "<group>"; };
 		7E36360E12FCF52A00D6344A /* libassimp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libassimp.dylib; sourceTree = SOURCE_ROOT; };
@@ -200,7 +206,7 @@
 			isa = PBXGroup;
 			children = (
 				44337ED214FE4714009B2FA4 /* source */,
-				44337ECF14FE46BD009B2FA4 /* shaders */,
+				44A4A2BC15135AD9008CC58E /* shaders */,
 				4448792414FE43DA00D88B27 /* models */,
 				C6A0FF2B0290797F04C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -215,17 +221,6 @@
 				8DD76FB20486AB0100D96B5E /* 248-ScoreGame */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		44337ECF14FE46BD009B2FA4 /* shaders */ = {
-			isa = PBXGroup;
-			children = (
-				443ACF44151097950030C12C /* phong.frag.glsl */,
-				443ACF45151097950030C12C /* phong.vert.glsl */,
-				443ACF46151097950030C12C /* simplePhong.frag.glsl */,
-				443ACF47151097950030C12C /* simplePhong.vert.glsl */,
-			);
-			path = shaders;
 			sourceTree = "<group>";
 		};
 		44337ED214FE4714009B2FA4 /* source */ = {
@@ -325,6 +320,19 @@
 				4448793E14FE43DA00D88B27 /* tiles_s.jpg */,
 			);
 			path = models;
+			sourceTree = "<group>";
+		};
+		44A4A2BC15135AD9008CC58E /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				44C66F7D15135A3700BA3B72 /* phong.frag.glsl */,
+				44C66F7E15135A3700BA3B72 /* phong.vert.glsl */,
+				44C66F7F15135A3700BA3B72 /* simplePhong.frag.glsl */,
+				44C66F8015135A3700BA3B72 /* simplePhong.vert.glsl */,
+				44C66F8115135A3700BA3B72 /* simpleToon.frag.glsl */,
+				44C66F8215135A3700BA3B72 /* simpleToon.vert.glsl */,
+			);
+			name = shaders;
 			sourceTree = "<group>";
 		};
 		C6A0FF2B0290797F04C91782 /* Documentation */ = {
