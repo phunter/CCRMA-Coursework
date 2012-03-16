@@ -20,6 +20,9 @@
 //#include "STVector3.h"
 //#include "STColor4f.h"
 
+#include "CustomVertex.h"
+#include "Shader.h"
+
 using namespace std;
 
 class Note;
@@ -38,7 +41,7 @@ struct Spelling {
 
 class Note {
 public:
-    Note(float x, float y, float z, int mapped_midi_num, float s, int t);
+    Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::vector<Shader*> *shaders_);
     
     float getExcite();
     void setExcite(float e);
@@ -72,16 +75,31 @@ public:
     
     void DisplayNotes(float h);
     void DisplayConnections();
+    
+    void RenderNotes();
+    void RenderConnections();
+    
     bool IsConnectedTo(int mapped_midi_num);
-    void DrawStaffLines();
+
     void NoteHead();
+    void RenderNoteHead();
+    
     void DrawFlat();
     void DrawSharp();
+    
     void DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled);
+    void RenderCircle(aiVector3D cent, float rad, float roundness, int numCorners);
+    
+    void DrawStaffLines();
+    void RenderStaffLines();
     
     void DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices);
-    void DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, int segments, int segmentFaces);
+    void RenderCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices);
     
+    void DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments);
+    void RenderTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments);
+    
+    void RenderVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum);
     bool maybe();
     
 private:
@@ -108,6 +126,8 @@ private:
     
     // varying
     float excitement;
+    
+    std::vector<Shader*> *shaders;
     
     // connections
 //    vector<Note*> next_notes;

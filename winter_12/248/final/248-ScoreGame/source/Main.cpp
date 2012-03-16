@@ -17,7 +17,6 @@
 #include "NoteMessage.h"
 #include "Dissonance.h"
 
-//#define MODEL_PATH "models/teapot.3ds"
 #define WIN_WIDTH 880
 #define WIN_HEIGHT 880
 
@@ -57,6 +56,13 @@ Note * curNote;
 
 int curMidiNote = -1;
 
+//bool fixedPipeline = true;
+bool fixedPipeline = false;
+
+GLuint scene_list = 0;
+
+// shader things
+std::vector<Shader*> shaders;
 
 typedef vector<int> IntContainer;
 typedef IntContainer::iterator IntIterator;
@@ -74,17 +80,30 @@ queue <NoteMessage*> g_messages;
 
 Camera *cam;
 
+struct testVertex
+{
+	aiVector3D pos;
+	aiVector3D norm;
+};
+
 
 // function prototypes
 void initOpenGL();
 void loadAssets();
 void handleInput();
+
+// temporary
+void Display_FixedPipeline();
+
 void renderFrame();
 void updateAudioConnections();
 void triggerAudio(int note_number, int on);
 void updateState();
 
 void ReadMessage();
+
+void setupLights();
+
 
 ////////////////////////////////////////////////////////////////
 namespace osc{
@@ -231,16 +250,17 @@ void initOpenGL() {
     glClearColor(.9f, .9f, .8f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
-    glEnable( GL_BLEND );
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     glViewport(0, 0, window.GetWidth(), window.GetHeight());
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-    glMatrixMode (GL_MODELVIEW);
-
-
+    
+    
+    // fixed pipeline
+    if (fixedPipeline) {
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    }
+        
+    setupLights();
 }
 
 void loadAssets() {
@@ -248,23 +268,48 @@ void loadAssets() {
     // more you can do with this asset loader, including load textures.
     // More info is here:
     // http://assimp.sourceforge.net/lib_html/usage.html
-    //    scene = importer.ReadFile(MODEL_PATH,  
-    //        aiProcess_CalcTangentSpace |
-    //        aiProcess_Triangulate |
-    //        aiProcess_JoinIdenticalVertices |
-    //        aiProcessPreset_TargetRealtime_Quality);
-    //
-    //    if (!scene || scene->mNumMeshes <= 0) {
-    //        std::cerr << importer.GetErrorString() << std::endl;
-    //        exit(-1);
-    //    }
         
     //////////////////////////////////////////////////////////////////////////
     // TODO: LOAD YOUR SHADERS/TEXTURES
     //////////////////////////////////////////////////////////////////////////
+ 
+    // if the display list has not been made yet, create a new one and
+    // fill it with scene contents
+	if(scene_list == 0) {
+	    scene_list = glGenLists(1);
+	    glNewList(scene_list, GL_COMPILE);
+	    //recursive_load_meshes(scene1, scene1->mRootNode);
+        
+        //
+        // do something here!!!
+        //
+	    glEndList();
+	}
+    glCallList(scene_list);
+
     
+    Shader * shader1 = new Shader("shaders/simplePhong");
+    shaders.push_back(shader1);
+    
+//    Shader * shader2 = new Shader("shaders/phongEnvMap");
+//    shaders.push_back(shader2);
 }
 
+
+void setupLights()
+{
+    // some sexy values for light source 0
+    GLfloat light0_position[] = { 0.0, 5.0, 0.0, 1.0 };
+    GLfloat light0_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat light0_diffuse[] = { .9, .8, .8, 1.0 };
+    GLfloat light0_specular[] = { .9, 0.7, 0.7, 1.0 };
+    GLfloat shininess = 40;
+    glLightfv( GL_LIGHT0, GL_AMBIENT, light0_ambient );
+    glLightfv( GL_LIGHT0, GL_POSITION, light0_position );
+    glLightfv( GL_LIGHT0, GL_DIFFUSE, light0_diffuse );
+    glLightfv( GL_LIGHT0, GL_SPECULAR, light0_specular );
+    glLightfv( GL_LIGHT0, GL_SHININESS, &shininess );
+}
 
 
 
@@ -296,6 +341,11 @@ void handleInput() {
                         osc::SendMyNote( -1, 0 ); // all notes off
                         osc::SendClearBuffers();
                         break;
+                        
+//                    case sf::Key::P:
+//                        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+//                        break;
+//                                            
                     case sf::Key::Comma:
                         cam->UpdateDefaultHeight(cam->GetDefaultHeight() + .1);
                         break;
@@ -375,60 +425,195 @@ void handleInput() {
     }
 }
 
-
-
-void renderFrame() {
+void setMaterial(int shaderNum) {
     
-    //glClearColor(1.f, 1.f, 1.f, 1.0f);
+    GLfloat diff_color[] = { .5, .5, .5, 1.0 };
+    GLfloat spec_color[] = { .9, .8, .9, 1.0 };
+    GLfloat amb_color[] = { .1, .1, .1, 1.0 };
+    GLfloat shiny = 40.0;
+
+    
+    // Get a handle to the diffuse, specular, and ambient variables
+    // inside the shader.  Then set them with the diffuse, specular, and
+    // ambient color.
+    
+    
+    GLint diffuse = glGetUniformLocation(shaders[shaderNum]->programID(), "Kd");
+    glUniform3f(diffuse, diff_color[0], diff_color[1], diff_color[2]);
+    
+    // Specular material
+    GLint specular = glGetUniformLocation(shaders[shaderNum]->programID(), "Ks");
+    glUniform3f(specular, spec_color[0], spec_color[1], spec_color[2]);
+    
+    // Ambient material
+    GLint ambient = glGetUniformLocation(shaders[shaderNum]->programID(), "Ka");
+    glUniform3f(ambient, amb_color[0], amb_color[1], amb_color[2]);
+    
+    // Specular power
+    GLint shininess = glGetUniformLocation(shaders[shaderNum]->programID(), "alpha");
+    glUniform1f(shininess, shiny);
+}
+
+//void setMeshData(int meshNum, int shaderNum) {
+//    const aiMesh * mesh = meshes[meshNum].mesh;
+//    
+//    // Get a handle to the variables for the vertex data inside the shader.
+//    GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
+//    glEnableVertexAttribArray(position);
+//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mVertices);
+//    
+//    // Texture coords.  Note the [0] at the end, very important
+//    GLint texcoord = glGetAttribLocation(shaders[shaderNum]->programID(), "texcoordIn");
+//    glEnableVertexAttribArray(texcoord);
+//    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTextureCoords[0]);
+//    
+//    // Normals
+//    GLint normal = glGetAttribLocation(shaders[shaderNum]->programID(), "normalIn");
+//    glEnableVertexAttribArray(normal);
+//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mNormals);
+//    
+//    // Tangent Vectors
+//    GLint tangent = glGetAttribLocation(shaders[shaderNum]->programID(), "tangentIn");
+//    glEnableVertexAttribArray(tangent);
+//    glVertexAttribPointer(tangent, 3, GL_FLOAT, 0, sizeof(aiVector3D), mesh->mTangents);
+//}
+
+void testRects1() {
+    glBegin(GL_QUADS);
+    
+    glColor4f(0.3,0.6,0.3,0.6);
+//    glVertex3f(-3.0, -3.0, 0.0);
+//    glVertex3f(-3.0, 3.0, 0.0);
+//    glVertex3f(3.0, 3.0, 0.0);
+//    glVertex3f(3.0, -3.0, 0.0);
+//
+//    glColor4f(0.6,0.3,0.3,0.6);
+//    glVertex3f(-3.0, 3.0, 0.0);
+//    glVertex3f(-3.0, 6.0, 0.0);
+//    glVertex3f(3.0, 6.0, 0.0);
+//    glVertex3f(3.0, 3.0, 0.0);
+//    
+//    glColor4f(0.3,0.6,0.6,0.6);
+//    glVertex3f(6.0, -3.0, 0.0);
+//    glVertex3f(6.0, 3.0, 0.0);
+//    glVertex3f(3.0, 3.0, 0.0);
+//    glVertex3f(3.0, -3.0, 0.0);
+//    
+//    glColor4f(0.3,0.3,0.6,0.6);
+//    glVertex3f(-3.0, -3.0, 0.0);
+//    glVertex3f(-3.0, -6.0, 0.0);
+//    glVertex3f(3.0, -6.0, 0.0);
+//    glVertex3f(3.0, -3.0, 0.0);
+//    
+//    glColor4f(0.6,0.3,0.6,0.6);
+//    glVertex3f(-3.0, -3.0, 0.0);
+//    glVertex3f(-6.0, -3.0, 0.0);
+//    glVertex3f(-6.0, 3.0, 0.0);
+//    glVertex3f(-3.0, 3.0, 0.0);
+    
+    glVertex3f(-1.0, -1.0, 0.0);
+    glVertex3f(-1.0, 1.0, 0.0);
+    glVertex3f(1.0, 1.0, 0.0);
+    glVertex3f(1.0, -1.0, 0.0);
+
+    glEnd();
+}
+
+void testRects2() {
+
+    int num_vertices = 3;
+    testVertex * my_vertices;
+    my_vertices = new testVertex[num_vertices];
+
+    // specify vertex locations
+    my_vertices[0].pos = aiVector3D(-1.0, -1.0, 0.0);
+    my_vertices[1].pos = aiVector3D(-1.0, 1.0, 0.0);
+    my_vertices[2].pos = aiVector3D(1.0, 1.0, 0.0);
+    
+    // specify normal directions
+    my_vertices[0].norm = aiVector3D(1.0, 0.0, 0.0);
+    my_vertices[1].norm = aiVector3D(0.0, 1.0, 0.0);
+    my_vertices[2].norm = aiVector3D(0.0, 0.0, 1.0);
+    
+
+    int shaderNum = 0;
+    
+    GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->pos);
+    
+    GLint normal = glGetAttribLocation(shaders[shaderNum]->programID(), "normalIn");
+    glEnableVertexAttribArray(normal);
+    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->norm);
+    
+
+    
+    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+}
+
+
+void Display_FixedPipeline() {
+    //glClearColor(1.f, 1.f, 1.f, 0.1f);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     aiVector3D * cam_pos = cam->getPosition();
     aiVector3D * look_pos = cam->getLookAt();
     
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glFrustum (-.5, .5, -.5, .5, .01, 30.0);
+    glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
-    
-//    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, cam_pos->x, cam_pos->y, 0.0, 0.0, 1.0, 0.0);
-//    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z + 2.0, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
     
-
-    glBegin(GL_QUADS);
-    glColor4f(0.3,0.6,0.3,0.6);
-    glVertex3f(-3.0, -3.0, 0.0);
-    glVertex3f(-3.0, 3.0, 0.0);
-    glVertex3f(3.0, 3.0, 0.0);
-    glVertex3f(3.0, -3.0, 0.0);
-    
-    glColor4f(0.6,0.3,0.3,0.6);
-    glVertex3f(-3.0, 3.0, 0.0);
-    glVertex3f(-3.0, 6.0, 0.0);
-    glVertex3f(3.0, 6.0, 0.0);
-    glVertex3f(3.0, 3.0, 0.0);
-    
-    glColor4f(0.3,0.6,0.6,0.6);
-    glVertex3f(6.0, -3.0, 0.0);
-    glVertex3f(6.0, 3.0, 0.0);
-    glVertex3f(3.0, 3.0, 0.0);
-    glVertex3f(3.0, -3.0, 0.0);
-    
-    glColor4f(0.3,0.3,0.6,0.6);
-    glVertex3f(-3.0, -3.0, 0.0);
-    glVertex3f(-3.0, -6.0, 0.0);
-    glVertex3f(3.0, -6.0, 0.0);
-    glVertex3f(3.0, -3.0, 0.0);
-    
-    glColor4f(0.6,0.3,0.6,0.6);
-    glVertex3f(-3.0, -3.0, 0.0);
-    glVertex3f(-6.0, -3.0, 0.0);
-    glVertex3f(-6.0, 3.0, 0.0);
-    glVertex3f(-3.0, 3.0, 0.0);
-
-
-    glEnd();
-    
+    testRects1();
     graph->Display(cam_pos->z);
+}
+
+void renderFrame() {
     
-    graph->FadeColors();
+    //glClearColor(1.f, 1.f, 1.f, 0.1f);
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    
+    aiVector3D * cam_pos = cam->getPosition();
+    aiVector3D * look_pos = cam->getLookAt();
+        
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
+    
+    // For Fixed Pipeline
+    //graph->Display(cam_pos->z);
+    
+    // For Custom Pipeline
+    int shaderNum = 0;
+    glUseProgram(shaders[shaderNum]->programID());
+    
+    setMaterial(shaderNum);
+    
+    //testRects2();
+    graph->Render();
+    
+//    for (int i = 0; i < meshes.size(); i++) {
+//        
+//        glUseProgram(shaders[shaderNum]->programID());
+//        
+//        //setMatrices(cur_scene);
+//        
+//        setMaterial(shaderNum);
+//        //setTextures(i, shaderNum, false);
+//        setMeshData(i, shaderNum);
+//        
+//        // Draw the mesh
+//        if (meshes[i].mesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE) {
+//            
+//            //glDrawArrays();
+//            glDrawElements(GL_TRIANGLES, 3*meshes[i].mesh->mNumFaces, GL_UNSIGNED_INT, &meshes[i].indexBuffer[0]);
+//        }
+//    }
 }
 
 void updateAudioConnections() {
@@ -478,6 +663,7 @@ void updateState() {
     delta = .002;
     
     graph->UpdateGraph(delta);
+    //graph->FadeColors();
     
     cam->updateCam(delta);
     
@@ -508,7 +694,7 @@ int main(int argc, char** argv) {
     
     srand( (unsigned)time( NULL ) );
     
-    graph = new Graph(max_notes, dissonance);
+    graph = new Graph(max_notes, dissonance, &shaders);
     
     cam = new Camera(0.0, 0.0, 4.0);
     
@@ -519,13 +705,27 @@ int main(int argc, char** argv) {
         connection_list[i] = 0;
     }
     
+    //    glMatrixMode (GL_PROJECTION);
+    //    glLoadIdentity ();
+    //    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
+    //    glMatrixMode (GL_MODELVIEW);
+
+    
     // Main Loop
     while (window.IsOpened()) {
         
         handleInput();
         updateState();
         updateAudioConnections();
-        renderFrame();
+        
+        if (fixedPipeline) {
+            // Fixed Pipeline
+            Display_FixedPipeline();
+        }
+        else {
+            // Custom Pipeline
+            renderFrame();   
+        }
         
         window.Display();
     }

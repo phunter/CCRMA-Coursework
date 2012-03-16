@@ -14,6 +14,7 @@
 
 #include "Note.h"
 #include "Dissonance.h"
+#include "Shader.h"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ using namespace std;
 
 class Graph {
 public:
-    Graph(int max_size_, Dissonance *diss_mat_);
+    Graph(int max_size_, Dissonance *diss_mat_, std::vector<Shader*> *shaders_);
     
     aiVector3D * GetLocation(int mapped_midi);
     Note * GetNote(int mapped_midi);
@@ -47,6 +48,9 @@ public:
     void TrimOldConnections();
     
     void Display(float cam_height);
+    
+    void Render();
+    
     void ExciteNote();
     void FadeColors();
     
@@ -65,6 +69,8 @@ private:
 
     Dissonance * diss_mat;
     vector <Note*> note_graph;
+    
+    std::vector<Shader*> *shaders;
 };
 
 

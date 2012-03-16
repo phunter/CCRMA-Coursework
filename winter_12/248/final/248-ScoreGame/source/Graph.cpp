@@ -8,7 +8,7 @@
 
 #include "Graph.h"
 
-Graph::Graph(int max_size_, Dissonance * diss_mat_) {
+Graph::Graph(int max_size_, Dissonance * diss_mat_, std::vector<Shader*> *shaders_) {
     max_size = max_size_;
     note_graph.resize(max_size);
     diss_mat = diss_mat_;
@@ -16,6 +16,7 @@ Graph::Graph(int max_size_, Dissonance * diss_mat_) {
     cur_size = 0;
     current_note = -1;
     
+    shaders = shaders_;
     //midi_offset = midi_offset_;
 }
 
@@ -108,7 +109,8 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.z,
                                     mapped_midi,
                                     .5,
-                                    10.0);
+                                    10.0,
+                                    shaders);
     cur_size++;
 }
 
@@ -126,6 +128,7 @@ void Graph::UpdateGraph(float delta) {
     
     AttractToXYPlane(delta);
     
+    FadeColors();
     
     IncrementTimeCounts(delta);
     TrimOldConnections();
@@ -210,6 +213,22 @@ void Graph::Display(float cam_height) {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
             note_graph[i]->DisplayNotes(cam_height);
+        }
+    }
+}
+
+void Graph::Render() {
+    
+    // first draw the connections
+    for (int i = 0; i < max_size; i++) {
+        if (note_graph[i] != NULL) {
+            note_graph[i]->RenderConnections();
+        }
+    }
+    // then draw the notes
+    for (int i = 0; i < max_size; i++) {
+        if (note_graph[i] != NULL) {
+            note_graph[i]->RenderNotes();
         }
     }
 }

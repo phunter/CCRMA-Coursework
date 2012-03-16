@@ -9,7 +9,7 @@
 #include "Note.h"
 
 // position: (x,y), relative midi note: mapped_midi_num, speed s, max_connection_time: t
-Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
+Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::vector<Shader*> *shaders_)
 {
     color = aiColor4D((float)rand()/RAND_MAX,(float)rand()/RAND_MAX,(float)rand()/RAND_MAX,1.0);
     centerPosition = aiVector3D(x,y,z);
@@ -17,6 +17,7 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
 //    printf("centerPosition.x = %f, centerPosition.y = %f\n", centerPosition.x, centerPosition.y);
 
     radius = .2;
+    //line_thickness = .03;
     line_thickness = .014;
     width_max = (10 * radius) / .2;
     
@@ -32,6 +33,8 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t)
     max_connections = 50;
     
     connection_list.resize(max_connections);
+    
+    shaders = shaders_;
     
     rel_space = note_space;
     // for notes with ledger lines
@@ -386,20 +389,22 @@ void Note::DisplayNotes(float h)
     cam_height = h - centerPosition.z;
     width_max = ((10 * radius) / .2) / h;
             
-    //glEnable( GL_LINE_SMOOTH );
+    
+    glEnable( GL_LINE_SMOOTH );
 
     // color inside of in bubble
     glColor4f(color.r, color.g, color.b, excitement);
-//    DrawCircle(centerPosition, radius, 24, true);    
     DrawCircle(centerPosition, radius, 50, true);
     
     // draw outer bubble
+
     glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
-//    glLineWidth(.8*width_max);
-//    DrawCircle(centerPosition, radius, 100, false);
-    //glDisable(GL_LINE_SMOOTH);
+
+    glLineWidth(.8*width_max);
+    //DrawCircle(centerPosition, radius, 100, false);
+    glDisable(GL_LINE_SMOOTH);
     DrawTorus(centerPosition, radius, line_thickness, 26, 8);
-    //glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_LINE_SMOOTH);
     
     // draw staff lines
     glPushMatrix();
@@ -411,8 +416,52 @@ void Note::DisplayNotes(float h)
     NoteHead();
     glPopMatrix();
     
-    //glDisable( GL_LINE_SMOOTH );
+    glDisable( GL_LINE_SMOOTH );
 }
+
+void Note::RenderNotes()
+{
+    glPushMatrix();
+    /////////////////////////////////////////////////////////////////
+    // Basic Formula:
+    //    int num_vertices = 3;
+    //    CustomVertex * my_vertices;
+    //    my_vertices = new CustomVertex[num_vertices];
+    //    
+    //    // specify vertex locations
+    //    my_vertices[0].position = centerPosition + aiVector3D(1.0, 0.0, 0.0);
+    //    my_vertices[1].position = centerPosition + aiVector3D(0.0, 1.0, 0.0);
+    //    my_vertices[2].position = centerPosition + aiVector3D(-1.0, 0.0, 0.0);
+    //    
+    //    // specify normal directions
+    //    my_vertices[0].normal = aiVector3D(1.0, 0.0, 0.0);
+    //    my_vertices[1].normal = aiVector3D(0.0, 1.0, 0.0);
+    //    my_vertices[2].normal = aiVector3D(0.0, 0.0, 1.0);
+    //    
+    //    
+    //    int shaderNum = 0;
+    //    
+    //    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
+    //    glEnableVertexAttribArray(position);
+    //    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
+    //    
+    //    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
+    //    glEnableVertexAttribArray(normal);
+    //    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
+    //    
+    //    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+    /////////////////////////////////////////////////////////////////
+    
+
+    RenderTorus(centerPosition, radius, line_thickness, 50, 8);
+
+    RenderStaffLines();
+
+    RenderNoteHead();
+
+    glPopMatrix();
+}
+
 
 bool Note::IsConnectedTo(int mapped_midi_num) {
     if (connection_list[mapped_midi_num] == NULL) {
@@ -463,6 +512,39 @@ void Note::DisplayConnections()
     }
 }
 
+
+void Note::RenderConnections()
+{
+    for (int i = 0; i < max_connections; i++) {
+        if (connection_list[i] != NULL) {
+            aiVector3D orig = centerPosition;
+            aiVector3D goal = *connection_list[i]->next_note->getLocation();
+            
+            aiVector3D direction = goal - orig;
+            
+            aiVector3D XY_direction = aiVector3D(direction.x, direction.y, 0.0); // ignore Z
+            
+            XY_direction.Normalize();
+            
+            aiVector3D start = orig + XY_direction*radius;
+            aiVector3D finish = goal - XY_direction*radius;
+            //            printf("orig at (%f,%f,%f)\n",orig.x,orig.y,orig.z);
+            //            printf("goal at (%f,%f,%f)\n",goal.x,goal.y,goal.z);
+            //            printf("start at (%f,%f,%f)\n",start.x,start.y,start.z);
+            //            printf("finish at (%f,%f,%f)\n",finish.x,finish.y,finish.z);
+            
+            
+            float connectionOpac = 1.0 - .9 * (connection_list[i]->time_count / max_connection_time);
+            glColor4f(0.0, 0.0, 0.0, connectionOpac);
+            
+            RenderCylinder(start, finish, line_thickness, 8);
+            //            glVertex3f(start.x, start.y, start.z);
+            //            glVertex3f(finish.x, finish.y, finish.z);
+        }
+    }
+}
+
+
 void Note::DrawStaffLines()
 {
     float staffLen = (radius/1.8);
@@ -476,7 +558,6 @@ void Note::DrawStaffLines()
     
     glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z);
                 
-//    glBegin(GL_LINES);
 
     for (int i = -2; i < 3; i++) {
         float tmpLineLen = staffLen;
@@ -501,11 +582,45 @@ void Note::DrawStaffLines()
         DrawCylinder(aiVector3D(-tmpLineLen, i * lineHeight, 0.0),
                      aiVector3D(tmpLineLen, i * lineHeight, 0.0),
                      .005, 4);
-//        glVertex3f(-tmpLineLen, i * lineHeight, 0.0);
-//        glVertex3f(tmpLineLen, i * lineHeight, 0.0);
     }    
+}
+
+void Note::RenderStaffLines()
+{
+    glPushMatrix();
+    float staffLen = (radius/1.8);
+    float ledgerLen = staffLen/3.0;
+    float lineHeight = (radius/4.0);
+    
+    int note_outness = note_space / 2;
         
-//    glEnd();
+    glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z);
+    
+    for (int i = -2; i < 3; i++) {
+        float tmpLineLen = staffLen;
+        
+        // bruteForce
+        if (i == -2 && (note_outness <= -3)) {
+            tmpLineLen = ledgerLen;
+        }
+        if (i == -1 && (note_outness <= -4 || note_outness >= 6)) {
+            tmpLineLen = ledgerLen;
+        }
+        if (i == 0 && (note_outness <= -5 || note_outness >= 5)) {
+            tmpLineLen = ledgerLen;
+        }
+        if (i == 1 && (note_outness >= 4 || note_outness <= -6)) {
+            tmpLineLen = ledgerLen;
+        }
+        if (i == 2 && (note_outness >= 3)) {
+            tmpLineLen = ledgerLen;
+        }
+        
+        RenderCylinder(aiVector3D(-tmpLineLen, i * lineHeight, 0.0),
+                       aiVector3D(tmpLineLen, i * lineHeight, 0.0),
+                       .005, 4); //.005, 4
+    }
+    glPopMatrix();
 }
 
 void Note::NoteHead()
@@ -513,14 +628,13 @@ void Note::NoteHead()
     glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z); 
     glTranslatef(0.0, rel_space * (radius/8.0), 0.01);
     glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
-    //glBegin(GL_TRIANGLE_FAN);
-    //glVertex3f(0.0, 0.0, 0.0);
+
     DrawCircle(aiVector3D(0.0,0.0,0.0), radius*0.1, 40, 1);
-    //glEnd();
+
     glLineWidth(.3*width_max);
-    //glBegin(GL_LINE_STRIP);
+
     DrawCircle(aiVector3D(0.0,0.0,0.), radius*0.1, 40, 0);
-    //glEnd();
+
     if (accidental == 1) {
         DrawSharp();
     }
@@ -528,6 +642,27 @@ void Note::NoteHead()
         DrawFlat();
     }
 }
+
+void Note::RenderNoteHead()
+{
+    glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z); 
+    glTranslatef(0.0, rel_space * (radius/8.0), 0.0051);
+//    glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
+//    
+    DrawCircle(aiVector3D(0.0,0.0,0.0), radius*0.1, 40, 1);
+//    
+//    glLineWidth(.3*width_max);
+//    
+//    DrawCircle(aiVector3D(0.0,0.0,0.), radius*0.1, 40, 0);
+//    
+//    if (accidental == 1) {
+//        DrawSharp();
+//    }
+//    else if (accidental == -1) {
+//        DrawFlat();
+//    }
+}
+
 
 void Note::DrawFlat()
 {
@@ -584,8 +719,10 @@ void Note::DrawSharp()
 
 void Note::DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled) { 
     float angle, angle2;
+    
     if (filled) {
         glBegin(GL_TRIANGLE_FAN);
+        //glNormal3f(	0.0, 0.0, 1.0);
         glVertex3f(cent.x, cent.y, cent.z);
         for(int i = 0; i <= numVerts; i+=2) { 
             angle = i*2*M_PI/numVerts; 
@@ -596,6 +733,7 @@ void Note::DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled) {
     else {
         for(int i = 0; i <= numVerts; i++) { 
             glBegin(GL_LINES);
+            //glNormal3f(	0.0, 0.0, 1.0);
             angle = (i-1)*2*M_PI/numVerts; 
             glVertex3f(cent.x + (cos(angle) * rad), cent.y + (sin(angle) * rad), cent.z);
             angle2 = (i+1)*2*M_PI/numVerts;
@@ -604,6 +742,65 @@ void Note::DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled) {
         }
     }
 }
+
+void Note::RenderCircle(aiVector3D cent, float rad, float roundness, int numCorners) { 
+    int num_vertices = 3 * numCorners;
+    CustomVertex * my_vertices;
+    my_vertices = new CustomVertex[num_vertices];
+    
+
+    float angle, angle2;
+    
+    //glBegin(GL_TRIANGLE_FAN);
+    //glNormal3f(	0.0, 0.0, 1.0);
+    //glVertex3f(cent.x, cent.y, cent.z);
+    
+    //    my_vertices[0].position = centerPosition + aiVector3D(1.0, 0.0, 0.0);
+    //    my_vertices[1].position = centerPosition + aiVector3D(0.0, 1.0, 0.0);
+    //    my_vertices[2].position = centerPosition + aiVector3D(-1.0, 0.0, 0.0);
+    //    
+    //    // specify normal directions
+    //    my_vertices[0].normal = aiVector3D(1.0, 0.0, 0.0);
+    //    my_vertices[1].normal = aiVector3D(0.0, 1.0, 0.0);
+    //    my_vertices[2].normal = aiVector3D(0.0, 0.0, 1.0);
+    
+    
+    for(int i = 0; i < numCorners; i++) {
+        angle = i*2*M_PI/numCorners;
+        angle2 = (i+1)*2*M_PI/numCorners;
+        
+        my_vertices[3*i + 0].position = cent;
+        my_vertices[3*i + 1].position = cent + rad * aiVector3D(cos(angle), sin(angle), 0.0);
+        my_vertices[3*i + 2].position = cent + rad * aiVector3D(cos(angle2), sin(angle2), 0.0);
+        
+        // specify normal directions
+        my_vertices[3*i + 0].normal = aiVector3D(0.0, 0.0, 1.0);
+        my_vertices[3*i + 1].normal = aiVector3D(0.0, 0.0, 1.0) + roundness * aiVector3D(cos(angle), sin(angle), 0.0);
+        my_vertices[3*i + 1].normal.Normalize();
+        my_vertices[3*i + 2].normal = aiVector3D(0.0, 0.0, 1.0) + roundness * aiVector3D(cos(angle2), sin(angle2), 0.0);
+        my_vertices[3*i + 2].normal.Normalize();
+        
+    } 
+    glEnd();
+    
+    int shaderNum = 0;
+    
+    RenderVertices(my_vertices, num_vertices, shaderNum);
+    
+//    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
+//    glEnableVertexAttribArray(position);
+//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
+//    
+//    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
+//    glEnableVertexAttribArray(normal);
+//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
+//    
+//    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+    
+    delete [] my_vertices;
+
+}
+
 
 void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices) {
     // 1) translate to endOne
@@ -622,11 +819,10 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     
     glTranslatef(endOne.x, endOne.y, endOne.z);
     
-    // get put x-y distance in one dimension of 2D vector
+    // put x-y distance in one dimension of 2D vector
     aiVector2D xyDirection = aiVector2D(connectionVector.x, connectionVector.y);
     aiVector2D heightTriangle = aiVector2D(xyDirection.Length(), connectionVector.z);
     
-    //aiVector2D zComponent = aiVector2D(sqrt(pow(connectionVector.x, 2) + pow(connectionVector.y, 2)), connectionVector.z);
     heightTriangle.Normalize();
     float rotateDegrees = ((M_PI/2.0)-asin(heightTriangle.y)) * 180.0 / M_PI;
     
@@ -636,10 +832,9 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     aiVector3D bottomCenter = aiVector3D(0.0,0.0,0.0);
     aiVector3D topCenter = aiVector3D(0.0,0.0,length);
     
-//    glColor4f(0.0, 0.0, 0.0, .9);
-    
     // draw bottom circle
     glBegin(GL_TRIANGLE_FAN);
+    glNormal3f(0.0,0.0,-1.0);
     glVertex3f(bottomCenter.x, bottomCenter.y, bottomCenter.z);
     for(int i = 0; i <= slices; i++) { 
         angle = i*2*M_PI/slices; 
@@ -649,6 +844,7 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     
     // draw top circle
     glBegin(GL_TRIANGLE_FAN);
+    glNormal3f(0.0,0.0,1.0);
     glVertex3f(topCenter.x, topCenter.y, topCenter.z);
     for(int i = 0; i <= slices; i++) { 
         angle = i*2*M_PI/slices; 
@@ -657,22 +853,189 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     glEnd();
     
     // draw sides of cylinder
-//    glColor4f(.8, 0.8, 0.8, .6);
+
+    aiVector3D outerPos;
+    aiVector3D normalDir;
     glBegin(GL_QUADS);
     for(int i = 0; i < slices; i++) { 
         angle = i*2*M_PI/slices; 
         angle2 = (i+1)*2*M_PI/slices;
         
-        glVertex3f(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
-        glVertex3f(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
-        glVertex3f(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
-        glVertex3f(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
+        outerPos = aiVector3D(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
+        normalDir = outerPos - bottomCenter;
+        normalDir.Normalize();
+        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+        
+        outerPos = aiVector3D(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
+        normalDir = outerPos - bottomCenter;
+        normalDir.Normalize();
+        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+
+        
+        outerPos = aiVector3D(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
+        normalDir = outerPos - topCenter;
+        normalDir.Normalize();
+        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+        
+        outerPos = aiVector3D(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
+        normalDir = outerPos - topCenter;
+        normalDir.Normalize();
+        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+
+        
+//        glVertex3f(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
+//        glVertex3f(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
+//        glVertex3f(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
+//        glVertex3f(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
     } 
     glEnd();
-
     glPopMatrix();
-    
 }
+
+void Note::RenderCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices) {
+    
+    glPushMatrix();
+    
+    // num verts = 3 * slices for top and bottom + 6 (one quad) per slice for sides
+    int num_vertices = 2 * 3 * slices + 6 * slices; // or simply 12 * slices
+    CustomVertex * my_vertices;
+    my_vertices = new CustomVertex[num_vertices];
+    
+    // 1) translate to endOne
+    // 2) rotate to angle(endOne,endTwo)
+    // 3) cylinder bottom centered at (0,0,0), top at (0,0,length(endTwo - endOne))
+    
+    // RENDER
+    // top & bottom circle
+    aiVector3D connectionVector = endTwo - endOne;
+    float length = connectionVector.Length();
+    float angle, angle2;
+    
+    aiVector3D rotationVector = aiVector3D(-connectionVector.y, connectionVector.x, 0.0);
+    
+    glTranslatef(endOne.x, endOne.y, endOne.z);
+    
+    // put x-y distance in one dimension of 2D vector
+    aiVector2D xyDirection = aiVector2D(connectionVector.x, connectionVector.y);
+    aiVector2D heightTriangle = aiVector2D(xyDirection.Length(), connectionVector.z);
+    
+    heightTriangle.Normalize();
+    float rotateDegrees = ((M_PI/2.0)-asin(heightTriangle.y)) * 180.0 / M_PI;
+    
+    glRotatef(rotateDegrees, rotationVector.x, rotationVector.y, rotationVector.z);
+    
+    
+    aiVector3D bottomCenter = aiVector3D(0.0,0.0,0.0);
+    aiVector3D topCenter = aiVector3D(0.0,0.0,length);
+    
+    // draw bottom circle
+    for(int i = 0; i < slices; i++) { 
+        angle = i*2*M_PI/slices;
+        angle2 = (i+1)*2*M_PI/slices;
+        
+        // specify vertex locations
+        my_vertices[3*i + 0].position = bottomCenter;
+        my_vertices[3*i + 1].position = bottomCenter + radius * aiVector3D(cos(angle), sin(angle), 0.0);
+        my_vertices[3*i + 2].position = bottomCenter + radius * aiVector3D(cos(angle2), sin(angle2), 0.0);
+        
+        // specify normal directions: all downward
+        my_vertices[3*i + 0].normal = aiVector3D(0.0, 0.0, -1.0);
+        my_vertices[3*i + 1].normal = aiVector3D(0.0, 0.0, -1.0);
+        my_vertices[3*i + 2].normal = aiVector3D(0.0, 0.0, -1.0);
+
+        //glVertex3f(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
+    } 
+    
+    // draw top circle
+    for(int i = 0; i < slices; i++) {
+        angle = i*2*M_PI/slices;
+        angle2 = (i+1)*2*M_PI/slices;
+ 
+        // specify vertex locations
+        my_vertices[3*slices + 3*i + 0].position = topCenter;
+        my_vertices[3*slices + 3*i + 1].position = topCenter + radius * aiVector3D(cos(angle), sin(angle), 0.0);
+        my_vertices[3*slices + 3*i + 2].position = topCenter + radius * aiVector3D(cos(angle2), sin(angle2), 0.0);
+        
+        // specify normal directions: all downward
+        my_vertices[3*slices + 3*i + 0].normal = aiVector3D(0.0, 0.0, 1.0);
+        my_vertices[3*slices + 3*i + 1].normal = aiVector3D(0.0, 0.0, 1.0);
+        my_vertices[3*slices + 3*i + 2].normal = aiVector3D(0.0, 0.0, 1.0);
+
+        //glVertex3f(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
+    } 
+    
+    // draw sides of cylinder
+    
+    aiVector3D bottom1, bottom2, top1, top2;
+    aiVector3D normalDir;
+    for(int i = 0; i < slices; i++) { 
+        angle = i*2*M_PI/slices; 
+        angle2 = (i+1)*2*M_PI/slices;
+        
+        bottom1 = aiVector3D(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
+//        normalDir = outerPos - bottomCenter;
+//        normalDir.Normalize();
+//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+        
+        bottom2 = aiVector3D(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
+//        normalDir = outerPos - bottomCenter;
+//        normalDir.Normalize();
+//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+        
+        
+        top2 = aiVector3D(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
+//        normalDir = outerPos - topCenter;
+//        normalDir.Normalize();
+//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+        
+        top1 = aiVector3D(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
+//        normalDir = outerPos - topCenter;
+//        normalDir.Normalize();
+//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
+//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
+        
+        // specify positions
+        my_vertices[6*slices + 6*i + 0].position = bottom1;
+        my_vertices[6*slices + 6*i + 1].position = bottom2;
+        my_vertices[6*slices + 6*i + 2].position = top2;
+        
+        // specify normal directions
+        my_vertices[6*slices + 6*i + 0].normal = bottom1 - bottomCenter;
+        my_vertices[6*slices + 6*i + 1].normal = bottom2 - bottomCenter;
+        my_vertices[6*slices + 6*i + 2].normal = top2 - topCenter;
+        
+        // specify positions
+        my_vertices[6*slices + 6*i + 3].position = top2;
+        my_vertices[6*slices + 6*i + 4].position = top1;
+        my_vertices[6*slices + 6*i + 5].position = bottom1;
+        
+        // specify normal directions
+        my_vertices[6*slices + 6*i + 3].normal = top2 - topCenter;
+        my_vertices[6*slices + 6*i + 4].normal = top1 - topCenter;
+        my_vertices[6*slices + 6*i + 5].normal = bottom1 - bottomCenter;
+
+        
+        //        glVertex3f(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
+        //        glVertex3f(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
+        //        glVertex3f(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
+        //        glVertex3f(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
+    } 
+    
+    int shaderNum = 0;
+    
+    RenderVertices(my_vertices, num_vertices, shaderNum);
+    delete [] my_vertices;
+    
+    glPopMatrix();
+}
+
 
 void Note::DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments) {
     
@@ -682,6 +1045,11 @@ void Note::DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, in
 
     glPointSize(4);
     glBegin(GL_QUADS);
+    //
+    //
+    //glNormal3f(	.7, .6, .5);
+    //
+    //
     
     //Draw order:
     // for outerSegment i, draw innerSegment j
@@ -733,6 +1101,111 @@ void Note::DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, in
     glPopMatrix();
 }
 
+void Note::RenderTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments) {
+    glPushMatrix();
+    // it takes 6 vertices to render a quad, and there are (outerSegments * innerSegments) quads
+    int num_vertices = 6 * outerSegments * innerSegments;
+    
+    CustomVertex * my_vertices;
+    my_vertices = new CustomVertex[num_vertices];
+    
+    
+    glTranslatef(center.x, center.y, center.z);
+    
+    //Draw order:
+    // for outerSegment i, draw innerSegment j
+    
+    float outerAngle1, outerAngle2, innerAngle1, innerAngle2;
+    
+    for (int i = 0; i < outerSegments; i++) {
+        outerAngle1 = i*2*M_PI/outerSegments; 
+        outerAngle2 = (i+1)*2*M_PI/outerSegments;
+        
+        for (int j = 0; j < innerSegments; j++) {
+            innerAngle1 = j*2*M_PI/innerSegments; 
+            innerAngle2 = (j+1)*2*M_PI/innerSegments;
+            
+            aiVector3D outerInfluence1 = centerRadius * aiVector3D( cos(outerAngle1), sin(outerAngle1), 0.0);
+            aiVector3D outerInfluence2 = centerRadius * aiVector3D( cos(outerAngle2), sin(outerAngle2), 0.0);
+            
+            // here x and y components vary both by inner and outer angles! z component only by inner angle.
+            
+            //positon = center + outerInfluence + innerInfluence
+            aiVector3D o1i1 = outerInfluence1 + edgeRadius * aiVector3D(cos(outerAngle1) * cos(innerAngle1),
+                                                                        sin(outerAngle1) * cos(innerAngle1),
+                                                                        sin(innerAngle1));
+            aiVector3D o1i2 = outerInfluence1 + edgeRadius * aiVector3D(cos(outerAngle1) * cos(innerAngle2),
+                                                                        sin(outerAngle1) * cos(innerAngle2),
+                                                                        sin(innerAngle2));
+            aiVector3D o2i1 = outerInfluence2 + edgeRadius * aiVector3D(cos(outerAngle2) * cos(innerAngle1),
+                                                                        sin(outerAngle2) * cos(innerAngle1),
+                                                                        sin(innerAngle1));
+            aiVector3D o2i2 = outerInfluence2 + edgeRadius * aiVector3D(cos(outerAngle2) * cos(innerAngle2),
+                                                                        sin(outerAngle2) * cos(innerAngle2),
+                                                                        sin(innerAngle2));
+            
+            // counter-clockwise order
+            // verts 1, 2, 3
+            //glVertex3f(o1i1.x,o1i1.y,o1i1.z);
+            //glVertex3f(o2i1.x,o2i1.y,o2i1.z);
+            //glVertex3f(o2i2.x,o2i2.y,o2i2.z);
+            
+            my_vertices[6*(j + innerSegments*i) + 0].position = o1i1;
+            my_vertices[6*(j + innerSegments*i) + 1].position = o2i1;
+            my_vertices[6*(j + innerSegments*i) + 2].position = o2i2;
+            
+            // specify normal directions
+            my_vertices[6*(j + innerSegments*i) + 0].normal = o1i1 - outerInfluence1;
+            my_vertices[6*(j + innerSegments*i) + 1].normal = o2i1 - outerInfluence2;
+            my_vertices[6*(j + innerSegments*i) + 2].normal = o2i2 - outerInfluence2;
+
+            // verts 3, 4, 1
+            //glVertex3f(o2i2.x,o2i2.y,o2i2.z);
+            //glVertex3f(o1i2.x,o1i2.y,o1i2.z);
+            //glVertex3f(o1i1.x,o1i1.y,o1i1.z);
+            
+            my_vertices[6*(j + innerSegments*i) + 3].position = o2i2;
+            my_vertices[6*(j + innerSegments*i) + 4].position = o1i2;
+            my_vertices[6*(j + innerSegments*i) + 5].position = o1i1;
+            
+            // specify normal directions
+            my_vertices[6*(j + innerSegments*i) + 3].normal = o2i2 - outerInfluence2;
+            my_vertices[6*(j + innerSegments*i) + 4].normal = o1i2 - outerInfluence1;
+            my_vertices[6*(j + innerSegments*i) + 5].normal = o1i1 - outerInfluence1;
+            
+        }
+    }
+    
+    int shaderNum = 0;
+    
+    RenderVertices(my_vertices, num_vertices, shaderNum);
+//    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
+//    glEnableVertexAttribArray(position);
+//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
+//    
+//    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
+//    glEnableVertexAttribArray(normal);
+//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
+//    
+//    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+    
+    delete [] my_vertices;
+    glPopMatrix();
+}
+
+void Note::RenderVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum) {
+    
+    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
+    
+    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
+    glEnableVertexAttribArray(normal);
+    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
+    
+    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+
+}
 
 bool Note::maybe() {
     return (float)rand()/RAND_MAX > .5;

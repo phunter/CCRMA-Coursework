@@ -21,6 +21,10 @@
 		44337F0314FE4A5E009B2FA4 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44337EF614FE4A5E009B2FA4 /* OscReceivedElements.cpp */; };
 		44337F0414FE4A5E009B2FA4 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44337EF814FE4A5E009B2FA4 /* OscTypes.cpp */; };
 		44337F0614FE5797009B2FA4 /* diss_matrix.txt in Copy Files */ = {isa = PBXBuildFile; fileRef = 44337F0514FE5797009B2FA4 /* diss_matrix.txt */; };
+		443ACF48151097950030C12C /* phong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF44151097950030C12C /* phong.frag.glsl */; };
+		443ACF49151097950030C12C /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF45151097950030C12C /* phong.vert.glsl */; };
+		443ACF4A151097950030C12C /* simplePhong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF46151097950030C12C /* simplePhong.frag.glsl */; };
+		443ACF4B151097950030C12C /* simplePhong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 443ACF47151097950030C12C /* simplePhong.vert.glsl */; };
 		44C9FCA614FE461000F33326 /* teapot.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44C9FCA414FE461000F33326 /* teapot.3ds */; };
 		44C9FCA714FE461000F33326 /* teapot.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44C9FCA514FE461000F33326 /* teapot.blend */; };
 		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
@@ -56,6 +60,10 @@
 			dstPath = shaders;
 			dstSubfolderSpec = 7;
 			files = (
+				443ACF48151097950030C12C /* phong.frag.glsl in Copy Shaders */,
+				443ACF49151097950030C12C /* phong.vert.glsl in Copy Shaders */,
+				443ACF4A151097950030C12C /* simplePhong.frag.glsl in Copy Shaders */,
+				443ACF4B151097950030C12C /* simplePhong.vert.glsl in Copy Shaders */,
 			);
 			name = "Copy Shaders";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,8 +100,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		44337ED014FE46BD009B2FA4 /* phong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.frag.glsl; sourceTree = "<group>"; };
-		44337ED114FE46BD009B2FA4 /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.vert.glsl; sourceTree = "<group>"; };
 		44337ED314FE4714009B2FA4 /* Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Main.cpp; sourceTree = "<group>"; };
 		44337ED414FE4714009B2FA4 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shader.cpp; sourceTree = "<group>"; };
 		44337ED514FE4714009B2FA4 /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
@@ -129,6 +135,10 @@
 		44337EF814FE4A5E009B2FA4 /* OscTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OscTypes.cpp; sourceTree = "<group>"; };
 		44337EF914FE4A5E009B2FA4 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		44337F0514FE5797009B2FA4 /* diss_matrix.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = diss_matrix.txt; sourceTree = "<group>"; };
+		443ACF44151097950030C12C /* phong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.frag.glsl; sourceTree = "<group>"; };
+		443ACF45151097950030C12C /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = phong.vert.glsl; sourceTree = "<group>"; };
+		443ACF46151097950030C12C /* simplePhong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = simplePhong.frag.glsl; sourceTree = "<group>"; };
+		443ACF47151097950030C12C /* simplePhong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = simplePhong.vert.glsl; sourceTree = "<group>"; };
 		4448792514FE43DA00D88B27 /* armadillo.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.3ds; sourceTree = "<group>"; };
 		4448792614FE43DA00D88B27 /* armadillo.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend; sourceTree = "<group>"; };
 		4448792714FE43DA00D88B27 /* armadillo.blend1 */ = {isa = PBXFileReference; lastKnownFileType = file; path = armadillo.blend1; sourceTree = "<group>"; };
@@ -153,6 +163,7 @@
 		4448793C14FE43DA00D88B27 /* tiles_d.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_d.jpg; sourceTree = "<group>"; };
 		4448793D14FE43DA00D88B27 /* tiles_n.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_n.jpg; sourceTree = "<group>"; };
 		4448793E14FE43DA00D88B27 /* tiles_s.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tiles_s.jpg; sourceTree = "<group>"; };
+		44C417DF151331A300586593 /* CustomVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomVertex.h; sourceTree = "<group>"; };
 		44C9FCA414FE461000F33326 /* teapot.3ds */ = {isa = PBXFileReference; lastKnownFileType = file; path = teapot.3ds; sourceTree = "<group>"; };
 		44C9FCA514FE461000F33326 /* teapot.blend */ = {isa = PBXFileReference; lastKnownFileType = file; path = teapot.blend; sourceTree = "<group>"; };
 		7E36360E12FCF52A00D6344A /* libassimp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libassimp.dylib; sourceTree = SOURCE_ROOT; };
@@ -209,8 +220,10 @@
 		44337ECF14FE46BD009B2FA4 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
-				44337ED014FE46BD009B2FA4 /* phong.frag.glsl */,
-				44337ED114FE46BD009B2FA4 /* phong.vert.glsl */,
+				443ACF44151097950030C12C /* phong.frag.glsl */,
+				443ACF45151097950030C12C /* phong.vert.glsl */,
+				443ACF46151097950030C12C /* simplePhong.frag.glsl */,
+				443ACF47151097950030C12C /* simplePhong.vert.glsl */,
 			);
 			path = shaders;
 			sourceTree = "<group>";
@@ -221,6 +234,7 @@
 				44337ED314FE4714009B2FA4 /* Main.cpp */,
 				44337ED814FE4A5E009B2FA4 /* Camera.cpp */,
 				44337ED914FE4A5E009B2FA4 /* Camera.h */,
+				44C417DF151331A300586593 /* CustomVertex.h */,
 				44337EDA14FE4A5E009B2FA4 /* Dissonance.cpp */,
 				44337EDB14FE4A5E009B2FA4 /* Dissonance.h */,
 				44337EDC14FE4A5E009B2FA4 /* Framework.h */,

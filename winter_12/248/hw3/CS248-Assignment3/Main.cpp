@@ -13,8 +13,8 @@
 #include <sstream>
 
 #define CATHEDRAL_PATH "models/cathedral.3ds"
-#define STATUE_PATH "models/armadillo.3ds"
-//#define STATUE_PATH "models/sphere.3ds"
+//#define STATUE_PATH "models/armadillo.3ds"
+#define STATUE_PATH "models/sphere.3ds"
 
 #define MY_PI 3.14159265
 #define CUBE_MAP_SIZE 600
@@ -83,7 +83,7 @@ bool go_down = false;
 
 struct meshObject {
     const aiMesh* mesh;
-    std::vector<unsigned> indexBuffer;
+    std::vector<unsigned int> indexBuffer;
     
     aiString diff_string;
     aiString spec_string;
@@ -172,6 +172,7 @@ void initOpenGL() {
         exit(-1);
     }
 #endif
+    
     // This initializes OpenGL with some common defaults.  More info here:
     // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
     glClearDepth(1.0f);
