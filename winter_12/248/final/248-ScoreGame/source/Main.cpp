@@ -4,6 +4,8 @@
 
 #include "Framework.h"
 #include "Shader.h"
+#include "MultiSampleRenderTarget.h"
+#include "DepthRenderTarget.h"
 
 #include "osc/OscOutboundPacketStream.h"
 #include "ip/UdpSocket.h"
@@ -46,9 +48,9 @@ int inPortNum = 7000;
 
 // Note Things
 // VIEWABLE RANGE = MIDI NOTE 47 (LOW) TO 94 (HIGH)
-// Range of 47 possible notes
+// Range of 48 possible notes
 int midi_offset = 47; // map midi note 47 to note 0
-int max_notes = 51;
+int max_notes = 48;   // number of representable notes
 Graph *graph;
 
 vector <Note*> g_notes(max_notes);
@@ -58,6 +60,15 @@ int curMidiNote = -1;
 
 //bool fixedPipeline = true;
 bool fixedPipeline = false;
+
+bool test = false;
+
+// MultiSample stuff
+
+int multiSampleAmount = 1;
+MultiSampleRenderTarget *multiSampleRenderTarget;
+
+// end MultiSample stuff
 
 GLuint scene_list = 0;
 
@@ -215,7 +226,7 @@ void ReadMessage() {
     //printf("message received is 'note %d, vel %d'\n", note, vel);
     g_messages.pop();
     
-    graph->AddConnectExcite(note, 0.1 + 3.5 * (vel / 127.0));
+    graph->AddConnectExcite(note, 0.1 + .2 * (vel / 127.0));
     
     if (note != curMidiNote) {
         //triggerAudio(curMidiNote, 0);
@@ -261,6 +272,8 @@ void initOpenGL() {
     }
         
     setupLights();
+    
+    multiSampleRenderTarget = new MultiSampleRenderTarget(WIN_WIDTH, WIN_HEIGHT);
 }
 
 void loadAssets() {
@@ -278,6 +291,9 @@ void loadAssets() {
     
     Shader * shader2 = new Shader("shaders/simplePhong");
     shaders.push_back(shader2);
+    
+    Shader * shader3 = new Shader("shaders/simple");
+    shaders.push_back(shader3);
 }
 
 
@@ -285,9 +301,9 @@ void setupLights()
 {
     // some sexy values for light source 0
     GLfloat light0_position[] = { 0.0, 5.0, 0.0, 1.0 };
-    GLfloat light0_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat light0_diffuse[] = { .9, .8, .8, 1.0 };
-    GLfloat light0_specular[] = { .9, 0.9, 0.7, 1.0 };
+    GLfloat light0_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light0_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light0_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat shininess = 40;
     glLightfv( GL_LIGHT0, GL_AMBIENT, light0_ambient );
     glLightfv( GL_LIGHT0, GL_POSITION, light0_position );
@@ -325,6 +341,9 @@ void handleInput() {
                         graph->SetCurrentNote(-1);
                         osc::SendMyNote( -1, 0 ); // all notes off
                         osc::SendClearBuffers();
+                        break;
+                    case sf::Key::T:
+                        test = !test;
                         break;
                         
 //                    case sf::Key::P:
@@ -412,8 +431,8 @@ void handleInput() {
 
 void setMaterial(int shaderNum) {
     
-    GLfloat diff_color[] = { .5, .5, .5, 1.0 };
-    GLfloat spec_color[] = { .9, .8, .9, 1.0 };
+    GLfloat diff_color[] = { .6, .6, .6, 1.0 };
+    GLfloat spec_color[] = { .25, .25, .25, 1.0 };
     GLfloat amb_color[] = { .1, .1, .1, 1.0 };
     GLfloat shiny = 40.0;
 
@@ -487,9 +506,9 @@ void testRects2() {
     my_vertices[2].pos = aiVector3D(10.0, 10.0, 0.0);
     
     // specify normal directions
-    my_vertices[0].norm = aiVector3D(1.0, 0.0, 0.0);
-    my_vertices[1].norm = aiVector3D(0.0, 1.0, 0.0);
-    my_vertices[2].norm = aiVector3D(0.0, 0.0, 1.0);
+    my_vertices[0].norm = aiVector3D(1.1, 0.0, 0.0);
+    my_vertices[1].norm = aiVector3D(0.0, 1.1, 0.0);
+    my_vertices[2].norm = aiVector3D(0.0, 0.0, 1.1);
     
     // specify vertex locations
     my_vertices[3].pos = aiVector3D(10.0, 10.0, 0.0);
@@ -497,9 +516,9 @@ void testRects2() {
     my_vertices[5].pos = aiVector3D(-10.0, -10.0, 0.0);
     
     // specify normal directions
-    my_vertices[3].norm = aiVector3D(0.0, 0.0, 1.0);
-    my_vertices[4].norm = aiVector3D(0.0, 1.0, 0.0);
-    my_vertices[5].norm = aiVector3D(1.0, 0.0, 0.0);
+    my_vertices[3].norm = aiVector3D(0.0, 0.0, 1.1);
+    my_vertices[4].norm = aiVector3D(0.0, -1.1, 0.0);
+    my_vertices[5].norm = aiVector3D(1.1, 0.0, 0.0);
 
 
     int shaderNum = 1;
@@ -526,39 +545,86 @@ void Display_FixedPipeline() {
     
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1., 30.0);
+    glFrustum (-.5, .5, -.5, .5, 1.0, 300.0);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
+    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
     testRects1();
     graph->Display(cam_pos->z);
 }
 
 void renderFrame() {
-    
     //glClearColor(1.f, 1.f, 1.f, 0.1f);
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    //glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     aiVector3D * cam_pos = cam->getPosition();
     aiVector3D * look_pos = cam->getLookAt();
         
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1., 30.0);
+    glFrustum (-.5, .5, -.5, .5, 1.0, 300.0);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 1.0, 0.0);
+    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
+    
+    int shaderNum;
+    ///////// first do our multi-sample pass
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    multiSampleRenderTarget->bind();
+//    shaderNum = 2; // simple (for now)
+//    glUseProgram(shaders[shaderNum]->programID());
+//    graph->Render();
+    shaderNum = 0;
+    glUseProgram(shaders[shaderNum]->programID());
+    testRects2();
+
+    //renderNode(simpleShader, cathedralScene, cathedralScene->mRootNode, true);
+    
+    multiSampleRenderTarget->unbind();
+    /////// END FIRST PASS
+    
+    // then do our interpolation pass
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // For Custom Pipeline
-    int shaderNum = 0;
-    glUseProgram(shaders[shaderNum]->programID());
-    setMaterial(shaderNum);
+    //shaderNum = 0;
+    //glUseProgram(shaders[shaderNum]->programID());
+    //setMaterial(shaderNum);
+
     graph->Render();
-    
+
 //    shaderNum = 1;
 //    glUseProgram(shaders[shaderNum]->programID());
 //    testRects2();
+    
+    // Display a test quad on screen (press t key to toggle)
+    if (test)
+    {
+        // Render test quad
+        glDisable(GL_LIGHTING);
+        //glUseProgramObjectARB(0);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-WIN_WIDTH/2,WIN_WIDTH/2,-WIN_HEIGHT/2,WIN_HEIGHT/2,1,20);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glColor4f(1,1,1,1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
+        glEnable(GL_TEXTURE_2D);
+        glTranslated(0,-WIN_HEIGHT/2,-1);
+        glBegin(GL_QUADS);
+        glTexCoord2d(0,0);glVertex3f(0,0,0);
+        glTexCoord2d(1,0);glVertex3f(WIN_WIDTH/2,0,0);
+        glTexCoord2d(1,1);glVertex3f(WIN_WIDTH/2,WIN_HEIGHT/2,0);
+        glTexCoord2d(0,1);glVertex3f(0,WIN_HEIGHT/2,0);
+        glEnd();
+        glEnable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+        multiSampleRenderTarget->unbind();
+    }
 }
 
 void updateAudioConnections() {
@@ -617,9 +683,9 @@ void updateState() {
     }
 }
 
-
 int main(int argc, char** argv) {
     
+
     printf("Initialize output\n");
     
     if (argc != 2) {
@@ -674,6 +740,5 @@ int main(int argc, char** argv) {
         
         window.Display();
     }
-    
     return 0;
 }

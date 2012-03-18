@@ -41,5 +41,6 @@ void main() {
 	vec3 ambient = Ka * gl_LightSource[0].ambient.rgb;
 
 	// This actually writes to the frame buffer
-	gl_FragColor = vec4(diffuse + specular + ambient, 1);
+	//gl_FragColor = vec4(diffuse + specular + ambient, 1);
+    gl_FragColor = vec4(texcoord.x, texcoord.y, 0, 1);
 }

@@ -19,7 +19,7 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
     default_radius = .2;
     radius = default_radius;
     //line_thickness = .03;
-    line_thickness = .014;
+    line_thickness = .02;
     width_max = (10 * radius) / .2;
     
     excitement = 0.0;
@@ -45,7 +45,36 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
     if (note_space < -5) {
         rel_space = -4 + (note_space%2);
     }
+    
+    t_outerSegments = 50;
+    t_innerSegments = 12;
+    t_num_vertices = 6 * t_outerSegments * t_innerSegments;
+    
+    // set up materials
+    outer_material = new CustomMaterial;
+    fill_material = new CustomMaterial;
+    
+    fill_material->amb_color[0] = .2 + .7 * color.r;
+    fill_material->amb_color[1] = .2 + .7 * color.g;
+    fill_material->amb_color[2] = .2 + .7 * color.b;
+    fill_material->diff_color[0] = .3 * color.r;
+    fill_material->diff_color[1] = .3 * color.g;
+    fill_material->diff_color[2] = .3 * color.b;
+    fill_material->spec_color[0] = fill_material->spec_color[1] = fill_material->spec_color[2] = .1;
+    fill_material->shiny = 10;
+    
+    // set up geometry
+    torus_vertices = new CustomVertex[t_num_vertices];
+    ConstructTorus(centerPosition, default_radius, line_thickness);
 }
+
+Note::~Note()
+{
+    delete [] torus_vertices;
+    delete outer_material;
+    delete fill_material;
+}
+
 
 float Note::getExcite() {
     return excitement;
@@ -56,8 +85,8 @@ void Note::setExcite(float e) {
 }
 
 void Note::FadeExcite() {
-    excitement = max(excitement - .01, 0.0);
-    radius = default_radius + .1 * excitement;
+    excitement = max(excitement - .001, 0.0);
+    //radius = default_radius + .1 * excitement;
 }
 
 void Note::GetCurConnections(vector<int> * note_list) {
@@ -380,13 +409,13 @@ void Note::AttractToXY(float delta) {
         centerPosition = aiVector3D(me.x, me.y, line_thickness);
     }
     else {
-        aiVector3D projection = aiVector3D(me.x, me.y, line_thickness);
+        aiVector3D projection = aiVector3D(me.x, me.y, line_thickness + 3.0*excitement);
         aiVector3D path = projection - me;
         float mag = path.Length();
         aiVector3D dir = path / mag;
         
         // this parameter goes (~ exponentially) from 0.0 = 3D to 1.0 = 2D
-        float dimensionality = 0.0001; //.06;
+        float dimensionality = 0.002; //.06;
         float how_fast = 1000.0 * speed * delta;
         
         centerPosition = me + (projection - me) * dimensionality * how_fast;
@@ -429,42 +458,20 @@ void Note::DisplayNotes(float h)
     glDisable( GL_LINE_SMOOTH );
 }
 
-void Note::RenderNotes()
+void Note::RenderNote()
 {
     glPushMatrix();
-    /////////////////////////////////////////////////////////////////
-    // Basic Formula:
-    //    int num_vertices = 3;
-    //    CustomVertex * my_vertices;
-    //    my_vertices = new CustomVertex[num_vertices];
-    //    
-    //    // specify vertex locations
-    //    my_vertices[0].position = centerPosition + aiVector3D(1.0, 0.0, 0.0);
-    //    my_vertices[1].position = centerPosition + aiVector3D(0.0, 1.0, 0.0);
-    //    my_vertices[2].position = centerPosition + aiVector3D(-1.0, 0.0, 0.0);
-    //    
-    //    // specify normal directions
-    //    my_vertices[0].normal = aiVector3D(1.0, 0.0, 0.0);
-    //    my_vertices[1].normal = aiVector3D(0.0, 1.0, 0.0);
-    //    my_vertices[2].normal = aiVector3D(0.0, 0.0, 1.0);
-    //    
-    //    
-    //    int shaderNum = 0;
-    //    
-    //    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
-    //    glEnableVertexAttribArray(position);
-    //    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
-    //    
-    //    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
-    //    glEnableVertexAttribArray(normal);
-    //    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
-    //    
-    //    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
-    /////////////////////////////////////////////////////////////////
     
+    // why do this? //
+    int shaderNum = 0;
+    glUseProgram((*shaders)[shaderNum]->programID());
+    //////////////////
+    
+    RenderCircle2(centerPosition, radius, .9, 20);
 
-    RenderTorus(centerPosition, radius, line_thickness, 50, 12);
-
+    //RenderTorus(centerPosition, radius, line_thickness, 50, 12);
+    RenderPremadeTorus();
+    
     RenderStaffLines();
 
     RenderNoteHead();
@@ -515,7 +522,7 @@ void Note::DisplayConnections()
             float connectionOpac = 1.0 - .9 * (connection_list[i]->time_count / max_connection_time);
             glColor4f(0.0, 0.0, 0.0, connectionOpac);
             
-            DrawCylinder(start, finish, line_thickness, 12);
+            DrawCylinder(start, finish, line_thickness, 11);
 //            glVertex3f(start.x, start.y, start.z);
 //            glVertex3f(finish.x, finish.y, finish.z);
         }
@@ -547,8 +554,12 @@ void Note::RenderConnections()
             float connectionOpac = 1.0 - .9 * (connection_list[i]->time_count / max_connection_time);
             glColor4f(0.0, 0.0, 0.0, connectionOpac);
             
+            //float my_thickness = fmax(.005, line_thickness - .002 * direction.Length());
+            //RenderCylinder(start, finish, my_thickness, 8);
+            
             RenderCylinder(start, finish, line_thickness, 8);
-            //            glVertex3f(start.x, start.y, start.z);
+            
+            //            glVertex3f(start.x, start.y, start.z)
             //            glVertex3f(finish.x, finish.y, finish.z);
         }
     }
@@ -659,7 +670,7 @@ void Note::RenderNoteHead()
     glTranslatef(0.0, rel_space * (radius/8.0), 0.0051);
 //    glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
 //    
-    RenderCircle(aiVector3D(0.0,0.0,0.0), radius*0.1, .9, 20);
+    RenderCircle(aiVector3D(0.0,0.0,0.0), radius*0.12, .9, 20);
 //    
 //    glLineWidth(.3*width_max);
 //    
@@ -760,20 +771,37 @@ void Note::RenderCircle(aiVector3D cent, float rad, float roundness, int numCorn
     
 
     float angle, angle2;
+        
+    for(int i = 0; i < numCorners; i++) {
+        angle = i*2*M_PI/numCorners;
+        angle2 = (i+1)*2*M_PI/numCorners;
+        
+        my_vertices[3*i + 0].position = cent;
+        my_vertices[3*i + 1].position = cent + rad * aiVector3D(cos(angle), sin(angle), 0.0);
+        my_vertices[3*i + 2].position = cent + rad * aiVector3D(cos(angle2), sin(angle2), 0.0);
+        
+        // specify normal directions
+        my_vertices[3*i + 0].normal = aiVector3D(0.0, 0.0, 1.0);
+        my_vertices[3*i + 1].normal = aiVector3D(0.0, 0.0, 1.0) + roundness * aiVector3D(cos(angle), sin(angle), 0.0);
+        my_vertices[3*i + 1].normal.Normalize();
+        my_vertices[3*i + 2].normal = aiVector3D(0.0, 0.0, 1.0) + roundness * aiVector3D(cos(angle2), sin(angle2), 0.0);
+        my_vertices[3*i + 2].normal.Normalize();
+        
+    } 
+    glEnd();
     
-    //glBegin(GL_TRIANGLE_FAN);
-    //glNormal3f(	0.0, 0.0, 1.0);
-    //glVertex3f(cent.x, cent.y, cent.z);
+    int shaderNum = 0;
+    //AttachMaterial(outer_material, shaderNum);
+    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);    
+    delete [] my_vertices;
+}
+
+void Note::RenderCircle2(aiVector3D cent, float rad, float roundness, int numCorners) { 
+    int num_vertices = 3 * numCorners;
+    CustomVertex * my_vertices;
+    my_vertices = new CustomVertex[num_vertices];
     
-    //    my_vertices[0].position = centerPosition + aiVector3D(1.0, 0.0, 0.0);
-    //    my_vertices[1].position = centerPosition + aiVector3D(0.0, 1.0, 0.0);
-    //    my_vertices[2].position = centerPosition + aiVector3D(-1.0, 0.0, 0.0);
-    //    
-    //    // specify normal directions
-    //    my_vertices[0].normal = aiVector3D(1.0, 0.0, 0.0);
-    //    my_vertices[1].normal = aiVector3D(0.0, 1.0, 0.0);
-    //    my_vertices[2].normal = aiVector3D(0.0, 0.0, 1.0);
-    
+    float angle, angle2;
     
     for(int i = 0; i < numCorners; i++) {
         angle = i*2*M_PI/numCorners;
@@ -794,22 +822,13 @@ void Note::RenderCircle(aiVector3D cent, float rad, float roundness, int numCorn
     glEnd();
     
     int shaderNum = 0;
+    //AttachMaterial(fill_material, shaderNum);
     
-    RenderVertices(my_vertices, num_vertices, shaderNum);
-    
-//    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
-//    glEnableVertexAttribArray(position);
-//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
-//    
-//    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
-//    glEnableVertexAttribArray(normal);
-//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
-//    
-//    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
-    
+    RenderVertices(my_vertices, num_vertices, fill_material, shaderNum);    
     delete [] my_vertices;
-
 }
+
+
 
 
 void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int slices) {
@@ -838,7 +857,6 @@ void Note::DrawCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, int 
     
     glRotatef(rotateDegrees, rotationVector.x, rotationVector.y, rotationVector.z);
 
-    
     aiVector3D bottomCenter = aiVector3D(0.0,0.0,0.0);
     aiVector3D topCenter = aiVector3D(0.0,0.0,length);
     
@@ -986,30 +1004,10 @@ void Note::RenderCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, in
         angle = i*2*M_PI/slices; 
         angle2 = (i+1)*2*M_PI/slices;
         
-        bottom1 = aiVector3D(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
-//        normalDir = outerPos - bottomCenter;
-//        normalDir.Normalize();
-//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
-//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
-        
+        bottom1 = aiVector3D(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);        
         bottom2 = aiVector3D(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
-//        normalDir = outerPos - bottomCenter;
-//        normalDir.Normalize();
-//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
-//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
-        
-        
         top2 = aiVector3D(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
-//        normalDir = outerPos - topCenter;
-//        normalDir.Normalize();
-//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
-//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
-        
         top1 = aiVector3D(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
-//        normalDir = outerPos - topCenter;
-//        normalDir.Normalize();
-//        glNormal3f(normalDir.x, normalDir.y, normalDir.z);
-//        glVertex3f(outerPos.x, outerPos.y, outerPos.z);
         
         // specify positions
         my_vertices[6*slices + 6*i + 0].position = bottom1;
@@ -1030,17 +1028,11 @@ void Note::RenderCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, in
         my_vertices[6*slices + 6*i + 3].normal = top2 - topCenter;
         my_vertices[6*slices + 6*i + 4].normal = top1 - topCenter;
         my_vertices[6*slices + 6*i + 5].normal = bottom1 - bottomCenter;
-
         
-        //        glVertex3f(bottomCenter.x + (cos(angle) * radius), bottomCenter.y + (sin(angle) * radius), bottomCenter.z);
-        //        glVertex3f(bottomCenter.x + (cos(angle2) * radius), bottomCenter.y + (sin(angle2) * radius), bottomCenter.z);
-        //        glVertex3f(topCenter.x + (cos(angle2) * radius), topCenter.y + (sin(angle2) * radius), topCenter.z);
-        //        glVertex3f(topCenter.x + (cos(angle) * radius), topCenter.y + (sin(angle) * radius), topCenter.z);
     } 
     
     int shaderNum = 0;
-    
-    RenderVertices(my_vertices, num_vertices, shaderNum);
+    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);
     delete [] my_vertices;
     
     glPopMatrix();
@@ -1187,24 +1179,117 @@ void Note::RenderTorus(aiVector3D center, float centerRadius, float edgeRadius, 
     }
     
     int shaderNum = 0;
-    
-    RenderVertices(my_vertices, num_vertices, shaderNum);
-//    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
-//    glEnableVertexAttribArray(position);
-//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
-//    
-//    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
-//    glEnableVertexAttribArray(normal);
-//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
-//    
-//    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
-    
+    //AttachMaterial(outer_material, shaderNum);
+    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);    
     delete [] my_vertices;
     glPopMatrix();
 }
 
-void Note::RenderVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum) {
+void Note::ConstructTorus(aiVector3D center, float centerRadius, float edgeRadius) {
+    glPushMatrix();
     
+    glLoadIdentity();
+    
+    //Draw order:
+    // for outerSegment i, draw innerSegment j
+    
+    float outerAngle1, outerAngle2, innerAngle1, innerAngle2;
+    
+    for (int i = 0; i < t_outerSegments; i++) {
+        outerAngle1 = i*2*M_PI/t_outerSegments; 
+        outerAngle2 = (i+1)*2*M_PI/t_outerSegments;
+        
+        for (int j = 0; j < t_innerSegments; j++) {
+            innerAngle1 = j*2*M_PI/t_innerSegments; 
+            innerAngle2 = (j+1)*2*M_PI/t_innerSegments;
+            
+            aiVector3D outerInfluence1 = centerRadius * aiVector3D( cos(outerAngle1), sin(outerAngle1), 0.0);
+            aiVector3D outerInfluence2 = centerRadius * aiVector3D( cos(outerAngle2), sin(outerAngle2), 0.0);
+            
+            // here x and y components vary both by inner and outer angles! z component only by inner angle.
+            
+            //positon = center + outerInfluence + innerInfluence
+            aiVector3D o1i1 = outerInfluence1 + edgeRadius * aiVector3D(cos(outerAngle1) * cos(innerAngle1),
+                                                                        sin(outerAngle1) * cos(innerAngle1),
+                                                                        sin(innerAngle1));
+            aiVector3D o1i2 = outerInfluence1 + edgeRadius * aiVector3D(cos(outerAngle1) * cos(innerAngle2),
+                                                                        sin(outerAngle1) * cos(innerAngle2),
+                                                                        sin(innerAngle2));
+            aiVector3D o2i1 = outerInfluence2 + edgeRadius * aiVector3D(cos(outerAngle2) * cos(innerAngle1),
+                                                                        sin(outerAngle2) * cos(innerAngle1),
+                                                                        sin(innerAngle1));
+            aiVector3D o2i2 = outerInfluence2 + edgeRadius * aiVector3D(cos(outerAngle2) * cos(innerAngle2),
+                                                                        sin(outerAngle2) * cos(innerAngle2),
+                                                                        sin(innerAngle2));
+            
+            // counter-clockwise order
+            // verts 1, 2, 3
+            //glVertex3f(o1i1.x,o1i1.y,o1i1.z);
+            //glVertex3f(o2i1.x,o2i1.y,o2i1.z);
+            //glVertex3f(o2i2.x,o2i2.y,o2i2.z);
+            
+            torus_vertices[6*(j + t_innerSegments*i) + 0].position = o1i1;
+            torus_vertices[6*(j + t_innerSegments*i) + 1].position = o2i1;
+            torus_vertices[6*(j + t_innerSegments*i) + 2].position = o2i2;
+            
+            // specify normal directions
+            torus_vertices[6*(j + t_innerSegments*i) + 0].normal = o1i1 - outerInfluence1;
+            torus_vertices[6*(j + t_innerSegments*i) + 1].normal = o2i1 - outerInfluence2;
+            torus_vertices[6*(j + t_innerSegments*i) + 2].normal = o2i2 - outerInfluence2;
+            
+            // verts 3, 4, 1
+            //glVertex3f(o2i2.x,o2i2.y,o2i2.z);
+            //glVertex3f(o1i2.x,o1i2.y,o1i2.z);
+            //glVertex3f(o1i1.x,o1i1.y,o1i1.z);
+            
+            torus_vertices[6*(j + t_innerSegments*i) + 3].position = o2i2;
+            torus_vertices[6*(j + t_innerSegments*i) + 4].position = o1i2;
+            torus_vertices[6*(j + t_innerSegments*i) + 5].position = o1i1;
+            
+            // specify normal directions
+            torus_vertices[6*(j + t_innerSegments*i) + 3].normal = o2i2 - outerInfluence2;
+            torus_vertices[6*(j + t_innerSegments*i) + 4].normal = o1i2 - outerInfluence1;
+            torus_vertices[6*(j + t_innerSegments*i) + 5].normal = o1i1 - outerInfluence1;
+            
+        }
+    }
+    glPopMatrix();
+}
+
+void Note::RenderPremadeTorus() {
+    glPushMatrix();
+    
+    glTranslatef(centerPosition.x, centerPosition.y, centerPosition.z);
+    
+    // why these numbers?
+    float scale_pcnt = radius / default_radius;
+    glScalef( scale_pcnt, scale_pcnt, 1.0);
+    
+    int shaderNum = 0;
+    //AttachMaterial(outer_material, shaderNum);
+    RenderVertices(torus_vertices, t_num_vertices, outer_material, shaderNum);
+    
+    glPopMatrix();
+}
+
+void Note::AttachMaterial(CustomMaterial * mat, int shaderNum) {
+    GLint diffuse = glGetUniformLocation((*shaders)[shaderNum]->programID(), "Kd");
+    glUniform3f(diffuse, mat->diff_color[0], mat->diff_color[1], mat->diff_color[2]);
+    
+    // Specular material
+    GLint specular = glGetUniformLocation((*shaders)[shaderNum]->programID(), "Ks");
+    glUniform3f(specular, mat->spec_color[0], mat->spec_color[1], mat->spec_color[2]);
+    
+    // Ambient material
+    GLint ambient = glGetUniformLocation((*shaders)[shaderNum]->programID(), "Ka");
+    glUniform3f(ambient, mat->amb_color[0], mat->amb_color[1], mat->amb_color[2]);
+    
+    // Specular power
+    GLint shininess = glGetUniformLocation((*shaders)[shaderNum]->programID(), "alpha");
+    glUniform1f(shininess, mat->shiny);
+}
+
+void Note::AttachVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum) {
     GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
     glEnableVertexAttribArray(position);
     glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
@@ -1212,9 +1297,24 @@ void Note::RenderVertices(CustomVertex * my_vertices, int num_vertices, int shad
     GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
     glEnableVertexAttribArray(normal);
     glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
-    
-    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+}
 
+
+
+void Note::RenderVertices(CustomVertex * my_vertices, int num_vertices, CustomMaterial * mat,int shaderNum) {
+//    GLint position = glGetAttribLocation((*shaders)[shaderNum]->programID(), "positionIn");
+//    glEnableVertexAttribArray(position);
+//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->position);
+//    
+//    GLint normal = glGetAttribLocation((*shaders)[shaderNum]->programID(), "normalIn");
+//    glEnableVertexAttribArray(normal);
+//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(CustomVertex), &my_vertices->normal);
+    
+    AttachVertices(my_vertices, num_vertices, shaderNum);
+    AttachMaterial(mat, shaderNum);
+
+    glUseProgram((*shaders)[shaderNum]->programID());
+    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
 }
 
 bool Note::maybe() {

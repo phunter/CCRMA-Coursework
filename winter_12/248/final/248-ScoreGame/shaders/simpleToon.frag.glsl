@@ -12,14 +12,14 @@ varying vec3 normal;
 varying vec3 eyePosition;
 
 
-float ToonQuantize1(in float val) {
-    float stretch = floor(val * 1.9);
-    float squash = stretch / 2.0;
+float ToonDiffuse(in float val) {
+    float stretch = floor(val * 1.5);
+    float squash = stretch / 1.0;
     return squash;
 }
 
-float ToonQuantize2(in float val) {
-    float stretch = floor(val * 1.01);
+float ToonSpecular(in float val) {
+    float stretch = floor(val * 1.05);
     float squash = stretch / 1.0;
     return squash;
 }
@@ -34,12 +34,14 @@ void main() {
 	vec3 V = normalize(-eyePosition);
 		
 	// Calculate the diffuse color coefficient
-	float Rd = ToonQuantize1(max(0.0, dot(L, N)));
+	float Rd = ToonDiffuse(max(0.0, dot(L, N)));
+    //float Rd = max(0.0, dot(L, N));
     vec3 diffuse = Rd * Kd * gl_LightSource[0].diffuse.rgb;
 	
 	// Calculate the specular coefficient
 	vec3 R = reflect(-L, N);
-	float Rs = pow(ToonQuantize2(max(0.0, dot(V, R))), alpha);
+	float Rs = pow(ToonSpecular(max(0.0, dot(V, R))), alpha);
+    //float Rs = pow(max(0.0, dot(V, R)), alpha);
 	vec3 specular = Rs * Ks * gl_LightSource[0].specular.rgb;
 		
 	// Ambient is easy
@@ -47,4 +49,5 @@ void main() {
 
 	// This actually writes to the frame buffer
 	gl_FragColor = vec4(diffuse + specular + ambient, 1);
+    //gl_FragColor = vec4(ambient, 1);
 }

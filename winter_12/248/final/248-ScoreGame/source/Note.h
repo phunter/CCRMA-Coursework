@@ -20,6 +20,7 @@
 //#include "STVector3.h"
 //#include "STColor4f.h"
 
+#include "CustomMaterial.h"
 #include "CustomVertex.h"
 #include "Shader.h"
 
@@ -42,6 +43,7 @@ struct Spelling {
 class Note {
 public:
     Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::vector<Shader*> *shaders_);
+    ~Note();
     
     float getExcite();
     void setExcite(float e);
@@ -79,7 +81,7 @@ public:
     void DisplayNotes(float h);
     void DisplayConnections();
     
-    void RenderNotes();
+    void RenderNote();
     void RenderConnections();
     
     bool IsConnectedTo(int mapped_midi_num);
@@ -92,6 +94,7 @@ public:
     
     void DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled);
     void RenderCircle(aiVector3D cent, float rad, float roundness, int numCorners);
+    void RenderCircle2(aiVector3D cent, float rad, float roundness, int numCorners);
     
     void DrawStaffLines();
     void RenderStaffLines();
@@ -102,7 +105,13 @@ public:
     void DrawTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments);
     void RenderTorus(aiVector3D center, float centerRadius, float edgeRadius, int outerSegments, int innerSegments);
     
-    void RenderVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum);
+    void ConstructTorus(aiVector3D center, float centerRadius, float edgeRadius);
+    void RenderPremadeTorus();
+    
+    void AttachMaterial(CustomMaterial * mat, int shaderNum);
+    void AttachVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum);
+    
+    void RenderVertices(CustomVertex * my_vertices, int num_vertices, CustomMaterial * material,int shaderNum);
     bool maybe();
     
 private:
@@ -138,6 +147,17 @@ private:
 //    vector<float> ideal_dists;
     
     vector<Connection*> connection_list;
+    
+    // materials
+    CustomMaterial *fill_material;
+    CustomMaterial *outer_material;
+    
+    // geometry
+    int t_num_vertices;
+    int t_outerSegments;
+    int t_innerSegments;
+    CustomVertex * torus_vertices;
+    
     };
 
 #endif

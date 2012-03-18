@@ -55,7 +55,7 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
     // Ff the note doesn't exist yet, add it
     if (note_graph[mapped_midi] == NULL) {
         
-        // Calculate starting position for new note
+        // Calculate a starting position for new note
         float xdir = (float)rand()/RAND_MAX - .5;
         float ydir = (float)rand()/RAND_MAX - .5;
         float zdir = (float)rand()/RAND_MAX - .5;        
@@ -88,6 +88,7 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
     if (cur_size > 1) {
         if (!note_graph[cur_note]->IsConnectedTo(prev_note)) {
             note_graph[cur_note]->addTwoWayConnection(note_graph[prev_note], dist);
+            //note_graph[cur_note]->addConnection(note_graph[prev_note], dist);
             
         }
         else { // update connection length between current and previous note
@@ -108,9 +109,13 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.y,
                                     start_pos.z,
                                     mapped_midi,
-                                    5.0,  // speed
-                                    50.0, // connection time
+                                    1.0,  // speed
+                                    15.0, // connection time
                                     shaders);
+    // set new current note's excite from prev note's excite
+    if (cur_size > 0) {
+        note_graph[cur_note]->setExcite(note_graph[prev_note]->getExcite());
+    }    
     cur_size++;
 }
 
@@ -225,10 +230,11 @@ void Graph::Render() {
             note_graph[i]->RenderConnections();
         }
     }
+    
     // then draw the notes
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            note_graph[i]->RenderNotes();
+            note_graph[i]->RenderNote();
         }
     }
 }
@@ -236,13 +242,13 @@ void Graph::Render() {
 void Graph::ExciteNote() {
     Note *excite_note = note_graph[cur_note];
     
-    excite_note->setExcite(min(excite_note->getExcite() + .4, 1.0));
+    //excite_note->setExcite(excite_note->getExcite() + .4);
+    excite_note->setExcite(min(excite_note->getExcite() + .1, 1.2));
     //g_notes[1]->Nudge(STVector3( .02*(((float)rand()/RAND_MAX)-.5), .02*(((float)rand()/RAND_MAX)-.5), 0.0));
 
     //cam->setTarget(g_notes[1]->getLocation());
     
     //computeTravelDist();
-    
 }
 
 void Graph::FadeColors() {
