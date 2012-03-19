@@ -13,7 +13,7 @@ varying vec3 eyePosition;
 
 
 float ToonDiffuse(in float val) {
-    float stretch = floor(val * 1.5);
+    float stretch = floor(val * 1.9);
     float squash = stretch / 1.0;
     return squash;
 }
@@ -47,7 +47,20 @@ void main() {
 	// Ambient is easy
 	vec3 ambient = Ka * gl_LightSource[0].ambient.rgb;
 
+
+    int border = 0;
+    if ( dot(N,V) < .8 ) {
+        border = 1;
+    }
+    
+    if (border == 1) {
+        gl_FragColor = vec4(0, 0, 0, 1);
+    }
+    else {
+        gl_FragColor = vec4(diffuse + specular + ambient, 1);
+    }
+
 	// This actually writes to the frame buffer
-	gl_FragColor = vec4(diffuse + specular + ambient, 1);
+	//gl_FragColor = vec4(diffuse + specular + ambient, 1);
     //gl_FragColor = vec4(ambient, 1);
 }

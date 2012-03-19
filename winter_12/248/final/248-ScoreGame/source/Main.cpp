@@ -65,6 +65,7 @@ bool test_quad = false;
 bool toFile = false;
 
 // MultiSample stuff
+aiVector2D randomVar = aiVector2D(.00001, .51234);
 
 int multiSampleAmount = 2;
 MultiSampleRenderTarget *multiSampleRenderTarget;
@@ -291,7 +292,7 @@ void loadAssets() {
     Shader * shader1 = new Shader("shaders/simpleToon");
     shaders.push_back(shader1);
     
-    Shader * shader2 = new Shader("shaders/simplePhong");
+    Shader * shader2 = new Shader("shaders/specToon");
     shaders.push_back(shader2);
     
     Shader * shader3 = new Shader("shaders/downsample");
@@ -550,7 +551,7 @@ void Display_FixedPipeline() {
     
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 300.0);
+    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
@@ -567,7 +568,7 @@ void renderFrame() {
     
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 300.0);
+    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
@@ -589,7 +590,7 @@ void renderFrame() {
     if (toFile) {
         // Copy the back buffer into the current face of the cube map
         glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
-        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
         
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, 0, GL_RGBA, GL_FLOAT, NULL);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
@@ -642,6 +643,15 @@ void renderFrame() {
     // send downsample amount 
     GLint downAmnt = glGetUniformLocation(shaders[shaderNum]->programID(), "downAmount");
     glUniform1f(downAmnt, multiSampleAmount);
+    
+    // randomizer
+    //help += .0123456789;
+    randomVar.x += sin(randomVar.y);
+    randomVar.y += sin(randomVar.x);
+    
+    GLint randInc = glGetUniformLocation(shaders[shaderNum]->programID(), "randomInc");
+    glUniform2f(randInc, randomVar.x, randomVar.y);
+    
     // send window size 
     GLint winSize = glGetUniformLocation(shaders[shaderNum]->programID(), "targetRes");
     glUniform2f(winSize, WIN_WIDTH, WIN_HEIGHT);

@@ -11,9 +11,9 @@
 
 struct CustomMaterial {
     CustomMaterial() {
-        diff_color[0] = diff_color[1] = diff_color[2] = .6;
-        spec_color[0] = spec_color[1] = spec_color[2] = .25;
-        amb_color[0] = amb_color[1] = amb_color[2] = .1;
+        diff_color[0] = diff_color[1] = diff_color[2] = .25;
+        spec_color[0] = spec_color[1] = spec_color[2] = .15;
+        amb_color[0] = amb_color[1] = amb_color[2] = .25;
         
         diff_color[3] = spec_color[3] = amb_color[3] = 1.0;
         

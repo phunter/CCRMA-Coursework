@@ -5,6 +5,7 @@ uniform sampler2D bigTexture;
 
 uniform vec2 targetRes;
 uniform float downAmount;
+uniform vec2 randomInc;
 
 // These are values that OpenGL interpoates for us.  Note that some of these
 // are repeated from the fragment shader.  That's because they're passed
@@ -12,12 +13,13 @@ uniform float downAmount;
 varying vec2 texcoord;
 varying vec3 eyePosition;
 
+// should be from -1.0 to 1.0
 float rand(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+    return (1.0 - fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453));
 }
 
 float raisedCos(in float val){
-    return 1.0 - ((cos(val * 2.0 * 3.14159) + 1.0)/2.0);
+    return pow(((cos(val * 2.0 * 3.14159) + 1.0)/2.0),4.0);
 }
 
 void main() {
@@ -38,16 +40,21 @@ void main() {
         for (int j=0; j < down; j++) {
         
             vec2 pure_sample_loc = vec2(texcoord.x + float(i)*x_subpix_inc, texcoord.y + float(j)*y_subpix_inc);
-            //float rand1 = rand(vec2(pure_sample_loc.x, texcoord.y));
-            //float rand2 = rand(vec2(texcoord.x, pure_sample_loc.y));
+
+            //float rand1 = rand(vec2(pure_sample_loc.x, texcoord.y + randomInc.y));
+            //float rand2 = rand(vec2(texcoord.x + randomInc.x, pure_sample_loc.y));
             
-            //float x_fuzz = 50.0; // 10.0 * raisedCos(texcoord.x);
-            //float y_fuzz = 50.0; // 10.0 * raisedCos(texcoord.y);
+            //float randScale = 10.0;
+            //float x_fuzz = randScale * raisedCos(texcoord.x);
+            //float y_fuzz = randScale * raisedCos(texcoord.y);
+            
+            //vec2 pseudo_sample_loc = pure_sample_loc + vec2(x_fuzz*pixelSize.x*rand1, y_fuzz*pixelSize.y*rand2);
             
             //vec2 pseudo_sample_loc = vec2(texcoord.x + x_fuzz*pixelSize.x*rand1, texcoord.y + y_fuzz*pixelSize.y*rand2);
             
             //total += texture2D(bigTexture, pseudo_sample_loc).rgb;
             total += texture2D(bigTexture, pure_sample_loc).rgb;
+            
         }
     }
     

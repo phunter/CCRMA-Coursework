@@ -81,6 +81,7 @@ public:
     void DisplayNotes(float h);
     void DisplayConnections();
     
+    void ApplyGlobalScale();
     void RenderNote();
     void RenderConnections();
     
@@ -90,7 +91,9 @@ public:
     void RenderNoteHead();
     
     void DrawFlat();
+    void RenderFlat();
     void DrawSharp();
+    void RenderSharp();
     
     void DrawCircle(aiVector3D cent, float rad, int numVerts, bool filled);
     void RenderCircle(aiVector3D cent, float rad, float roundness, int numCorners);
@@ -124,6 +127,8 @@ private:
     float width_max;
     int max_connections;
     float max_connection_time;
+    
+    aiVector3D globalScale;
     
     int mapped_midi;
     // for now, 0 is middle line, +or- 4 is top/bottom line
