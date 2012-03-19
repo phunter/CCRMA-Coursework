@@ -23,8 +23,8 @@
 		44337F0614FE5797009B2FA4 /* diss_matrix.txt in Copy Files */ = {isa = PBXBuildFile; fileRef = 44337F0514FE5797009B2FA4 /* diss_matrix.txt */; };
 		449E42FF1515EFC60019FF87 /* DepthRenderTarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449E42FD1515EFC60019FF87 /* DepthRenderTarget.cpp */; };
 		449E43031515F1040019FF87 /* MultiSampleRenderTarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 449E43011515F1040019FF87 /* MultiSampleRenderTarget.cpp */; };
-		44A64F1F1515FE8800E4D170 /* simple.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44A64F1D1515FE8800E4D170 /* simple.frag.glsl */; };
-		44A64F201515FE8800E4D170 /* simple.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44A64F1E1515FE8800E4D170 /* simple.vert.glsl */; };
+		44A64F1F1515FE8800E4D170 /* downsample.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44A64F1D1515FE8800E4D170 /* downsample.frag.glsl */; };
+		44A64F201515FE8800E4D170 /* downsample.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44A64F1E1515FE8800E4D170 /* downsample.vert.glsl */; };
 		44C66F8315135A3700BA3B72 /* phong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7D15135A3700BA3B72 /* phong.frag.glsl */; };
 		44C66F8415135A3700BA3B72 /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7E15135A3700BA3B72 /* phong.vert.glsl */; };
 		44C66F8515135A3700BA3B72 /* simplePhong.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7F15135A3700BA3B72 /* simplePhong.frag.glsl */; };
@@ -68,8 +68,8 @@
 			files = (
 				44C66F8315135A3700BA3B72 /* phong.frag.glsl in Copy Shaders */,
 				44C66F8415135A3700BA3B72 /* phong.vert.glsl in Copy Shaders */,
-				44A64F1F1515FE8800E4D170 /* simple.frag.glsl in Copy Shaders */,
-				44A64F201515FE8800E4D170 /* simple.vert.glsl in Copy Shaders */,
+				44A64F1F1515FE8800E4D170 /* downsample.frag.glsl in Copy Shaders */,
+				44A64F201515FE8800E4D170 /* downsample.vert.glsl in Copy Shaders */,
 				44C66F8515135A3700BA3B72 /* simplePhong.frag.glsl in Copy Shaders */,
 				44C66F8615135A3700BA3B72 /* simplePhong.vert.glsl in Copy Shaders */,
 				44C66F8715135A3700BA3B72 /* simpleToon.frag.glsl in Copy Shaders */,
@@ -173,8 +173,8 @@
 		449E42FE1515EFC60019FF87 /* DepthRenderTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DepthRenderTarget.h; sourceTree = "<group>"; };
 		449E43011515F1040019FF87 /* MultiSampleRenderTarget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MultiSampleRenderTarget.cpp; sourceTree = "<group>"; };
 		449E43021515F1040019FF87 /* MultiSampleRenderTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiSampleRenderTarget.h; sourceTree = "<group>"; };
-		44A64F1D1515FE8800E4D170 /* simple.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = simple.frag.glsl; path = shaders/simple.frag.glsl; sourceTree = "<group>"; };
-		44A64F1E1515FE8800E4D170 /* simple.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = simple.vert.glsl; path = shaders/simple.vert.glsl; sourceTree = "<group>"; };
+		44A64F1D1515FE8800E4D170 /* downsample.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = downsample.frag.glsl; path = shaders/downsample.frag.glsl; sourceTree = "<group>"; };
+		44A64F1E1515FE8800E4D170 /* downsample.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = downsample.vert.glsl; path = shaders/downsample.vert.glsl; sourceTree = "<group>"; };
 		44C417DF151331A300586593 /* CustomVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomVertex.h; sourceTree = "<group>"; };
 		44C66F7D15135A3700BA3B72 /* phong.frag.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = phong.frag.glsl; path = shaders/phong.frag.glsl; sourceTree = "<group>"; };
 		44C66F7E15135A3700BA3B72 /* phong.vert.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; name = phong.vert.glsl; path = shaders/phong.vert.glsl; sourceTree = "<group>"; };
@@ -343,8 +343,8 @@
 		44A64F211515FEA000E4D170 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
-				44A64F1D1515FE8800E4D170 /* simple.frag.glsl */,
-				44A64F1E1515FE8800E4D170 /* simple.vert.glsl */,
+				44A64F1D1515FE8800E4D170 /* downsample.frag.glsl */,
+				44A64F1E1515FE8800E4D170 /* downsample.vert.glsl */,
 				44C66F7D15135A3700BA3B72 /* phong.frag.glsl */,
 				44C66F7E15135A3700BA3B72 /* phong.vert.glsl */,
 				44C66F7F15135A3700BA3B72 /* simplePhong.frag.glsl */,

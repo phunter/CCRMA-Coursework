@@ -61,11 +61,12 @@ int curMidiNote = -1;
 //bool fixedPipeline = true;
 bool fixedPipeline = false;
 
-bool test = false;
+bool test_quad = false;
+bool toFile = false;
 
 // MultiSample stuff
 
-int multiSampleAmount = 1;
+int multiSampleAmount = 2;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
@@ -95,6 +96,7 @@ struct testVertex
 {
 	aiVector3D pos;
 	aiVector3D norm;
+    aiVector2D texcoord;
 };
 
 
@@ -273,7 +275,7 @@ void initOpenGL() {
         
     setupLights();
     
-    multiSampleRenderTarget = new MultiSampleRenderTarget(WIN_WIDTH, WIN_HEIGHT);
+    multiSampleRenderTarget = new MultiSampleRenderTarget(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
 }
 
 void loadAssets() {
@@ -292,7 +294,7 @@ void loadAssets() {
     Shader * shader2 = new Shader("shaders/simplePhong");
     shaders.push_back(shader2);
     
-    Shader * shader3 = new Shader("shaders/simple");
+    Shader * shader3 = new Shader("shaders/downsample");
     shaders.push_back(shader3);
 }
 
@@ -343,7 +345,10 @@ void handleInput() {
                         osc::SendClearBuffers();
                         break;
                     case sf::Key::T:
-                        test = !test;
+                        test_quad = !test_quad;
+                        break;
+                    case sf::Key::F:
+                        toFile = true;
                         break;
                         
 //                    case sf::Key::P:
@@ -548,19 +553,18 @@ void Display_FixedPipeline() {
     glFrustum (-.5, .5, -.5, .5, 1.0, 300.0);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
+    gluLookAt(cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
-    testRects1();
+    //testRects1();
     graph->Display(cam_pos->z);
 }
 
+
 void renderFrame() {
-    //glClearColor(1.f, 1.f, 1.f, 0.1f);
-    //glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     aiVector3D * cam_pos = cam->getPosition();
     aiVector3D * look_pos = cam->getLookAt();
-        
+    
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     glFrustum (-.5, .5, -.5, .5, 1.0, 300.0);
@@ -568,43 +572,131 @@ void renderFrame() {
     glLoadIdentity();
     gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
-    int shaderNum;
-    ///////// first do our multi-sample pass
+    
+    ////////////////////////////// first pass //////////////////
+    // set rendering destination to FBO
+    glViewport(0, 0, window.GetWidth()*multiSampleAmount, window.GetHeight()*multiSampleAmount);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
+    multiSampleRenderTarget->bind();
+    
+    // clear buffers
+    glClearColor(.9f, .9f, .8f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    multiSampleRenderTarget->bind();
-//    shaderNum = 2; // simple (for now)
-//    glUseProgram(shaders[shaderNum]->programID());
-//    graph->Render();
-    shaderNum = 0;
-    glUseProgram(shaders[shaderNum]->programID());
-    testRects2();
-
-    //renderNode(simpleShader, cathedralScene, cathedralScene->mRootNode, true);
-    
-    multiSampleRenderTarget->unbind();
-    /////// END FIRST PASS
-    
-    // then do our interpolation pass
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // For Custom Pipeline
-    //shaderNum = 0;
-    //glUseProgram(shaders[shaderNum]->programID());
-    //setMaterial(shaderNum);
-
+    // draw a scene to a texture directly
     graph->Render();
+        
+    if (toFile) {
+        // Copy the back buffer into the current face of the cube map
+        glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
+        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
+        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, 0, GL_RGBA, GL_FLOAT, NULL);
+        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
+        
+        // for rendering to image (debugging)
+        sf::Uint8 *pixelArray = new sf::Uint8[WIN_WIDTH*multiSampleAmount*WIN_HEIGHT*multiSampleAmount*4];
+        
+        // use ONE of the two following lines:
+        // This line will copy images from the framebuffer
+        //glReadPixels(0, 0, WIN_WIDTH, WIN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
+        
+        // This line will copy images stored in the currently bound texture
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
+        
+        // FOR SAVING TO FILE
+        std::ostringstream out;
+        out << "/Users/phunter/test_img.jpg";
+        sf::Image img(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, sf::Color::White);
+        img.LoadFromPixels(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, pixelArray);
+        img.SaveToFile(out.str());
+        
+        toFile = false;
+        
+        //glBindTexture(GL_TEXTURE_2D, 0);
+        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    }
+    
+    /////////////////////////////////////////second pass attempt
+    glViewport(0, 0, window.GetWidth(), window.GetHeight());
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); // default framebuffer (window)
+    
+    // clear buffers
+    glClearColor(.1f, .2f, .2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // set up shader
+    int shaderNum = 2; // downsample shader
+    glUseProgram(shaders[shaderNum]->programID());
 
-//    shaderNum = 1;
-//    glUseProgram(shaders[shaderNum]->programID());
-//    testRects2();
+    //attach texture 
+    GLint bigTex = glGetUniformLocation(shaders[shaderNum]->programID(), "bigTexture");
+    glUniform1i(bigTex, 0); // The environment map will be GL_TEXTURE3
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    
+    // send downsample amount 
+    GLint downAmnt = glGetUniformLocation(shaders[shaderNum]->programID(), "downAmount");
+    glUniform1f(downAmnt, multiSampleAmount);
+    // send window size 
+    GLint winSize = glGetUniformLocation(shaders[shaderNum]->programID(), "targetRes");
+    glUniform2f(winSize, WIN_WIDTH, WIN_HEIGHT);
+    
+    int num_vertices = 6;
+    testVertex * my_vertices;
+    my_vertices = new testVertex[num_vertices];
+    
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+    //glOrtho(-WIN_WIDTH,WIN_WIDTH,-WIN_HEIGHT,WIN_HEIGHT,1,20);
+    glLoadIdentity();
+    gluLookAt(0., 0., 2., 0., 0., 0., 0., 1., 0.);
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
+    
+    // specify vertex locations
+    my_vertices[0].pos = aiVector3D(-1.0, -1.0, 0.0);
+    my_vertices[1].pos = aiVector3D(-1.0, 1.0, 0.0);
+    my_vertices[2].pos = aiVector3D(1.0, 1.0, 0.0);
+    
+    // specify texcoord locations
+    my_vertices[0].texcoord = aiVector2D(0.0, 0.0);
+    my_vertices[1].texcoord = aiVector2D(0.0, 1.0);
+    my_vertices[2].texcoord = aiVector2D(1.0, 1.0);
+    
+    // specify vertex locations
+    my_vertices[3].pos = aiVector3D(1.0, 1.0, 0.0);
+    my_vertices[4].pos = aiVector3D(1.0, -1.0, 0.0);
+    my_vertices[5].pos = aiVector3D(-1.0, -1.0, 0.0);
+    
+    // specify texcoord locations
+    my_vertices[3].texcoord = aiVector2D(1.0, 1.0);
+    my_vertices[4].texcoord = aiVector2D(1.0, 0.0);
+    my_vertices[5].texcoord = aiVector2D(0.0, 0.0);
+    
+    GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->pos);
+    
+    GLint texcoord = glGetAttribLocation(shaders[shaderNum]->programID(), "texcoordIn");
+    glEnableVertexAttribArray(texcoord);
+    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->texcoord); // use norm holder as hack for now
+    
+    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+    
+    
+    ////////////////////////////////////////////// end second pass
     
     // Display a test quad on screen (press t key to toggle)
-    if (test)
+    if (test_quad)
     {
         // Render test quad
         glDisable(GL_LIGHTING);
-        //glUseProgramObjectARB(0);
+        glUseProgramObjectARB(0);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(-WIN_WIDTH/2,WIN_WIDTH/2,-WIN_HEIGHT/2,WIN_HEIGHT/2,1,20);
@@ -626,6 +718,7 @@ void renderFrame() {
         multiSampleRenderTarget->unbind();
     }
 }
+
 
 void updateAudioConnections() {
     
@@ -735,7 +828,7 @@ int main(int argc, char** argv) {
         }
         else {
             // Custom Pipeline
-            renderFrame();   
+            renderFrame();
         }
         
         window.Display();

@@ -19,6 +19,11 @@ public:
     ~MultiSampleRenderTarget();
 
     /**
+     * check FBO completeness
+     */
+    bool checkFramebufferStatus();
+    
+    /**
      * Binds this target to the OpenGL pipeline, so that all colors are
      * output to the texture.
      */
@@ -33,6 +38,8 @@ public:
      * Returns the texture that was used for render-depth-to-texture.
      */
     GLuint textureID() const;
+    
+    GLuint fboID() const;
 
 private:
     GLuint textureID_;
