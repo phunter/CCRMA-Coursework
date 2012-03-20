@@ -1039,7 +1039,7 @@ int main(int argc, char** argv) {
     
     graph = new Graph(max_notes, dissonance, &shaders);
     
-    cam = new Camera(0.0, 0.0, 2.0);
+    cam = new Camera(0.0, 0.0, 1.5);
     
     connection_list.resize(max_notes);
     
