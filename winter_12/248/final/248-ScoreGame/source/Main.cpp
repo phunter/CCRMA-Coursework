@@ -328,7 +328,8 @@ void loadTexture( void )
 {
     
     //aiString parchment = aiString("models/parchment.jpg");
-	aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/Paper_texture_by_manekochan.jpg");
+	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/smoothish_paper.jpg");
+	aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/parchment_png.png");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/parchment_png.png");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/red_noise.jpg");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/tanFuzz2.jpg");
@@ -568,10 +569,10 @@ void FuzzRects() {
     // specify texcoord locations
     my_vertices[0].texcoord = aiVector2D(0.0, 0.0);
     my_vertices[1].texcoord = aiVector2D(0.0, 100.0);
-    my_vertices[2].texcoord = aiVector2D(100.0, 100.0);
+    my_vertices[2].texcoord = aiVector2D(10.0, 10.0);
     
-    my_vertices[3].texcoord = aiVector2D(100.0, 100.0);
-    my_vertices[4].texcoord = aiVector2D(100.0, 0.0);
+    my_vertices[3].texcoord = aiVector2D(10.0, 10.0);
+    my_vertices[4].texcoord = aiVector2D(10.0, 0.0);
     my_vertices[5].texcoord = aiVector2D(0.0, 0.0);
 
 	paperTexture->Bind();
@@ -793,16 +794,18 @@ void SaveImgToFile() {
 void Display_FixedPipeline() {
     //glClearColor(1.f, 1.f, 1.f, 0.1f);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	cam->CallLookAt();
     
     aiVector3D * cam_pos = cam->getPosition();
-    aiVector3D * look_pos = cam->getLookAt();
-    
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
+//    aiVector3D * look_pos = cam->getLookAt();
+//    
+//    glMatrixMode (GL_PROJECTION);
+//    glLoadIdentity ();
+//    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
+//    glMatrixMode (GL_MODELVIEW);
+//    glLoadIdentity();
+//    gluLookAt(cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
     //DrawRects();
     graph->Display(cam_pos->z);
@@ -810,15 +813,17 @@ void Display_FixedPipeline() {
 
 void renderFrame() {
     
-    aiVector3D * cam_pos = cam->getPosition();
-    aiVector3D * look_pos = cam->getLookAt();
-    
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
+	cam->CallLookAt();
+//    aiVector3D * cam_pos = cam->getPosition();
+//	  aiVector3D * look_pos = cam->getLookAt();
+//	  aiVector3D * up_pos = cam->getLookAt();
+//    
+//    glMatrixMode (GL_PROJECTION);
+//    glLoadIdentity ();
+//    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
+//    glMatrixMode (GL_MODELVIEW);
+//    glLoadIdentity();
+//    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
     
     ////////////////////////////// first pass //////////////////
@@ -835,8 +840,8 @@ void renderFrame() {
     // draw a scene to a texture directly
     graph->Render();
     
-	FuzzRects();
-	//TestRects();
+	//FuzzRects();
+	TestRects();
     
     if (toFile) {
         SaveImgToFile();
@@ -1034,7 +1039,7 @@ int main(int argc, char** argv) {
     
     graph = new Graph(max_notes, dissonance, &shaders);
     
-    cam = new Camera(0.0, 0.0, 4.0);
+    cam = new Camera(0.0, 0.0, 2.0);
     
     connection_list.resize(max_notes);
     

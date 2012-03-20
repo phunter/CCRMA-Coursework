@@ -110,7 +110,7 @@ void Note::IncreaseDeadness() {
 			
 			for (int i = 0; i < 3; i++) {
 				float speed = .999;
-  				current_fill_material.amb_color[i] = min(1.0,current_fill_material.amb_color[i] + (1.0-speed) * current_fill_material.amb_color[i]);
+  				current_fill_material.amb_color[i] = min(.972, current_fill_material.amb_color[i] + (1.0-speed) * current_fill_material.amb_color[i]);
 				current_fill_material.diff_color[i] *= speed;
 				current_fill_material.spec_color[i] *= speed;
 				
@@ -784,7 +784,7 @@ void Note::RenderFlat() {
 //    glVertex3f(-radius*.075, radius*0.34, 0.0);
 
     float roundness = 25.0;
-    int numCurveSegments = 12;
+    int numCurveSegments = 20;
     int num_vertices = 14 * numCurveSegments;
     CustomVertex * my_vertices;
     my_vertices = new CustomVertex[num_vertices];

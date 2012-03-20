@@ -31,13 +31,19 @@ public:
     //void setTarget(STPoint3 * t);
     aiVector3D * getPosition();
     aiVector3D * getLookAt();
+	aiVector3D * getUpDir();
+	
+	void CallLookAt();
     
 //    void calculateAccelteration();
 //    void calculateSpeed();
     
     void updateCam(float delta);
     void nudgeCam();
-    void newNudgeCam(float delta);
+    void slewPhantomCam(float delta);
+	void slewVantageStretch(float delta);
+	
+	void positionRealCam(float delta);
     void slewLookAt(float delta);
     void slewRealCam();
     void computeTravelDist();
@@ -46,7 +52,13 @@ public:
 private:
     
     float default_height;
-    
+	float current_height;
+    float default_setback;
+	float current_setback;
+	
+	aiVector3D default_vantage; // ideal viewing angle (as offset from look_position)
+	aiVector3D vantage_stretch; // should attempt to be 0
+	
     Note * target_note;
     aiVector3D target_position;
     
@@ -54,6 +66,7 @@ private:
     
     aiVector3D cam_position;
     aiVector3D look_position;
+	aiVector3D up_dir;
     
     aiVector3D start_position;
     

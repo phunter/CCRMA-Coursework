@@ -193,7 +193,6 @@
 		8DD76FB20486AB0100D96B5E /* 248-ScoreGame */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "248-ScoreGame"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC3FE7F415182A5900C99293 /* phongTexture.frag.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = phongTexture.frag.glsl; path = shaders/phongTexture.frag.glsl; sourceTree = "<group>"; };
 		AC3FE7F515182A5900C99293 /* phongTexture.vert.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = phongTexture.vert.glsl; path = shaders/phongTexture.vert.glsl; sourceTree = "<group>"; };
-		AC3FE7FC1518302500C99293 /* parchment.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = parchment.jpg; sourceTree = "<group>"; };
 		AC3FE7FD151838CF00C99293 /* backgroundFuzz.frag.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = backgroundFuzz.frag.glsl; path = shaders/backgroundFuzz.frag.glsl; sourceTree = "<group>"; };
 		AC3FE7FE151838CF00C99293 /* backgroundFuzz.vert.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = backgroundFuzz.vert.glsl; path = shaders/backgroundFuzz.vert.glsl; sourceTree = "<group>"; };
 		C6A0FF2C0290799A04C91782 /* 248-ScoreGame.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = "248-ScoreGame.1"; sourceTree = "<group>"; };
@@ -334,7 +333,6 @@
 				4448793114FE43DA00D88B27 /* floor_n.jpg */,
 				4448793214FE43DA00D88B27 /* floor_s.jpg */,
 				4448793314FE43DA00D88B27 /* glass_d.jpg */,
-				AC3FE7FC1518302500C99293 /* parchment.jpg */,
 				4448793414FE43DA00D88B27 /* sphere.3ds */,
 				4448793514FE43DA00D88B27 /* sphere.blend */,
 				4448793614FE43DA00D88B27 /* stone_d.jpg */,

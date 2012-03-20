@@ -17,6 +17,19 @@ varying vec2 texcoord;
 varying vec3 normal;
 varying vec3 eyePosition;
 
+float ToonSquash(in float val) {
+    float stretch = floor(val * 1.3);
+    float squash = stretch / 1.0;
+    return squash;
+}
+
+float ToonSquash2(in float val) {
+    float stretch = floor(val * 1.4);
+    float squash = stretch / 1.0;
+    return (1.0 - squash) * .5;
+}
+
+
 void main() {
 
 	// Normalize the normal, and calculate light vector and view vector
@@ -29,7 +42,10 @@ void main() {
 	// Calculate the diffuse color coefficient, and sample the diffuse texture
 	float Rd = max(0.0, dot(L, N));
 	vec3 Td = texture2D(diffuseMap, texcoord).rgb;
-	vec3 diffuse = Rd * Kd * Td * gl_LightSource[0].diffuse.rgb;
+	//vec3 diffuse = Rd * Kd * Td * gl_LightSource[0].diffuse.rgb;
+	
+	vec3 squashTd = vec3(ToonSquash(Td.x), ToonSquash(Td.y), ToonSquash2(Td.z));
+	vec3 diffuse = Rd * Kd * squashTd * gl_LightSource[0].diffuse.rgb;
 	
 	// Calculate the specular coefficient
 	vec3 R = reflect(-L, N);
