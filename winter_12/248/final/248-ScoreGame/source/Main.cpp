@@ -18,6 +18,7 @@
 #include "Camera.h"
 #include "NoteMessage.h"
 #include "Dissonance.h"
+#include "CustomMaterial.h"
 
 #define WIN_WIDTH 880
 #define WIN_HEIGHT 880
@@ -73,6 +74,7 @@ MultiSampleRenderTarget *multiSampleRenderTarget;
 // end MultiSample stuff
 
 GLuint scene_list = 0;
+GLuint paperTextureID;
 
 // shader things
 std::vector<Shader*> shaders;
@@ -261,7 +263,7 @@ void initOpenGL() {
     // This initializes OpenGL with some common defaults.  More info here:
     // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
     glClearDepth(1.0f);
-    glClearColor(.9f, .9f, .8f, 1.0f);
+    glClearColor(.9f, .9f, .9f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
     
@@ -290,13 +292,13 @@ void loadAssets() {
     //////////////////////////////////////////////////////////////////////////
  
     Shader * shader1 = new Shader("shaders/simpleToon");
-    shaders.push_back(shader1);
+    shaders.push_back(shader1); // 0
     
     Shader * shader2 = new Shader("shaders/specToon");
-    shaders.push_back(shader2);
+    shaders.push_back(shader2); // 1
     
     Shader * shader3 = new Shader("shaders/downsample");
-    shaders.push_back(shader3);
+    shaders.push_back(shader3); // 2
 }
 
 
@@ -315,6 +317,35 @@ void setupLights()
     glLightfv( GL_LIGHT0, GL_SHININESS, &shininess );
 }
 
+void loadTexture( void )	
+{
+    
+    aiString parchment = aiString("models/parchment.jpg");
+
+    sf::Image * background;
+        
+    background = new sf::Image();
+    bool loaded = background->LoadFromFile(parchment.data);
+
+            
+	//AUX_RGBImageRec *pTextureImage = auxDIBImageLoad( ".\\test.bmp" );
+    
+    background->Bind();
+    
+    if( loaded )
+	{
+		glGenTextures( 1, &paperTextureID );
+        
+		glBindTexture(GL_TEXTURE_2D, paperTextureID);
+        
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        
+		//glTexImage2D( GL_TEXTURE_2D, 0, 3, background->GetWidth(),background->GetHeight(), 0,
+        //             GL_RGB, GL_UNSIGNED_BYTE,background-> );
+	}
+    
+}
 
 
 void handleInput() {
@@ -437,7 +468,7 @@ void handleInput() {
 
 void setMaterial(int shaderNum) {
     
-    GLfloat diff_color[] = { .6, .6, .6, 1.0 };
+    GLfloat diff_color[] = { .0, .6, .6, 1.0 };
     GLfloat spec_color[] = { .25, .25, .25, 1.0 };
     GLfloat amb_color[] = { .1, .1, .1, 1.0 };
     GLfloat shiny = 40.0;
@@ -446,7 +477,6 @@ void setMaterial(int shaderNum) {
     // Get a handle to the diffuse, specular, and ambient variables
     // inside the shader.  Then set them with the diffuse, specular, and
     // ambient color.
-    
     
     GLint diffuse = glGetUniformLocation(shaders[shaderNum]->programID(), "Kd");
     glUniform3f(diffuse, diff_color[0], diff_color[1], diff_color[2]);
@@ -464,7 +494,7 @@ void setMaterial(int shaderNum) {
     glUniform1f(shininess, shiny);
 }
 
-void testRects1() {
+void DrawRects() {
     glBegin(GL_QUADS);
     
     glColor4f(0.3,0.6,0.3,0.6);
@@ -500,7 +530,7 @@ void testRects1() {
     glEnd();
 }
 
-void testRects2() {
+void TestRects() {
 
     int num_vertices = 6;
     testVertex * my_vertices;
@@ -512,9 +542,9 @@ void testRects2() {
     my_vertices[2].pos = aiVector3D(10.0, 10.0, 0.0);
     
     // specify normal directions
-    my_vertices[0].norm = aiVector3D(1.1, 0.0, 0.0);
-    my_vertices[1].norm = aiVector3D(0.0, 1.1, 0.0);
-    my_vertices[2].norm = aiVector3D(0.0, 0.0, 1.1);
+    my_vertices[0].norm = aiVector3D(-1.0, -1.0, 0.1);
+    my_vertices[1].norm = aiVector3D(-1.0, 1.0, 0.1);
+    my_vertices[2].norm = aiVector3D(1.0, 1.0, 0.1);
     
     // specify vertex locations
     my_vertices[3].pos = aiVector3D(10.0, 10.0, 0.0);
@@ -522,12 +552,39 @@ void testRects2() {
     my_vertices[5].pos = aiVector3D(-10.0, -10.0, 0.0);
     
     // specify normal directions
-    my_vertices[3].norm = aiVector3D(0.0, 0.0, 1.1);
-    my_vertices[4].norm = aiVector3D(0.0, -1.1, 0.0);
-    my_vertices[5].norm = aiVector3D(1.1, 0.0, 0.0);
-
+    my_vertices[3].norm = aiVector3D(1.0, 1.0, 0.1);
+    my_vertices[4].norm = aiVector3D(1.0, -1.0, 0.1);
+    my_vertices[5].norm = aiVector3D(-1.0, -1.0, 0.1);
 
     int shaderNum = 1;
+    
+//    CustomMaterial *mat = new CustomMaterial;
+//    
+//    mat->amb_color[0] = .3 + .9 ;
+//    mat->amb_color[1] = .3 + .4 ;
+//    mat->amb_color[2] = .3 + .4 ;
+//    mat->diff_color[0] = .3 ;
+//    mat->diff_color[1] = .3 ;
+//    mat->diff_color[2] = .3 ;
+//    mat->spec_color[0] = mat->spec_color[1] = mat->spec_color[2] = .1;
+//    mat->shiny = 10;
+//    
+//    GLint diffuse = glGetUniformLocation(shaders[shaderNum]->programID(), "Kd");
+//    glUniform3f(diffuse, mat->diff_color[0], mat->diff_color[1], mat->diff_color[2]);
+//    
+//    // Specular material
+//    GLint specular = glGetUniformLocation(shaders[shaderNum]->programID(), "Ks");
+//    glUniform3f(specular, mat->spec_color[0], mat->spec_color[1], mat->spec_color[2]);
+//    
+//    // Ambient material
+//    GLint ambient = glGetUniformLocation(shaders[shaderNum]->programID(), "Ka");
+//    glUniform3f(ambient, mat->amb_color[0], mat->amb_color[1], mat->amb_color[2]);
+//    
+//    // Specular power
+//    GLint shininess = glGetUniformLocation(shaders[shaderNum]->programID(), "alpha");
+//    glUniform1f(shininess, mat->shiny);
+
+    setMaterial(shaderNum);
     
     GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
     glEnableVertexAttribArray(position);
@@ -536,10 +593,41 @@ void testRects2() {
     GLint normal = glGetAttribLocation(shaders[shaderNum]->programID(), "normalIn");
     glEnableVertexAttribArray(normal);
     glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->norm);
-
     
     glDrawArrays(GL_TRIANGLES,0,num_vertices); 
 }
+
+void SaveImgToFile() {
+    // Copy the back buffer into the current face of the cube map
+    glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, 0, GL_RGBA, GL_FLOAT, NULL);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
+    
+    // for rendering to image (debugging)
+    sf::Uint8 *pixelArray = new sf::Uint8[WIN_WIDTH*multiSampleAmount*WIN_HEIGHT*multiSampleAmount*4];
+    
+    // use ONE of the two following lines:
+    // This line will copy images from the framebuffer
+    //glReadPixels(0, 0, WIN_WIDTH, WIN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
+    
+    // This line will copy images stored in the currently bound texture
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
+    
+    // FOR SAVING TO FILE
+    std::ostringstream out;
+    out << "/Users/phunter/test_img.jpg";
+    sf::Image img(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, sf::Color::White);
+    img.LoadFromPixels(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, pixelArray);
+    img.SaveToFile(out.str());
+    
+    toFile = false;
+    
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+}
+
 
 
 void Display_FixedPipeline() {
@@ -559,7 +647,6 @@ void Display_FixedPipeline() {
     //testRects1();
     graph->Display(cam_pos->z);
 }
-
 
 void renderFrame() {
     
@@ -581,41 +668,15 @@ void renderFrame() {
     multiSampleRenderTarget->bind();
     
     // clear buffers
-    glClearColor(.9f, .9f, .8f, 1.0f);
+    glClearColor(.9f, .9f, .9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // draw a scene to a texture directly
     graph->Render();
-        
+    //TestRects();
+    
     if (toFile) {
-        // Copy the back buffer into the current face of the cube map
-        glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
-        
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, 0, GL_RGBA, GL_FLOAT, NULL);
-        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
-        
-        // for rendering to image (debugging)
-        sf::Uint8 *pixelArray = new sf::Uint8[WIN_WIDTH*multiSampleAmount*WIN_HEIGHT*multiSampleAmount*4];
-        
-        // use ONE of the two following lines:
-        // This line will copy images from the framebuffer
-        //glReadPixels(0, 0, WIN_WIDTH, WIN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
-        
-        // This line will copy images stored in the currently bound texture
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
-        
-        // FOR SAVING TO FILE
-        std::ostringstream out;
-        out << "/Users/phunter/test_img.jpg";
-        sf::Image img(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, sf::Color::White);
-        img.LoadFromPixels(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, pixelArray);
-        img.SaveToFile(out.str());
-        
-        toFile = false;
-        
-        //glBindTexture(GL_TEXTURE_2D, 0);
-        //glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        SaveImgToFile();
     }
     
     /////////////////////////////////////////second pass attempt

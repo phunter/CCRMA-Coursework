@@ -130,7 +130,7 @@ void Camera::newNudgeCam(float delta) {
     phantom_position += .0005 * easeVal * pow(remaining_path.Length(),2) * remaining_path;
         
     // cam height
-    cam_position = phantom_position + aiVector3D(0.0, 0.0/*-1.6*/, default_height);
+    cam_position = phantom_position + aiVector3D(0.0, -1.6, default_height);
 }
 
 void Camera::slewLookAt(float delta) {
