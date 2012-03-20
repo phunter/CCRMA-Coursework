@@ -9,7 +9,9 @@
 #ifndef _48_ScoreGame_CustomMaterial_h
 #define _48_ScoreGame_CustomMaterial_h
 
-struct CustomMaterial {
+class CustomMaterial {
+
+public:
     CustomMaterial() {
         diff_color[0] = diff_color[1] = diff_color[2] = .25;
         spec_color[0] = spec_color[1] = spec_color[2] = .15;
@@ -19,7 +21,16 @@ struct CustomMaterial {
         
         shiny = 40.0;
     }
-    
+	
+	void CopyFrom(const CustomMaterial& mat) {
+		for (int i = 0; i < 4; i++) {
+			diff_color[i] = mat.diff_color[i];
+        	spec_color[i] = mat.spec_color[i];
+        	amb_color[i] = mat.amb_color[i];
+		}
+		shiny = mat.shiny;
+	}
+	
     GLfloat diff_color[4];
     GLfloat spec_color[4];
     GLfloat amb_color[4];

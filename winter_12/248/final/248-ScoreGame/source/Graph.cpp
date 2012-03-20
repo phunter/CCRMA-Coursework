@@ -110,7 +110,7 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.z,
                                     mapped_midi,
                                     1.0,  // speed
-                                    15.0, // connection time
+                                    5.0, // connection time
                                     shaders);
     // set new current note's excite from prev note's excite
     if (cur_size > 0) {
@@ -134,6 +134,7 @@ void Graph::UpdateGraph(float delta) {
     AttractToXYPlane(delta);
     
     FadeColors();
+	IncreaseDeadness(); // (sap life!)
     
     IncrementTimeCounts(delta);
     TrimOldConnections();
@@ -254,10 +255,17 @@ void Graph::ExciteNote() {
 void Graph::FadeColors() {
     for (int i = 0; i < max_size; i++) {
         if (note_graph[i] != NULL) {
-            //note_graph[i]->setExcite(max(note_graph[i]->getExcite() - .01, 0.0));
             note_graph[i]->FadeExcite();
         }
     }
+}
+
+void Graph::IncreaseDeadness() {
+    for (int i = 0; i < max_size; i++) {
+        if (note_graph[i] != NULL) {
+			note_graph[i]->IncreaseDeadness();
+        }
+    }	
 }
 
 void Graph::Clear() {

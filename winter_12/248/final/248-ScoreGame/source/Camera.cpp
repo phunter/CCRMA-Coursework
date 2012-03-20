@@ -82,7 +82,7 @@ aiVector3D * Camera::getLookAt() {
 void Camera::computeTravelDist(){
     target_position = aiVector3D(*target_note->getLocation());
     
-    printf("First target_position is (%f,%f,%f)\n",target_position.x,target_position.y,target_position.z);
+    //printf("First target_position is (%f,%f,%f)\n",target_position.x,target_position.y,target_position.z);
     
     cam_travel_dist = (target_position - start_position).Length();
 }
@@ -130,7 +130,7 @@ void Camera::newNudgeCam(float delta) {
     phantom_position += .0005 * easeVal * pow(remaining_path.Length(),2) * remaining_path;
         
     // cam height
-    cam_position = phantom_position + aiVector3D(0.0, -1.6, default_height);
+    cam_position = phantom_position + aiVector3D(0.0, -1.3, default_height);
 }
 
 void Camera::slewLookAt(float delta) {

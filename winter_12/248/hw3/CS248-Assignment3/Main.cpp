@@ -31,7 +31,7 @@ printf("%s\n", gluErrorString(error));\
 // and using rendering settings
 // http://www.sfml-dev.org/tutorials/1.6/window-window.php
 sf::WindowSettings settings(24, 8, 2);
-sf::Window window(sf::VideoMode(800, 600), "Assignment 3", sf::Style::Close, settings);
+sf::Window window(sf::VideoMode(1400, 1100), "Assignment 3", sf::Style::Close, settings);
 
 const sf::Input& Input = window.GetInput();
  

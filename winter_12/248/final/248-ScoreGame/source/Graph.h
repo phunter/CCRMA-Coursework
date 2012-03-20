@@ -53,6 +53,7 @@ public:
     
     void ExciteNote();
     void FadeColors();
+	void IncreaseDeadness();
     
     void Clear();
     

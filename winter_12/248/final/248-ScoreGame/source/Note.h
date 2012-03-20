@@ -48,8 +48,10 @@ public:
     float getExcite();
     void setExcite(float e);
     void FadeExcite();
+	void IncreaseDeadness();
     
     void GetCurConnections(vector<int> * note_list);
+	void BackToLife();
     
     void addTwoWayConnection(Note *note, float dist);
     void addConnection(Note *note, float dist);
@@ -81,7 +83,7 @@ public:
     void DisplayNotes(float h);
     void DisplayConnections();
     
-    void ApplyGlobalScale();
+    void ApplyScale();
     void RenderNote();
     void RenderConnections();
     
@@ -111,10 +113,10 @@ public:
     void ConstructTorus(aiVector3D center, float centerRadius, float edgeRadius);
     void RenderPremadeTorus();
     
-    void AttachMaterial(CustomMaterial * mat, int shaderNum);
+    void AttachMaterial(CustomMaterial mat, int shaderNum);
     void AttachVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum);
     
-    void RenderVertices(CustomVertex * my_vertices, int num_vertices, CustomMaterial * material,int shaderNum);
+    void RenderVertices(CustomVertex * my_vertices, int num_vertices, CustomMaterial material,int shaderNum);
     bool maybe();
     
 private:
@@ -125,9 +127,13 @@ private:
     float radius;
     float line_thickness;
     float width_max;
+	int num_connections;
     int max_connections;
     float max_connection_time;
     
+	int deadThresh;
+	int deadness;
+	
     aiVector3D globalScale;
     
     int mapped_midi;
@@ -138,6 +144,7 @@ private:
     int rel_space;  
     int accidental; // 0 is non, -1 is flat, +1 is shar
     
+	float default_speed;
     float speed;
     
     float cam_height;
@@ -154,8 +161,11 @@ private:
     vector<Connection*> connection_list;
     
     // materials
-    CustomMaterial *fill_material;
-    CustomMaterial *outer_material;
+    CustomMaterial default_fill_material;
+    CustomMaterial default_outer_material;
+	CustomMaterial current_fill_material;
+    CustomMaterial current_outer_material;
+	
     
     // geometry
     int t_num_vertices;

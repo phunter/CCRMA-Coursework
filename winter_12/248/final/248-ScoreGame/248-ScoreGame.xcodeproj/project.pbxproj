@@ -29,12 +29,14 @@
 		44C66F8415135A3700BA3B72 /* phong.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7E15135A3700BA3B72 /* phong.vert.glsl */; };
 		44C66F8515135A3700BA3B72 /* specToon.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F7F15135A3700BA3B72 /* specToon.frag.glsl */; };
 		44C66F8815135A3700BA3B72 /* outlineToon.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F8215135A3700BA3B72 /* outlineToon.vert.glsl */; };
-		44C9FCA614FE461000F33326 /* teapot.3ds in Copy Models */ = {isa = PBXBuildFile; fileRef = 44C9FCA414FE461000F33326 /* teapot.3ds */; };
-		44C9FCA714FE461000F33326 /* teapot.blend in Copy Models */ = {isa = PBXBuildFile; fileRef = 44C9FCA514FE461000F33326 /* teapot.blend */; };
 		44DE47601517F24700989E75 /* specToon.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44DE475F1517F1DD00989E75 /* specToon.vert.glsl */; };
 		44DE47611517F28400989E75 /* outlineToon.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = 44C66F8115135A3700BA3B72 /* outlineToon.frag.glsl */; };
 		7E36360F12FCF52A00D6344A /* libassimp.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E36360E12FCF52A00D6344A /* libassimp.dylib */; };
 		8DD76FB00486AB0100D96B5E /* 248-ScoreGame.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6A0FF2C0290799A04C91782 /* 248-ScoreGame.1 */; };
+		AC3FE7F615182A6C00C99293 /* phongTexture.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = AC3FE7F415182A5900C99293 /* phongTexture.frag.glsl */; };
+		AC3FE7F715182A6C00C99293 /* phongTexture.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = AC3FE7F515182A5900C99293 /* phongTexture.vert.glsl */; };
+		AC3FE7FF151838DD00C99293 /* backgroundFuzz.frag.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = AC3FE7FD151838CF00C99293 /* backgroundFuzz.frag.glsl */; };
+		AC3FE800151838DD00C99293 /* backgroundFuzz.vert.glsl in Copy Shaders */ = {isa = PBXBuildFile; fileRef = AC3FE7FE151838CF00C99293 /* backgroundFuzz.vert.glsl */; };
 		C9EA8F0C12EE77060002670E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8F0B12EE77060002670E /* OpenGL.framework */; };
 		C9EA8FDF12EE79EB0002670E /* sfml-graphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FD912EE79EB0002670E /* sfml-graphics.framework */; };
 		C9EA8FE012EE79EB0002670E /* sfml-network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9EA8FDA12EE79EB0002670E /* sfml-network.framework */; };
@@ -66,6 +68,10 @@
 			dstPath = shaders;
 			dstSubfolderSpec = 7;
 			files = (
+				AC3FE7FF151838DD00C99293 /* backgroundFuzz.frag.glsl in Copy Shaders */,
+				AC3FE800151838DD00C99293 /* backgroundFuzz.vert.glsl in Copy Shaders */,
+				AC3FE7F615182A6C00C99293 /* phongTexture.frag.glsl in Copy Shaders */,
+				AC3FE7F715182A6C00C99293 /* phongTexture.vert.glsl in Copy Shaders */,
 				44DE47611517F28400989E75 /* outlineToon.frag.glsl in Copy Shaders */,
 				44DE47601517F24700989E75 /* specToon.vert.glsl in Copy Shaders */,
 				44C66F8315135A3700BA3B72 /* phong.frag.glsl in Copy Shaders */,
@@ -101,8 +107,6 @@
 			dstPath = models;
 			dstSubfolderSpec = 7;
 			files = (
-				44C9FCA614FE461000F33326 /* teapot.3ds in Copy Models */,
-				44C9FCA714FE461000F33326 /* teapot.blend in Copy Models */,
 			);
 			name = "Copy Models";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -187,6 +191,11 @@
 		44DE475F1517F1DD00989E75 /* specToon.vert.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = specToon.vert.glsl; path = shaders/specToon.vert.glsl; sourceTree = "<group>"; };
 		7E36360E12FCF52A00D6344A /* libassimp.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libassimp.dylib; sourceTree = SOURCE_ROOT; };
 		8DD76FB20486AB0100D96B5E /* 248-ScoreGame */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "248-ScoreGame"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC3FE7F415182A5900C99293 /* phongTexture.frag.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = phongTexture.frag.glsl; path = shaders/phongTexture.frag.glsl; sourceTree = "<group>"; };
+		AC3FE7F515182A5900C99293 /* phongTexture.vert.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = phongTexture.vert.glsl; path = shaders/phongTexture.vert.glsl; sourceTree = "<group>"; };
+		AC3FE7FC1518302500C99293 /* parchment.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = parchment.jpg; sourceTree = "<group>"; };
+		AC3FE7FD151838CF00C99293 /* backgroundFuzz.frag.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = backgroundFuzz.frag.glsl; path = shaders/backgroundFuzz.frag.glsl; sourceTree = "<group>"; };
+		AC3FE7FE151838CF00C99293 /* backgroundFuzz.vert.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = backgroundFuzz.vert.glsl; path = shaders/backgroundFuzz.vert.glsl; sourceTree = "<group>"; };
 		C6A0FF2C0290799A04C91782 /* 248-ScoreGame.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = "248-ScoreGame.1"; sourceTree = "<group>"; };
 		C9EA8F0B12EE77060002670E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		C9EA8FD912EE79EB0002670E /* sfml-graphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "sfml-graphics.framework"; sourceTree = "<group>"; };
@@ -325,6 +334,7 @@
 				4448793114FE43DA00D88B27 /* floor_n.jpg */,
 				4448793214FE43DA00D88B27 /* floor_s.jpg */,
 				4448793314FE43DA00D88B27 /* glass_d.jpg */,
+				AC3FE7FC1518302500C99293 /* parchment.jpg */,
 				4448793414FE43DA00D88B27 /* sphere.3ds */,
 				4448793514FE43DA00D88B27 /* sphere.blend */,
 				4448793614FE43DA00D88B27 /* stone_d.jpg */,
@@ -343,10 +353,14 @@
 		44A64F211515FEA000E4D170 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
+				AC3FE7FD151838CF00C99293 /* backgroundFuzz.frag.glsl */,
+				AC3FE7FE151838CF00C99293 /* backgroundFuzz.vert.glsl */,
 				44A64F1D1515FE8800E4D170 /* downsample.frag.glsl */,
 				44A64F1E1515FE8800E4D170 /* downsample.vert.glsl */,
 				44C66F7D15135A3700BA3B72 /* phong.frag.glsl */,
 				44C66F7E15135A3700BA3B72 /* phong.vert.glsl */,
+				AC3FE7F415182A5900C99293 /* phongTexture.frag.glsl */,
+				AC3FE7F515182A5900C99293 /* phongTexture.vert.glsl */,
 				44C66F7F15135A3700BA3B72 /* specToon.frag.glsl */,
 				44DE475F1517F1DD00989E75 /* specToon.vert.glsl */,
 				44C66F8115135A3700BA3B72 /* outlineToon.frag.glsl */,

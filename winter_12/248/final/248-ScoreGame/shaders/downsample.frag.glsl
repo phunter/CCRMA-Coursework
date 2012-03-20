@@ -19,7 +19,7 @@ float rand(vec2 co){
 }
 
 float raisedCos(in float val){
-    return pow(((cos(val * 2.0 * 3.14159) + 1.0)/2.0),4.0);
+    return 1.0 - pow( ((cos(val * 2.0 * 3.14159) + 1.0)/2.0), 5.0);
 }
 
 void main() {
@@ -40,7 +40,7 @@ void main() {
         for (int j=0; j < down; j++) {
         
             vec2 pure_sample_loc = vec2(texcoord.x + float(i)*x_subpix_inc, texcoord.y + float(j)*y_subpix_inc);
-
+			
             //float rand1 = rand(vec2(pure_sample_loc.x, texcoord.y + randomInc.y));
             //float rand2 = rand(vec2(texcoord.x + randomInc.x, pure_sample_loc.y));
             
@@ -60,8 +60,8 @@ void main() {
     
     total = total / (floor(downAmount) * floor(downAmount));
     
-    float red = (rand(texcoord) + 1.0) / 2.0;
-    
-    //gl_FragColor = vec4(red, 0, 0, 1);
-    gl_FragColor = vec4(total.r, total.g, total.b, 1);
+    //float red = (rand(texcoord)/ 1.0) + .5;
+	
+    //gl_FragColor = vec4(red * .9, red * .9, red * .75, 1.0);
+    gl_FragColor = vec4(total.r, total.g, total.b, 1.0);
 }

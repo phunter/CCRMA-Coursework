@@ -22,17 +22,23 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
     line_thickness = .02;
     width_max = (10 * radius) / .2;
     
-    excitement = 0.0;
-    speed = s;
+	excitement = 0.0;
+	
+	default_speed = s;
+    speed = default_speed;
     max_connection_time = t;
     
     globalScale = aiVector3D(1.0, 1.0, 1.0);//.001);
+	
+	deadThresh = 1000;
+	deadness = 0;
     
     mapped_midi = mapped_midi_num;
     Spelling my_spell = SpellNote(mapped_midi_num);
     note_space = my_spell.staff_offset;
     accidental = my_spell.accidental;
     
+	num_connections = 0;
     max_connections = 50;
     
     connection_list.resize(max_connections);
@@ -53,17 +59,19 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
     t_num_vertices = 6 * t_outerSegments * t_innerSegments;
     
     // set up materials
-    outer_material = new CustomMaterial;
-    fill_material = new CustomMaterial;
-    
-    fill_material->amb_color[0] = .3 + .4 * color.r;
-    fill_material->amb_color[1] = .3 + .4 * color.g;
-    fill_material->amb_color[2] = .3 + .4 * color.b;
-    fill_material->diff_color[0] = .3 * color.r;
-    fill_material->diff_color[1] = .3 * color.g;
-    fill_material->diff_color[2] = .3 * color.b;
-    fill_material->spec_color[0] = fill_material->spec_color[1] = fill_material->spec_color[2] = .1;
-    fill_material->shiny = 10;
+    //default_outer_material = new CustomMaterial;
+    //default_fill_material = new CustomMaterial;
+	
+    default_fill_material.amb_color[0] = .3 + .4 * color.r;
+    default_fill_material.amb_color[1] = .3 + .4 * color.g;
+    default_fill_material.amb_color[2] = .3 + .4 * color.b;
+    default_fill_material.diff_color[0] = .3 * color.r;
+    default_fill_material.diff_color[1] = .3 * color.g;
+    default_fill_material.diff_color[2] = .3 * color.b;
+    default_fill_material.spec_color[0] = default_fill_material.spec_color[1] = default_fill_material.spec_color[2] = .1;
+    default_fill_material.shiny = 10;
+	
+	current_fill_material.CopyFrom(default_fill_material);
     
     // set up geometry
     torus_vertices = new CustomVertex[t_num_vertices];
@@ -73,8 +81,8 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
 Note::~Note()
 {
     delete [] torus_vertices;
-    delete outer_material;
-    delete fill_material;
+//    delete outer_material;
+//    delete fill_material;
 }
 
 
@@ -84,11 +92,34 @@ float Note::getExcite() {
 
 void Note::setExcite(float e) {
     excitement = e;
+	BackToLife();
 }
 
 void Note::FadeExcite() {
     excitement = max(excitement - .001, 0.0);
     //radius = default_radius + .1 * excitement;
+}
+
+void Note::IncreaseDeadness() {
+	printf("Num connections for note %d is %d\n", mapped_midi, deadness);
+	if (num_connections == 0) {
+		deadness++;
+		
+		if (deadness > deadThresh) {
+  			speed = max(0.0, default_speed-(deadness-deadThresh)*.001);
+			
+			for (int i = 0; i < 3; i++) {
+				float speed = .999;
+  				current_fill_material.amb_color[i] = min(1.0,current_fill_material.amb_color[i] + (1.0-speed) * current_fill_material.amb_color[i]);
+				current_fill_material.diff_color[i] *= speed;
+				current_fill_material.spec_color[i] *= speed;
+				
+				current_outer_material.amb_color[i] *= speed; //= min(1.0,(.01 * current_outer_material.amb_color[i]));
+				current_outer_material.diff_color[i] *= speed;
+				current_outer_material.spec_color[i] *= speed;
+			}
+		}
+	}
 }
 
 void Note::GetCurConnections(vector<int> * note_list) {
@@ -99,6 +130,13 @@ void Note::GetCurConnections(vector<int> * note_list) {
     }
 }
 
+void Note::BackToLife() {
+	deadness = 0;
+	speed = default_speed;
+	current_fill_material.CopyFrom(default_fill_material);
+	current_outer_material.CopyFrom(default_outer_material);
+}
+
 void Note::addConnection(Note * note, float dist)
 {
     Connection *new_connect = new Connection();
@@ -106,7 +144,9 @@ void Note::addConnection(Note * note, float dist)
     new_connect->ideal_dist = dist;
     new_connect->time_count = 0;
     
-    connection_list[note->getMappedMidi()] = new_connect;    
+    connection_list[note->getMappedMidi()] = new_connect;
+	num_connections++;
+	BackToLife();
 }
 
 void Note::addTwoWayConnection(Note *note, float dist)
@@ -119,7 +159,9 @@ void Note::addTwoWayConnection(Note *note, float dist)
     
     connection_list[note->getMappedMidi()] = new_connect;
     
-    note->addConnection(this, dist);
+	note->addConnection(this, dist);
+	num_connections++;
+	BackToLife();
 }
 
 void Note::updateConnection(int mapped_midi_num, float dist)
@@ -144,12 +186,14 @@ void Note::updateTwoWayConnection(int mapped_midi_num, float dist)
 void Note::DeleteConnection(int mapped_midi_num) {
     // TODO: clean up
     connection_list[mapped_midi_num] = NULL;
+	num_connections--;
 }
 
 void Note::DeleteTwoWayConnection(int mapped_midi_num) {
     // TODO: clean up
     connection_list[mapped_midi_num]->next_note->DeleteConnection(mapped_midi);
     connection_list[mapped_midi_num] = NULL;
+	num_connections--;
 }
 
 void Note::ResetTimeCount(int mapped_midi_num) {
@@ -460,27 +504,27 @@ void Note::DisplayNotes(float h)
     glDisable( GL_LINE_SMOOTH );
 }
 
-void Note::ApplyGlobalScale() {
-    glScalef(globalScale.x, globalScale.y, globalScale.z);
+void Note::ApplyScale() {	
+	float zscale = max(.2, 1.0-(deadness-deadThresh)*.001);
+	glScalef(1.0, 1.0, zscale);
 }
 
 void Note::RenderNote()
 {
     glPushMatrix();
+//    RenderCylinder(aiVector3D(0.0, 0.0, 0.0),
+//                   aiVector3D(1.0,  1.0, 1.0), .3, 4);
     
-    ApplyGlobalScale();
-    
-    // why do this? //
-    int shaderNum = 01;
-    glUseProgram((*shaders)[shaderNum]->programID());
-    //////////////////
+	if (deadness > deadThresh) {
+		ApplyScale();
+	}
     
     RenderCircle2(centerPosition, radius, .9, 20);
 
-    shaderNum = 0;
-    glUseProgram((*shaders)[shaderNum]->programID());
+//    shaderNum = 0;
+//    glUseProgram((*shaders)[shaderNum]->programID());
 
-    //RenderTorus(centerPosition, radius, line_thickness, 50, 12);
+//    RenderTorus(centerPosition, radius, line_thickness, 50, 12);
     RenderPremadeTorus();
     
     RenderStaffLines();
@@ -544,8 +588,7 @@ void Note::DisplayConnections()
 void Note::RenderConnections()
 {
     glPushMatrix();
-    ApplyGlobalScale();
-    
+   
     for (int i = 0; i < max_connections; i++) {
         if (connection_list[i] != NULL) {
             aiVector3D orig = centerPosition;
@@ -686,11 +729,9 @@ void Note::RenderNoteHead()
 //    glColor4f(0.0f, 0.0f, 0.0f, 1.0); 
 //    
     RenderCircle(aiVector3D(0.0,0.0,0.0), radius*0.12, .9, 20);
-//    
-//    glLineWidth(.3*width_max);
-//    
-//    DrawCircle(aiVector3D(0.0,0.0,0.), radius*0.1, 40, 0);
-//    
+    
+    DrawCircle(aiVector3D(0.0,0.0,0.), radius*0.1, 40, 0);
+    
     if (accidental == 1) {
         RenderSharp();
     }
@@ -838,7 +879,7 @@ void Note::RenderFlat() {
     }
     
     int shaderNum = 0;
-    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);    
+    RenderVertices(my_vertices, num_vertices, current_outer_material, shaderNum);    
     delete [] my_vertices;
 }
 
@@ -951,7 +992,7 @@ void Note::RenderCircle(aiVector3D cent, float rad, float roundness, int numCorn
     
     int shaderNum = 0;
     //AttachMaterial(outer_material, shaderNum);
-    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);    
+    RenderVertices(my_vertices, num_vertices, current_outer_material, shaderNum);    
     delete [] my_vertices;
 }
 
@@ -980,9 +1021,11 @@ void Note::RenderCircle2(aiVector3D cent, float rad, float roundness, int numCor
     } 
     
     int shaderNum = 1;
+	//glUseProgram((*shaders)[shaderNum]->programID());
+
     //AttachMaterial(fill_material, shaderNum);
     
-    RenderVertices(my_vertices, num_vertices, fill_material, shaderNum);    
+    RenderVertices(my_vertices, num_vertices, current_fill_material, shaderNum);    
     delete [] my_vertices;
 }
 
@@ -1188,7 +1231,7 @@ void Note::RenderCylinder(aiVector3D endOne, aiVector3D endTwo, float radius, in
     } 
     
     int shaderNum = 0;
-    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);
+    RenderVertices(my_vertices, num_vertices, current_outer_material, shaderNum);
     delete [] my_vertices;
     
     glPopMatrix();
@@ -1335,8 +1378,10 @@ void Note::RenderTorus(aiVector3D center, float centerRadius, float edgeRadius, 
     }
     
     int shaderNum = 0;
+    glUseProgram((*shaders)[shaderNum]->programID());
+    
     //AttachMaterial(outer_material, shaderNum);
-    RenderVertices(my_vertices, num_vertices, outer_material, shaderNum);    
+    RenderVertices(my_vertices, num_vertices, current_outer_material, shaderNum);    
     delete [] my_vertices;
     glPopMatrix();
 }
@@ -1423,26 +1468,26 @@ void Note::RenderPremadeTorus() {
     
     int shaderNum = 0;
     //AttachMaterial(outer_material, shaderNum);
-    RenderVertices(torus_vertices, t_num_vertices, outer_material, shaderNum);
-    
+    RenderVertices(torus_vertices, t_num_vertices, current_outer_material, shaderNum);
+	
     glPopMatrix();
-}
+}	
 
-void Note::AttachMaterial(CustomMaterial * mat, int shaderNum) {
+void Note::AttachMaterial(CustomMaterial mat, int shaderNum) {
     GLint diffuse = glGetUniformLocation((*shaders)[shaderNum]->programID(), "Kd");
-    glUniform3f(diffuse, mat->diff_color[0], mat->diff_color[1], mat->diff_color[2]);
+    glUniform3f(diffuse, mat.diff_color[0], mat.diff_color[1], mat.diff_color[2]);
     
     // Specular material
     GLint specular = glGetUniformLocation((*shaders)[shaderNum]->programID(), "Ks");
-    glUniform3f(specular, mat->spec_color[0], mat->spec_color[1], mat->spec_color[2]);
+    glUniform3f(specular, mat.spec_color[0], mat.spec_color[1], mat.spec_color[2]);
     
     // Ambient material
     GLint ambient = glGetUniformLocation((*shaders)[shaderNum]->programID(), "Ka");
-    glUniform3f(ambient, mat->amb_color[0], mat->amb_color[1], mat->amb_color[2]);
+    glUniform3f(ambient, mat.amb_color[0], mat.amb_color[1], mat.amb_color[2]);
     
     // Specular power
     GLint shininess = glGetUniformLocation((*shaders)[shaderNum]->programID(), "alpha");
-    glUniform1f(shininess, mat->shiny);
+    glUniform1f(shininess, mat.shiny);
 }
 
 void Note::AttachVertices(CustomVertex * my_vertices, int num_vertices, int shaderNum) {
@@ -1457,12 +1502,12 @@ void Note::AttachVertices(CustomVertex * my_vertices, int num_vertices, int shad
 
 
 
-void Note::RenderVertices(CustomVertex * my_vertices, int num_vertices, CustomMaterial * mat,int shaderNum) {
-    
+void Note::RenderVertices(CustomVertex * my_vertices, int num_vertices, CustomMaterial mat,int shaderNum) {
+
+    glUseProgram((*shaders)[shaderNum]->programID());
     AttachVertices(my_vertices, num_vertices, shaderNum);
     AttachMaterial(mat, shaderNum);
 
-    glUseProgram((*shaders)[shaderNum]->programID());
     glDrawArrays(GL_TRIANGLES,0,num_vertices); 
 }
 

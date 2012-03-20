@@ -20,8 +20,8 @@
 #include "Dissonance.h"
 #include "CustomMaterial.h"
 
-#define WIN_WIDTH 880
-#define WIN_HEIGHT 880
+#define WIN_WIDTH 1180
+#define WIN_HEIGHT 1180
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
 // and using rendering settings
@@ -68,13 +68,13 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 2;
+int multiSampleAmount = 3;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
 
 GLuint scene_list = 0;
-GLuint paperTextureID;
+sf::Image * paperTexture;
 
 // shader things
 std::vector<Shader*> shaders;
@@ -106,6 +106,7 @@ struct testVertex
 // function prototypes
 void initOpenGL();
 void loadAssets();
+void loadTexture();
 void handleInput();
 
 // temporary
@@ -290,8 +291,9 @@ void loadAssets() {
     //////////////////////////////////////////////////////////////////////////
     // TODO: LOAD YOUR SHADERS/TEXTURES
     //////////////////////////////////////////////////////////////////////////
+ 	loadTexture();
  
-    Shader * shader1 = new Shader("shaders/simpleToon");
+    Shader * shader1 = new Shader("shaders/outlineToon");
     shaders.push_back(shader1); // 0
     
     Shader * shader2 = new Shader("shaders/specToon");
@@ -299,8 +301,13 @@ void loadAssets() {
     
     Shader * shader3 = new Shader("shaders/downsample");
     shaders.push_back(shader3); // 2
+	
+	Shader * shader4 = new Shader("shaders/phongTexture");
+    shaders.push_back(shader4); // 3
+	
+	Shader * shader5 = new Shader("shaders/backgroundFuzz");
+    shaders.push_back(shader5); // 4
 }
-
 
 void setupLights()
 {
@@ -320,24 +327,23 @@ void setupLights()
 void loadTexture( void )	
 {
     
-    aiString parchment = aiString("models/parchment.jpg");
+    //aiString parchment = aiString("models/parchment.jpg");
+	aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/Paper_texture_by_manekochan.jpg");
+	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/parchment_png.png");
+	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/red_noise.jpg");
+	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/tanFuzz2.jpg");
+	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/dirty_parchment_by_swimmingintheether.jpg");
 
-    sf::Image * background;
-        
-    background = new sf::Image();
-    bool loaded = background->LoadFromFile(parchment.data);
-
-            
-	//AUX_RGBImageRec *pTextureImage = auxDIBImageLoad( ".\\test.bmp" );
-    
-    background->Bind();
+    paperTexture = new sf::Image();
+    bool loaded = paperTexture->LoadFromFile(parchment.data);
     
     if( loaded )
 	{
-		glGenTextures( 1, &paperTextureID );
+	
+		//glGenTextures( 1, &paperTextureID );
         
-		glBindTexture(GL_TEXTURE_2D, paperTextureID);
-        
+		//glBindTexture(GL_TEXTURE_2D, paperTextureID);
+		paperTexture->Bind();
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
         
@@ -530,44 +536,105 @@ void DrawRects() {
     glEnd();
 }
 
-void TestRects() {
+void FuzzRects() {
+	
+	// set up shader
+    int shaderNum = 4; // downsample shader
+    glUseProgram(shaders[shaderNum]->programID());
 
+	// set up vertices
     int num_vertices = 6;
     testVertex * my_vertices;
     my_vertices = new testVertex[num_vertices];
 
     // specify vertex locations
-    my_vertices[0].pos = aiVector3D(-10.0, -10.0, 0.0);
-    my_vertices[1].pos = aiVector3D(-10.0, 10.0, 0.0);
-    my_vertices[2].pos = aiVector3D(10.0, 10.0, 0.0);
-    
+    my_vertices[0].pos = aiVector3D(-100.0, -100.0, 0.0);
+    my_vertices[1].pos = aiVector3D(-100.0, 100.0, 0.0);
+    my_vertices[2].pos = aiVector3D(100.0, 100.0, 0.0);
+	
+    my_vertices[3].pos = aiVector3D(100.0, 100.0, 0.0);
+    my_vertices[4].pos = aiVector3D(100.0, -100.0, 0.0);
+    my_vertices[5].pos = aiVector3D(-100.0, -100.0, 0.0);
+	
     // specify normal directions
     my_vertices[0].norm = aiVector3D(-1.0, -1.0, 0.1);
     my_vertices[1].norm = aiVector3D(-1.0, 1.0, 0.1);
     my_vertices[2].norm = aiVector3D(1.0, 1.0, 0.1);
     
-    // specify vertex locations
-    my_vertices[3].pos = aiVector3D(10.0, 10.0, 0.0);
-    my_vertices[4].pos = aiVector3D(10.0, -10.0, 0.0);
-    my_vertices[5].pos = aiVector3D(-10.0, -10.0, 0.0);
-    
-    // specify normal directions
     my_vertices[3].norm = aiVector3D(1.0, 1.0, 0.1);
     my_vertices[4].norm = aiVector3D(1.0, -1.0, 0.1);
     my_vertices[5].norm = aiVector3D(-1.0, -1.0, 0.1);
 
-    int shaderNum = 1;
+    // specify texcoord locations
+    my_vertices[0].texcoord = aiVector2D(0.0, 0.0);
+    my_vertices[1].texcoord = aiVector2D(0.0, 100.0);
+    my_vertices[2].texcoord = aiVector2D(100.0, 100.0);
     
+    my_vertices[3].texcoord = aiVector2D(100.0, 100.0);
+    my_vertices[4].texcoord = aiVector2D(100.0, 0.0);
+    my_vertices[5].texcoord = aiVector2D(0.0, 0.0);
+
+	paperTexture->Bind();
+	// attach texture
+	GLint texture = glGetUniformLocation(shaders[shaderNum]->programID(), "diffuseMap");
+    glUniform1i(texture, 3); // The normal map will be GL_TEXTURE2
+    glActiveTexture(GL_TEXTURE3);
+	
+	paperTexture->Bind();
+	//glBindTexture(GL_TEXTURE_2D, paperTextureID);
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+//	GLint texture = glGetUniformLocation(shaders[shaderNum]->programID(), "diffuseMap");
+//    glUniform1i(texture, 4); // The normal map will be GL_TEXTURE2
+//    glActiveTexture(GL_TEXTURE4);
+//	paperTexture->Bind();
+//    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+//    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+//    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    
+    // send downsample amount 
+    GLint downAmnt = glGetUniformLocation(shaders[shaderNum]->programID(), "downAmount");
+    glUniform1f(downAmnt, 1);
+    
+    // randomizer
+    //help += .0123456789;
+    randomVar.x += sin(randomVar.y);
+    randomVar.y += sin(randomVar.x);
+    
+    GLint randInc = glGetUniformLocation(shaders[shaderNum]->programID(), "randomInc");
+    glUniform2f(randInc, randomVar.x, randomVar.y);
+    
+    // send window size 
+    GLint winSize = glGetUniformLocation(shaders[shaderNum]->programID(), "targetRes");
+    glUniform2f(winSize, WIN_WIDTH, WIN_HEIGHT);
+    
+    
+    GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
+    glEnableVertexAttribArray(position);
+    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->pos);
+    
+    GLint texcoord = glGetAttribLocation(shaders[shaderNum]->programID(), "texcoordIn");
+    glEnableVertexAttribArray(texcoord);
+    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->texcoord); // use norm holder as hack for now
+    
+    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+	
+	///////////////////////////
+	    
 //    CustomMaterial *mat = new CustomMaterial;
 //    
-//    mat->amb_color[0] = .3 + .9 ;
+//    mat->amb_color[0] = .3 + .4 ;
 //    mat->amb_color[1] = .3 + .4 ;
 //    mat->amb_color[2] = .3 + .4 ;
 //    mat->diff_color[0] = .3 ;
 //    mat->diff_color[1] = .3 ;
 //    mat->diff_color[2] = .3 ;
 //    mat->spec_color[0] = mat->spec_color[1] = mat->spec_color[2] = .1;
-//    mat->shiny = 10;
+//    mat->shiny = 1;
 //    
 //    GLint diffuse = glGetUniformLocation(shaders[shaderNum]->programID(), "Kd");
 //    glUniform3f(diffuse, mat->diff_color[0], mat->diff_color[1], mat->diff_color[2]);
@@ -583,9 +650,92 @@ void TestRects() {
 //    // Specular power
 //    GLint shininess = glGetUniformLocation(shaders[shaderNum]->programID(), "alpha");
 //    glUniform1f(shininess, mat->shiny);
+//
+//    //setMaterial(shaderNum);
+//    
+//	GLint texcoord = glGetAttribLocation(shaders[shaderNum]->programID(), "texcoordIn");
+//    glEnableVertexAttribArray(texcoord);
+//    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->texcoord); // use norm holder as hack for now
+//	
+//    GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
+//    glEnableVertexAttribArray(position);
+//    glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->pos);
+//    
+//    GLint normal = glGetAttribLocation(shaders[shaderNum]->programID(), "normalIn");
+//    glEnableVertexAttribArray(normal);
+//    glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->norm);
+		  
+    glDrawArrays(GL_TRIANGLES,0,num_vertices); 
+}
 
-    setMaterial(shaderNum);
+void TestRects() {
+
+    int num_vertices = 6;
+    testVertex * my_vertices;
+    my_vertices = new testVertex[num_vertices];
+
+    // specify vertex locations
+    my_vertices[0].pos = aiVector3D(-100.0, -100.0, 0.0);
+    my_vertices[1].pos = aiVector3D(-100.0, 100.0, 0.0);
+    my_vertices[2].pos = aiVector3D(100.0, 100.0, 0.0);
+	
+    my_vertices[3].pos = aiVector3D(100.0, 100.0, 0.0);
+    my_vertices[4].pos = aiVector3D(100.0, -100.0, 0.0);
+    my_vertices[5].pos = aiVector3D(-100.0, -100.0, 0.0);
+	
+    // specify normal directions
+    my_vertices[0].norm = aiVector3D(-1.0, -1.0, 0.1);
+    my_vertices[1].norm = aiVector3D(-1.0, 1.0, 0.1);
+    my_vertices[2].norm = aiVector3D(1.0, 1.0, 0.1);
     
+    my_vertices[3].norm = aiVector3D(1.0, 1.0, 0.1);
+    my_vertices[4].norm = aiVector3D(1.0, -1.0, 0.1);
+    my_vertices[5].norm = aiVector3D(-1.0, -1.0, 0.1);
+
+    // specify texcoord locations
+    my_vertices[0].texcoord = aiVector2D(0.0, 0.0);
+    my_vertices[1].texcoord = aiVector2D(0.0, 70.0);
+    my_vertices[2].texcoord = aiVector2D(70.0, 70.0);
+    
+    my_vertices[3].texcoord = aiVector2D(70.0, 70.0);
+    my_vertices[4].texcoord = aiVector2D(70.0, 0.0);
+    my_vertices[5].texcoord = aiVector2D(0.0, 0.0);
+
+    int shaderNum = 3;
+	glUseProgram(shaders[shaderNum]->programID());
+	    
+    CustomMaterial *mat = new CustomMaterial;
+    
+    mat->amb_color[0] = .6;
+    mat->amb_color[1] = .6;
+    mat->amb_color[2] = .5;
+    mat->diff_color[0] = .4;
+    mat->diff_color[1] = .4;
+    mat->diff_color[2] = .3;
+    mat->spec_color[0] = mat->spec_color[1] = mat->spec_color[2] = .1;
+    mat->shiny = 1;
+    
+    GLint diffuse = glGetUniformLocation(shaders[shaderNum]->programID(), "Kd");
+    glUniform3f(diffuse, mat->diff_color[0], mat->diff_color[1], mat->diff_color[2]);
+    
+    // Specular material
+    GLint specular = glGetUniformLocation(shaders[shaderNum]->programID(), "Ks");
+    glUniform3f(specular, mat->spec_color[0], mat->spec_color[1], mat->spec_color[2]);
+    
+    // Ambient material
+    GLint ambient = glGetUniformLocation(shaders[shaderNum]->programID(), "Ka");
+    glUniform3f(ambient, mat->amb_color[0], mat->amb_color[1], mat->amb_color[2]);
+    
+    // Specular power
+    GLint shininess = glGetUniformLocation(shaders[shaderNum]->programID(), "alpha");
+    glUniform1f(shininess, mat->shiny);
+
+    //setMaterial(shaderNum);
+    
+	GLint texcoord = glGetAttribLocation(shaders[shaderNum]->programID(), "texcoordIn");
+    glEnableVertexAttribArray(texcoord);
+    glVertexAttribPointer(texcoord, 2, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->texcoord); // use norm holder as hack for now
+	
     GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
     glEnableVertexAttribArray(position);
     glVertexAttribPointer(position, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->pos);
@@ -593,7 +743,17 @@ void TestRects() {
     GLint normal = glGetAttribLocation(shaders[shaderNum]->programID(), "normalIn");
     glEnableVertexAttribArray(normal);
     glVertexAttribPointer(normal, 3, GL_FLOAT, 0, sizeof(testVertex), &my_vertices->norm);
-    
+	
+	GLint texture = glGetUniformLocation(shaders[shaderNum]->programID(), "diffuseMap");
+    glUniform1i(texture, 3); // The normal map will be GL_TEXTURE2
+    glActiveTexture(GL_TEXTURE3);
+	
+	paperTexture->Bind();
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	  
     glDrawArrays(GL_TRIANGLES,0,num_vertices); 
 }
 
@@ -617,7 +777,7 @@ void SaveImgToFile() {
     
     // FOR SAVING TO FILE
     std::ostringstream out;
-    out << "/Users/phunter/test_img.jpg";
+    out << "/Users/phunter8/test_img2.jpg";
     sf::Image img(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, sf::Color::White);
     img.LoadFromPixels(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, pixelArray);
     img.SaveToFile(out.str());
@@ -644,7 +804,7 @@ void Display_FixedPipeline() {
     glLoadIdentity();
     gluLookAt(cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
-    //testRects1();
+    //DrawRects();
     graph->Display(cam_pos->z);
 }
 
@@ -668,12 +828,15 @@ void renderFrame() {
     multiSampleRenderTarget->bind();
     
     // clear buffers
-    glClearColor(.9f, .9f, .9f, 1.0f);
+    //glClearColor(.9f, .9f, .8f, 1.0f);
+	glClearColor(.972f, .972f, .972f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // draw a scene to a texture directly
     graph->Render();
-    //TestRects();
+    
+	FuzzRects();
+	//TestRects();
     
     if (toFile) {
         SaveImgToFile();

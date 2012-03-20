@@ -3,44 +3,7 @@
 
 MultiSampleRenderTarget::MultiSampleRenderTarget(unsigned int width, unsigned int height) {
     width_ = width;
-    height_ = height;
-
-    //glPushAttrib( GL_ALL_ATTRIB_BITS );
-    
-    // Initialize the texture, including filtering options
-//    glGenTextures(1, &textureID_);
-//    glBindTexture(GL_TEXTURE_2D, textureID_);
-    
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-   
-    
-//    // Generate a framebuffer
-//    glGenFramebuffersEXT(1, &frameBufferID_);
-//    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, frameBufferID_);
-//
-//    // Attach the texture to the frame buffer
-//    glFramebufferTexture2DEXT(
-//        GL_FRAMEBUFFER_EXT,
-//        GL_COLOR_ATTACHMENT0_EXT,
-//        GL_TEXTURE_2D,
-//        textureID_,
-//        0);
-//
-//    // Check the status of the FBO
-//    //glDrawBuffer(GL_NONE);
-//    if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)) {
-//        throw std::runtime_error("Invalid framebuffer configuration");
-//        exit(-1);
-//    }
-    
-    ///////////////////// Hereafter a test
-    
+    height_ = height;    
     
     // create a texture object
     glGenTextures(1, &textureID_);
