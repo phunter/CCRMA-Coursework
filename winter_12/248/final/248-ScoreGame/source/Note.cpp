@@ -110,7 +110,7 @@ void Note::IncreaseDeadness() {
 			
 			for (int i = 0; i < 3; i++) {
 				float speed = .999;
-  				current_fill_material.amb_color[i] = min(.972, current_fill_material.amb_color[i] + (1.0-speed) * current_fill_material.amb_color[i]);
+  				current_fill_material.amb_color[i] = min(.690, current_fill_material.amb_color[i] + (1.0-speed) * current_fill_material.amb_color[i]);
 				current_fill_material.diff_color[i] *= speed;
 				current_fill_material.spec_color[i] *= speed;
 				
@@ -512,19 +512,13 @@ void Note::ApplyScale() {
 void Note::RenderNote()
 {
     glPushMatrix();
-//    RenderCylinder(aiVector3D(0.0, 0.0, 0.0),
-//                   aiVector3D(1.0,  1.0, 1.0), .3, 4);
-    
+	
 	if (deadness > deadThresh) {
 		ApplyScale();
 	}
     
     RenderCircle2(centerPosition, radius, .9, 20);
 
-//    shaderNum = 0;
-//    glUseProgram((*shaders)[shaderNum]->programID());
-
-//    RenderTorus(centerPosition, radius, line_thickness, 50, 12);
     RenderPremadeTorus();
     
     RenderStaffLines();

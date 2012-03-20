@@ -1,0 +1,12 @@
+
+
+fs = 44100;
+N = 2048;
+
+Y = hanning(N/2);
+Y_shift = fftshift(Y);
+
+Y_insert = ones(N/2,1)
+
+plot(Y_shift);
+%wavwrite(Y,fs,'hanning.wav');

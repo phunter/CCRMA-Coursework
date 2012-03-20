@@ -89,13 +89,24 @@ aiVector3D * Camera::getUpDir() {
     return &up_dir;
 }
 
-void Camera::CallLookAt() {
-    
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity();
+void Camera::CallLookAt(float aspectRatio) {
+
+	GLfloat nearClip = .1f;
+	GLfloat farClip = 50.f;
+	GLfloat fieldOfView = 45.0f;
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(fieldOfView, aspectRatio, nearClip, farClip);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+//    glMatrixMode (GL_PROJECTION);
+//    glLoadIdentity ();
+//    glFrustum (-.5*aspectRatio, .5*aspectRatio, -.5, .5, 1.0, 30.0);
+//    glMatrixMode (GL_MODELVIEW);
+//    glLoadIdentity();
+
     gluLookAt (cam_position.x, cam_position.y, cam_position.z, look_position.x, look_position.y, look_position.z, up_dir.x, up_dir.y, up_dir.z);
 }
 

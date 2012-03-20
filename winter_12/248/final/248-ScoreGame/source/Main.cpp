@@ -20,15 +20,20 @@
 #include "Dissonance.h"
 #include "CustomMaterial.h"
 
-#define WIN_WIDTH 1180
-#define WIN_HEIGHT 1180
+#define WIN_WIDTH 740
+#define WIN_HEIGHT 480
+#define FS_WIN_WIDTH 1920
+#define FS_WIN_HEIGHT 1200
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
 // and using rendering settings
 // http://www.sfml-dev.org/tutorials/1.6/window-window.php
 sf::WindowSettings settings(24, 8, 2);
+
+// fullscreen or no?
 sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
- 
+//sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
+
 // This is a clock you can use to control animation.  For more info, see:
 // http://www.sfml-dev.org/tutorials/1.6/window-time.php
 sf::Clock graphics_clock, audio_clock;
@@ -54,6 +59,10 @@ int midi_offset = 47; // map midi note 47 to note 0
 int max_notes = 48;   // number of representable notes
 Graph *graph;
 
+// window dimensions
+int window_width;
+int window_height;
+
 vector <Note*> g_notes(max_notes);
 Note * curNote;
 
@@ -68,7 +77,7 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 3;
+int multiSampleAmount = 4;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
@@ -144,7 +153,8 @@ namespace osc{
                     std::cout << "received '/test' message with arguments: "
                     << a3 << "\n";
                     
-                }else if( strcmp( m.AddressPattern(), "/note" ) == 0 ){
+                }
+				else if( strcmp( m.AddressPattern(), "/note" ) == 0 ){
                     // example #2 -- argument iterator interface, supports
                     // reflection for overloaded messages (eg you can call 
                     // (*arg)->IsBool() to check if a bool was passed etc).
@@ -162,6 +172,10 @@ namespace osc{
                     
                     std::cout << "received '/note' message with arguments: "
                     << a1 << " " << a2 << "\n";
+                }
+				else if( strcmp( m.AddressPattern(), "/new" ) == 0 ){
+                    graph->Reset(); // start anew
+					curMidiNote = -1;
                 }
             }catch( osc::Exception& e ){
                 // any parsing errors such as unexpected argument types, or 
@@ -230,20 +244,24 @@ void ReadMessage() {
     int vel = note_message->note_vel;
     
     //printf("message received is 'note %d, vel %d'\n", note, vel);
+	
     g_messages.pop();
-    
-    graph->AddConnectExcite(note, 0.1 + .2 * (vel / 127.0));
-    
-    if (note != curMidiNote) {
-        //triggerAudio(curMidiNote, 0);
-        curMidiNote = note;
-        //triggerAudio(curMidiNote, 1);
-    }
-    
-    graph->SetCurrentNote(note);
-    cam->setTargetNote(graph->GetCurrentNote());
-    
-    //cam->setTargetNote(graph->GetNote(note));
+	
+	if (note >= 0) {
+	
+	    graph->AddConnectExcite(note, 0.1 + .2 * (vel / 127.0));
+	    
+	    if (note != curMidiNote) {
+	        //triggerAudio(curMidiNote, 0);
+	        curMidiNote = note;
+	        //triggerAudio(curMidiNote, 1);
+	    }
+	    
+	    graph->SetCurrentNote(note);
+	    cam->setTargetNote(graph->GetCurrentNote());
+	    
+	    //cam->setTargetNote(graph->GetNote(note));
+	}
 }
 
 
@@ -261,15 +279,17 @@ void initOpenGL() {
     }
 #endif
 
+	window_width = window.GetWidth();
+	window_height = window.GetHeight();
+	
     // This initializes OpenGL with some common defaults.  More info here:
     // http://www.sfml-dev.org/tutorials/1.6/window-opengl.php
     glClearDepth(1.0f);
-    glClearColor(.9f, .9f, .9f, 1.0f);
+    glClearColor(.4f, .4f, .424f, 1.0f);
     
     glEnable(GL_DEPTH_TEST);
     
-    glViewport(0, 0, window.GetWidth(), window.GetHeight());
-    
+    glViewport(0, 0, window_width, window_height);
     
     // fixed pipeline
     if (fixedPipeline) {
@@ -279,7 +299,7 @@ void initOpenGL() {
         
     setupLights();
     
-    multiSampleRenderTarget = new MultiSampleRenderTarget(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
+    multiSampleRenderTarget = new MultiSampleRenderTarget(window_width*multiSampleAmount, window_height*multiSampleAmount);
 }
 
 void loadAssets() {
@@ -611,7 +631,7 @@ void FuzzRects() {
     
     // send window size 
     GLint winSize = glGetUniformLocation(shaders[shaderNum]->programID(), "targetRes");
-    glUniform2f(winSize, WIN_WIDTH, WIN_HEIGHT);
+    glUniform2f(winSize, window_width, window_height);
     
     
     GLint position = glGetAttribLocation(shaders[shaderNum]->programID(), "positionIn");
@@ -707,11 +727,11 @@ void TestRects() {
 	    
     CustomMaterial *mat = new CustomMaterial;
     
-    mat->amb_color[0] = .6;
-    mat->amb_color[1] = .6;
-    mat->amb_color[2] = .5;
+    mat->amb_color[0] = .4;
+    mat->amb_color[1] = .4;
+    mat->amb_color[2] = .35;
     mat->diff_color[0] = .4;
-    mat->diff_color[1] = .4;
+    mat->diff_color[1] = .3;
     mat->diff_color[2] = .3;
     mat->spec_color[0] = mat->spec_color[1] = mat->spec_color[2] = .1;
     mat->shiny = 1;
@@ -763,15 +783,15 @@ void SaveImgToFile() {
     glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, multiSampleRenderTarget->fboID());
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, 0, GL_RGBA, GL_FLOAT, NULL);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width*multiSampleAmount, window_height*multiSampleAmount, 0, GL_RGBA, GL_FLOAT, NULL);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, window_width*multiSampleAmount, window_height*multiSampleAmount);
     
     // for rendering to image (debugging)
-    sf::Uint8 *pixelArray = new sf::Uint8[WIN_WIDTH*multiSampleAmount*WIN_HEIGHT*multiSampleAmount*4];
+    sf::Uint8 *pixelArray = new sf::Uint8[window_width*multiSampleAmount*window_height*multiSampleAmount*4];
     
     // use ONE of the two following lines:
     // This line will copy images from the framebuffer
-    //glReadPixels(0, 0, WIN_WIDTH, WIN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
+    //glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
     
     // This line will copy images stored in the currently bound texture
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelArray);
@@ -779,8 +799,8 @@ void SaveImgToFile() {
     // FOR SAVING TO FILE
     std::ostringstream out;
     out << "/Users/phunter8/test_img2.jpg";
-    sf::Image img(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, sf::Color::White);
-    img.LoadFromPixels(WIN_WIDTH*multiSampleAmount, WIN_HEIGHT*multiSampleAmount, pixelArray);
+    sf::Image img(window_width*multiSampleAmount, window_height*multiSampleAmount, sf::Color::White);
+    img.LoadFromPixels(window_width*multiSampleAmount, window_height*multiSampleAmount, pixelArray);
     img.SaveToFile(out.str());
     
     toFile = false;
@@ -792,20 +812,11 @@ void SaveImgToFile() {
 
 
 void Display_FixedPipeline() {
-    //glClearColor(1.f, 1.f, 1.f, 0.1f);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	cam->CallLookAt();
+	cam->CallLookAt(window_width / window_height);
     
     aiVector3D * cam_pos = cam->getPosition();
-//    aiVector3D * look_pos = cam->getLookAt();
-//    
-//    glMatrixMode (GL_PROJECTION);
-//    glLoadIdentity ();
-//    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-//    glMatrixMode (GL_MODELVIEW);
-//    glLoadIdentity();
-//    gluLookAt(cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
     
     //DrawRects();
     graph->Display(cam_pos->z);
@@ -813,18 +824,10 @@ void Display_FixedPipeline() {
 
 void renderFrame() {
     
-	cam->CallLookAt();
-//    aiVector3D * cam_pos = cam->getPosition();
-//	  aiVector3D * look_pos = cam->getLookAt();
-//	  aiVector3D * up_pos = cam->getLookAt();
-//    
-//    glMatrixMode (GL_PROJECTION);
-//    glLoadIdentity ();
-//    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-//    glMatrixMode (GL_MODELVIEW);
-//    glLoadIdentity();
-//    gluLookAt (cam_pos->x, cam_pos->y, cam_pos->z, look_pos->x, look_pos->y, look_pos->z, 0.0, 2.0, 1.0);
-    
+	
+	float aspect = (float)window_width / (float)window_height;
+	
+	cam->CallLookAt(aspect);    
     
     ////////////////////////////// first pass //////////////////
     // set rendering destination to FBO
@@ -834,8 +837,9 @@ void renderFrame() {
     
     // clear buffers
     //glClearColor(.9f, .9f, .8f, 1.0f);
-	glClearColor(.972f, .972f, .972f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(.972f, .972f, .972f, 1.0f);
+	glClearColor(.4f, .4f, .424f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // draw a scene to a texture directly
     graph->Render();
@@ -847,8 +851,8 @@ void renderFrame() {
         SaveImgToFile();
     }
     
-    /////////////////////////////////////////second pass attempt
-    glViewport(0, 0, window.GetWidth(), window.GetHeight());
+    /////////////////////////////////////////second pass
+    glViewport(0, 0, window_width, window_height);
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0); // default framebuffer (window)
     
     // clear buffers
@@ -883,7 +887,7 @@ void renderFrame() {
     
     // send window size 
     GLint winSize = glGetUniformLocation(shaders[shaderNum]->programID(), "targetRes");
-    glUniform2f(winSize, WIN_WIDTH, WIN_HEIGHT);
+    glUniform2f(winSize, window_width, window_height);
     
     int num_vertices = 6;
     testVertex * my_vertices;
@@ -891,9 +895,21 @@ void renderFrame() {
     
 //    glMatrixMode(GL_PROJECTION);
 //    glLoadIdentity();
-    //glOrtho(-WIN_WIDTH,WIN_WIDTH,-WIN_HEIGHT,WIN_HEIGHT,1,20);
+    //glOrtho(-window_width,window_width,-window_height,window_height,1,20);
+	
+	
+	//GLfloat nearClip = .1f;
+	//GLfloat farClip = 50.f;
+	//GLfloat fieldOfView = 90.0f;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho( -1, 1, -1, 1, -5, 5);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
     glLoadIdentity();
     gluLookAt(0., 0., 2., 0., 0., 0., 0., 1., 0.);
+	
 //    glMatrixMode(GL_MODELVIEW);
 //    glLoadIdentity();
     
@@ -938,19 +954,19 @@ void renderFrame() {
         glUseProgramObjectARB(0);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(-WIN_WIDTH/2,WIN_WIDTH/2,-WIN_HEIGHT/2,WIN_HEIGHT/2,1,20);
+        glOrtho(-window_width/2,window_width/2,-window_height/2,window_height/2,1,20);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glColor4f(1,1,1,1);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, multiSampleRenderTarget->textureID());
         glEnable(GL_TEXTURE_2D);
-        glTranslated(0,-WIN_HEIGHT/2,-1);
+        glTranslated(0,-window_height/2,-1);
         glBegin(GL_QUADS);
         glTexCoord2d(0,0);glVertex3f(0,0,0);
-        glTexCoord2d(1,0);glVertex3f(WIN_WIDTH/2,0,0);
-        glTexCoord2d(1,1);glVertex3f(WIN_WIDTH/2,WIN_HEIGHT/2,0);
-        glTexCoord2d(0,1);glVertex3f(0,WIN_HEIGHT/2,0);
+        glTexCoord2d(1,0);glVertex3f(window_width/2,0,0);
+        glTexCoord2d(1,1);glVertex3f(window_width/2,window_height/2,0);
+        glTexCoord2d(0,1);glVertex3f(0,window_height/2,0);
         glEnd();
         glEnable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
@@ -1019,14 +1035,10 @@ int main(int argc, char** argv) {
     
 
     printf("Initialize output\n");
-    
-    if (argc != 2) {
-		exit(0);
-    }
-    
+       
     // Read Dissonance Matrix from file
-    dissonance = new Dissonance(std::string(argv[1]));
-        
+    dissonance = new Dissonance(std::string("diss_matrix.txt"));
+
     initOpenGL();
     loadAssets();
     
@@ -1039,7 +1051,7 @@ int main(int argc, char** argv) {
     
     graph = new Graph(max_notes, dissonance, &shaders);
     
-    cam = new Camera(0.0, 0.0, 1.5);
+    cam = new Camera(0.0, 0.0, 1.4);
     
     connection_list.resize(max_notes);
     
@@ -1047,11 +1059,6 @@ int main(int argc, char** argv) {
     for (int i = 0; i < connection_list.size(); i++) {
         connection_list[i] = 0;
     }
-    
-    //    glMatrixMode (GL_PROJECTION);
-    //    glLoadIdentity ();
-    //    glFrustum (-.5, .5, -.5, .5, 1.0, 30.0);
-    //    glMatrixMode (GL_MODELVIEW);
 
     
     // Main Loop

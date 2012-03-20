@@ -66,7 +66,7 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
         //STVector3 new_dir = STVector3((float)rand()/RAND_MAX - .5, (float)rand()/RAND_MAX - .5, 0.0);
         
         aiVector3D new_pos;
-        if (cur_size == 0) {
+        if (cur_size == 0 || current_note == -1) {
             new_pos = new_dir * dist;
             //new_pos = aiVector3D(0.0,0.0,0.0);
         }
@@ -85,12 +85,15 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
     
     // check to see if the new current note is connected to the previous note
     // and if not, connect the two notes
-    if (cur_size > 1) {
+    if (cur_size > 1 && prev_note != -1) {
         if (!note_graph[cur_note]->IsConnectedTo(prev_note)) {
             note_graph[cur_note]->addTwoWayConnection(note_graph[prev_note], dist);
             //note_graph[cur_note]->addConnection(note_graph[prev_note], dist);
             
         }
+		else if ( prev_note == -1) {
+			
+		}
         else { // update connection length between current and previous note
             //note_graph[cur_note]->updateConnection(prev_note, dist);
             note_graph[cur_note]->updateTwoWayConnection(prev_note, dist);
@@ -102,6 +105,9 @@ void Graph::AddConnectExcite(int mapped_midi, float dist) {
 
 void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
     
+	if (cur_note == -1) {
+  		cur_note = mapped_midi; // hack to get back to start
+	}
     prev_note = cur_note;
     cur_note = mapped_midi;
     
@@ -110,10 +116,10 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.z,
                                     mapped_midi,
                                     1.0,  // speed
-                                    8.0, // connection time
+                                    6.0, // connection time
                                     shaders);
     // set new current note's excite from prev note's excite
-    if (cur_size > 0) {
+    if (cur_size > 0 && current_note != -1) {
         note_graph[cur_note]->setExcite(note_graph[prev_note]->getExcite());
     }    
     cur_size++;
@@ -266,6 +272,12 @@ void Graph::IncreaseDeadness() {
 			note_graph[i]->IncreaseDeadness();
         }
     }	
+}
+
+void Graph::Reset() {
+    cur_note = -1;
+    prev_note = -1;
+	current_note = -1;
 }
 
 void Graph::Clear() {
