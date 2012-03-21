@@ -51,7 +51,7 @@ void main() {
 //            vec2 pseudo_sample_loc = pure_sample_loc + vec2(x_fuzz*pixelSize.x*rand1, y_fuzz*pixelSize.y*rand2);
 //            
 //			//vec2 pseudo_sample_loc = vec2(texcoord.x + x_fuzz*pixelSize.x*rand1, texcoord.y + y_fuzz*pixelSize.y*rand2);
-//            
+            
 //            total += texture2D(bigTexture, pseudo_sample_loc).rgb;
             total += texture2D(bigTexture, pure_sample_loc).rgb;
             

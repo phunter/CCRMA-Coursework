@@ -54,8 +54,8 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
         rel_space = -4 + (note_space%2);
     }
     
-    t_outerSegments = 50;
-    t_innerSegments = 12;
+    t_outerSegments = 100;
+    t_innerSegments = 30; 
     t_num_vertices = 6 * t_outerSegments * t_innerSegments;
     
     // set up materials
@@ -608,7 +608,7 @@ void Note::RenderConnections()
             //float my_thickness = fmax(.005, line_thickness - .002 * direction.Length());
             //RenderCylinder(start, finish, my_thickness, 8);
             
-            RenderCylinder(start, finish, line_thickness, 16);
+            RenderCylinder(start, finish, line_thickness, 30);
             
             //            glVertex3f(start.x, start.y, start.z)
             //            glVertex3f(finish.x, finish.y, finish.z);
