@@ -17,7 +17,7 @@ Camera::Camera(float x, float y, float def_height)
     cam_position.y = y;
     cam_position.z = def_height; // camera always starts at default height
 	
-	default_setback = 1.0;
+	default_setback = 1.5;
 	
 	default_vantage = aiVector3D(0.0, -default_setback, default_height); // ideal offset from phantom position
 	

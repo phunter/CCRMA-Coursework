@@ -22,8 +22,8 @@
 
 #define WIN_WIDTH 740
 #define WIN_HEIGHT 480
-#define FS_WIN_WIDTH 1920
-#define FS_WIN_HEIGHT 1200
+#define FS_WIN_WIDTH 1440
+#define FS_WIN_HEIGHT 900
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
 // and using rendering settings
@@ -349,7 +349,7 @@ void loadTexture( void )
     
     //aiString parchment = aiString("models/parchment.jpg");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/smoothish_paper.jpg");
-	aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/parchment_png.png");
+	aiString parchment = aiString("/Users/phunter/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/paper/parchment_png.png");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/parchment_png.png");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/red_noise.jpg");
 	//aiString parchment = aiString("/Users/phunter8/CCRMA-Coursework/winter_12/248/final/248-ScoreGame/models/tanFuzz2.jpg");
@@ -422,7 +422,7 @@ void handleInput() {
                         break;
                     case sf::Key::Num1:
                         note_message = new NoteMessage;
-                        note_message->note_num = 20;
+                        note_message->note_num = 8;
                         note_message->note_vel = 80;
                         g_messages.push(note_message);
                         break;
@@ -434,13 +434,13 @@ void handleInput() {
                         break;
                     case sf::Key::Num3:
                         note_message = new NoteMessage;
-                        note_message->note_num = 22;
+                        note_message->note_num = 36;
                         note_message->note_vel = 80;
                         g_messages.push(note_message);
                         break;
                     case sf::Key::Num4:
                         note_message = new NoteMessage;
-                        note_message->note_num = 23;
+                        note_message->note_num = 31;
                         note_message->note_vel = 80;
                         g_messages.push(note_message);
                         break;
@@ -798,7 +798,7 @@ void SaveImgToFile() {
     
     // FOR SAVING TO FILE
     std::ostringstream out;
-    out << "/Users/phunter8/test_img2.jpg";
+    out << "/Users/phunter/test_img2.jpg";
     sf::Image img(window_width*multiSampleAmount, window_height*multiSampleAmount, sf::Color::White);
     img.LoadFromPixels(window_width*multiSampleAmount, window_height*multiSampleAmount, pixelArray);
     img.SaveToFile(out.str());
