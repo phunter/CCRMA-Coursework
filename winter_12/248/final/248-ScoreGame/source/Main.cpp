@@ -31,8 +31,8 @@
 sf::WindowSettings settings(24, 8, 2);
 
 // fullscreen or no?
-sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
-//sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
+//sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
+sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
 
 // This is a clock you can use to control animation.  For more info, see:
 // http://www.sfml-dev.org/tutorials/1.6/window-time.php
@@ -77,7 +77,7 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 4;
+int multiSampleAmount = 3;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
@@ -1051,7 +1051,7 @@ int main(int argc, char** argv) {
     
     graph = new Graph(max_notes, dissonance, &shaders);
     
-    cam = new Camera(0.0, 0.0, 1.4);
+    cam = new Camera(0.0, 0.0, 1.6);
     
     connection_list.resize(max_notes);
     
