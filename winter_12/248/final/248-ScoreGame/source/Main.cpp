@@ -20,10 +20,12 @@
 #include "Dissonance.h"
 #include "CustomMaterial.h"
 
-#define WIN_WIDTH 740
-#define WIN_HEIGHT 480
-#define FS_WIN_WIDTH 1920
-#define FS_WIN_HEIGHT 1200
+#define WIN_WIDTH 1280
+#define WIN_HEIGHT 720
+//#define WIN_WIDTH 740
+//#define WIN_HEIGHT 480
+#define FS_WIN_WIDTH 1280
+#define FS_WIN_HEIGHT 800
 //#define FS_WIN_WIDTH 1440
 //#define FS_WIN_HEIGHT 900
 
@@ -79,7 +81,7 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 4;
+int multiSampleAmount = 2;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
