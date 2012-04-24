@@ -24,8 +24,8 @@
 #define WIN_HEIGHT 720
 //#define WIN_WIDTH 740
 //#define WIN_HEIGHT 480
-#define FS_WIN_WIDTH 1280
-#define FS_WIN_HEIGHT 800
+#define FS_WIN_WIDTH 1600
+#define FS_WIN_HEIGHT 1200
 //#define FS_WIN_WIDTH 1440
 //#define FS_WIN_HEIGHT 900
 
@@ -81,7 +81,7 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 2;
+int multiSampleAmount = 3;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
@@ -1055,7 +1055,7 @@ int main(int argc, char** argv) {
     
     graph = new Graph(max_notes, dissonance, &shaders);
     
-    cam = new Camera(0.0, 0.0, 1.6);
+    cam = new Camera(0.0, 0.0, 1.9);
     
     connection_list.resize(max_notes);
     

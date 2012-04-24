@@ -18,7 +18,7 @@ float ToonDiffuse(in float val) {
 }
 
 float ToonSpecular(in float val) {
-    float stretch = floor(val * 1.03);
+    float stretch = floor(val * 1.09);
     float squash = stretch / 1.0;
     return squash;
 }

@@ -10,7 +10,7 @@
 
 Camera::Camera(float x, float y, float def_height)
 {
-    target_note = new Note(x, y, 0.0, 24, .03, 2000, NULL);
+    target_note = new Note(x, y, 1.0, 24, .03, 2000, NULL);
     
     default_height = def_height;
     cam_position.x = x;

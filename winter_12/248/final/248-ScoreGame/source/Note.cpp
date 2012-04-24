@@ -68,7 +68,7 @@ Note::Note(float x, float y, float z, int mapped_midi_num, float s, int t, std::
     default_fill_material.diff_color[0] = .3 * color.r;
     default_fill_material.diff_color[1] = .3 * color.g;
     default_fill_material.diff_color[2] = .3 * color.b;
-    default_fill_material.spec_color[0] = default_fill_material.spec_color[1] = default_fill_material.spec_color[2] = .1;
+    default_fill_material.spec_color[0] = default_fill_material.spec_color[1] = default_fill_material.spec_color[2] = .05;
     default_fill_material.shiny = 10;
 	
 	current_fill_material.CopyFrom(default_fill_material);
