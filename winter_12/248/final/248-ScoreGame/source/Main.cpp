@@ -35,8 +35,8 @@
 sf::WindowSettings settings(24, 8, 2);
 
 // fullscreen or no?
-//sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
-sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
+sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
+//sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
 
 // This is a clock you can use to control animation.  For more info, see:
 // http://www.sfml-dev.org/tutorials/1.6/window-time.php
@@ -81,7 +81,7 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 3;
+int multiSampleAmount = 4;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
@@ -483,7 +483,7 @@ void handleInput() {
                         note_message->note_num = 29;
                         note_message->note_vel = 80;
                         g_messages.push(note_message);
-                        break;
+						break;
                     case sf::Key::A:
                         osc::SendMyNote( 22, 15 );
                         break;

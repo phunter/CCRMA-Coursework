@@ -106,8 +106,7 @@ void Note::IncreaseDeadness() {
 		deadness++;
 		
 		if (deadness > deadThresh) {
-  			speed = max(0.0, default_speed-(deadness-deadThresh)*.001);
-			
+						
 			for (int i = 0; i < 3; i++) {
 				float speed = .999;
   				current_fill_material.amb_color[i] = min(.690, current_fill_material.amb_color[i] + (1.0-speed) * current_fill_material.amb_color[i]);
@@ -151,7 +150,6 @@ void Note::addConnection(Note * note, float dist)
 
 void Note::addTwoWayConnection(Note *note, float dist)
 {
-    
     Connection *new_connect = new Connection();
     new_connect->next_note = note;
     new_connect->ideal_dist = dist;
@@ -504,7 +502,7 @@ void Note::DisplayNotes(float h)
     glDisable( GL_LINE_SMOOTH );
 }
 
-void Note::ApplyScale() {	
+void Note::ApplyScale() {
 	float zscale = max(.2, 1.0-(deadness-deadThresh)*.001);
 	glScalef(1.0, 1.0, zscale);
 }

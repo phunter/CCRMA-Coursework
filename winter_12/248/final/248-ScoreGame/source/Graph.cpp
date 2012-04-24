@@ -116,7 +116,7 @@ void Graph::AddNote(int mapped_midi, aiVector3D start_pos) {
                                     start_pos.z,
                                     mapped_midi,
                                     1.0,  // speed
-                                    5.0, // connection time
+                                    1.0, // connection time
                                     shaders);
     // set new current note's excite from prev note's excite
     if (cur_size > 0 && current_note != -1) {
