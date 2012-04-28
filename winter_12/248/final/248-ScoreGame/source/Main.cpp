@@ -24,10 +24,10 @@
 #define WIN_HEIGHT 720
 //#define WIN_WIDTH 740
 //#define WIN_HEIGHT 480
-#define FS_WIN_WIDTH 1600
-#define FS_WIN_HEIGHT 1200
-//#define FS_WIN_WIDTH 1440
-//#define FS_WIN_HEIGHT 900
+//#define FS_WIN_WIDTH 1920
+//#define FS_WIN_HEIGHT 1200
+#define FS_WIN_WIDTH 1024
+#define FS_WIN_HEIGHT 768
 
 // Note: See the SMFL documentation for info on setting up fullscreen mode
 // and using rendering settings
@@ -35,8 +35,8 @@
 sf::WindowSettings settings(24, 8, 2);
 
 // fullscreen or no?
-sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
-//sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
+//sf::Window window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Final Project", sf::Style::Close, settings);
+sf::Window window(sf::VideoMode(FS_WIN_WIDTH, FS_WIN_HEIGHT, 32), "Final Project", sf::Style::Fullscreen, settings);
 
 // This is a clock you can use to control animation.  For more info, see:
 // http://www.sfml-dev.org/tutorials/1.6/window-time.php
@@ -50,7 +50,7 @@ sf::Clock graphics_clock, audio_clock;
 
 
 // Set up OSC addresses, ports
-char *hostName = (char*)"localhost";
+char *hostName = (char*)"192.168.1.5";
 int outPortNum = 7001;
 int inPortNum = 7000;
 
@@ -81,7 +81,7 @@ bool toFile = false;
 // MultiSample stuff
 aiVector2D randomVar = aiVector2D(.00001, .51234);
 
-int multiSampleAmount = 4;
+int multiSampleAmount = 3;
 MultiSampleRenderTarget *multiSampleRenderTarget;
 
 // end MultiSample stuff
