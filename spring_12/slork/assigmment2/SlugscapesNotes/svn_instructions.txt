@@ -1,0 +1,3 @@
+svn add <filename>
+svn status
+svn commit -m 'lol this is my message'

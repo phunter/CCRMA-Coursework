@@ -1,0 +1,41 @@
+|-------------------|
+| performance modes |
+|-------------------|
+
+individual
+----------
+ascending lines
+descending
+held notes (sustain)
+specific pitches / clusters / chords
+short staccato
+bursts of noise with space
+loud <--> soft continuum
+dynamic trajectories (hairpins, ramps, etc)
+
+emotions
+--------
+happy <--> sad continuum
+spooky
+angry
+
+group
+-----
+computer mediated:
+	synchronizing attacks with visual/screen cue
+
+following:
+	call and response
+	follow the leader (realtime)
+
+avoidance:
+	pitch avoidance
+	rhythmic avoidance
+	timbral avoidance
+	"bumping" people out of their "regions"
+
+
+transitions
+-----------
+graph of connections
+voting at end of each section
